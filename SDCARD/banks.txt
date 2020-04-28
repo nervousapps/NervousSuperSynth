@@ -1,0 +1,37 @@
+{
+  "banks": [
+    {
+      "name": "909",
+      "value": ["samples/9CLOP1","samples/9HHCD0.WAV","samples/9MT0D3.WAV","samples/9LT3D7.WAV","samples/9RIDED2.WAV","samples/9HHCD8.WAV"]
+    },
+    {
+      "name": "808",
+      "value": ["samples/8Cym1.WAV","samples/8HConga1.WAV","samples/8HTom1.WAV","samples/8MTom2.WAV","samples/8LTom3.WAV","samples/8LConga1.WAV"]
+
+    },
+    {
+      "name": "707",
+      "value": ["samples/7Cash3.WAV","samples/7HC3.WAV","samples/7Cow3.WAV","samples/7ide3.WAV","samples/7im3.WAV","samples/7Tom22.WAV"]
+    },
+    {
+      "name": "RX11",
+      "value": ["samples/RCLHAT1.WAV","samples/RCOW1.WAV","samples/9MT0D3.WAV","samples/RCOW2.WAV","samples/ROPHAT1.WAV","samples/RSHAKER.WAV"]
+    },
+    {
+      "name": "DARB",
+      "value": ["samples/Darb1.WAV","samples/Darb2.WAV","samples/Darb3.WAV","samples/Darb4.WAV","samples/9HHCD6.WAV","samples/9HHCD8.WAV"]
+    },
+    {
+      "name": "PIANO",
+      "value": ["samples/VGIRLS.WAV","samples/Piano1.WAV","samples/9MT0D3.WAV","samples/9RIDED2.WAV","samples/9HHCD6.WAV","samples/9HHCD8.WAV"]
+    },
+    {
+      "name": "909",
+      "value": ["samples/VGIRLS.WAV","samples/9HHCD0.WAV","samples/9MT0D3.WAV","samples/9RIDED2.WAV","samples/9HHCD6.WAV","samples/9HHCD8.WAV"]
+    },
+    {
+      "name": "PERSO",
+      "value": ["samples/VGIRLS.WAV","samples/9HHCD0.WAV","samples/9MT0D3.WAV","samples/9RIDED2.WAV","samples/9HHCD6.WAV","samples/9HHCD8.WAV"]
+    }
+  ]
+}
