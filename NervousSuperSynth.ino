@@ -6,6 +6,7 @@
 #include "display/Display.h"
 #include "hardware/HardwareControls.h"
 #include "sampleplayer/SamplePlayer.h"
+#include "kelpie/kelpiemaster.h"
 
 
 void setup(){
@@ -16,8 +17,8 @@ void setup(){
 
   // Configure the DACs
   analogWriteResolution(16);
-  dacs1.analogReference(INTERNAL);
-  AudioMemory(160);
+  DACS1.analogReference(INTERNAL);
+  AudioMemory(800);
 
   // Set mixers gain
   mix1.gain(0, 3);
@@ -38,15 +39,22 @@ void setup(){
 
   Serial.begin(9600);
   Serial.print("Begin");
+
   setup_lcd();
   setup_progressbar();
+
   setup_hardware_controls();
+
   lcd.setCursor(0,0);
   lcd.print("SuperSynth");
+
   init_banks();
+
+  kelpie_setup();
 }
 
 void loop(){
   control_sampleplayer();
   sampleplay();
+  kelpie_run();
 }
