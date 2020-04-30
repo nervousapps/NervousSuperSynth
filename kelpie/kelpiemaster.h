@@ -227,7 +227,7 @@ void get_parameters(){
   }
 }
 
-void OnNoteOn(byte channel, byte note, byte velocity) {
+void KelpieOnNoteOn(byte channel, byte note, byte velocity) {
   if (note > 23 && note < 108)
   {
     LFO.phase(0); // retrigger LFO on keypress
@@ -244,7 +244,7 @@ void OnNoteOn(byte channel, byte note, byte velocity) {
   }
 }
 
-void OnNoteOff(byte channel, byte note, byte velocity) {
+void KelpieOnNoteOff(byte channel, byte note, byte velocity) {
   if (note > 23 && note < 108)
   {
     if (globalState.IS_POLY == true) // depending on mode send to buffer
@@ -308,8 +308,8 @@ void kelpie_setup(){
   ALL_VOICE_MIX.gain(0, 2);
   ALL_VOICE_MIX.gain(1, 2);
 
-  usbMIDI.setHandleNoteOff(OnNoteOff);
-  usbMIDI.setHandleNoteOn(OnNoteOn) ;
+  usbMIDI.setHandleNoteOff(KelpieOnNoteOff);
+  usbMIDI.setHandleNoteOn(KelpieOnNoteOn);
 }
 
 void kelpie_run(){

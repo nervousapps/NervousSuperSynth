@@ -41,27 +41,27 @@ void sampleplay(){
     if (digital_trig[i].fallingEdge()) {
       switch (i) {
         case 0:
-          playSdWav1.play(banks[bank_number].sample1);
+          sampleplaySdWav1.play(banks[bank_number].sample1);
           break;
 
         case 1:
-          playSdWav2.play(banks[bank_number].sample2);
+          sampleplaySdWav2.play(banks[bank_number].sample2);
           break;
 
         case 2:
-          playSdWav3.play(banks[bank_number].sample3);
+          sampleplaySdWav3.play(banks[bank_number].sample3);
           break;
 
         case 3:
-          playSdWav4.play(banks[bank_number].sample4);
+          sampleplaySdWav4.play(banks[bank_number].sample4);
           break;
 
         case 4:
-          playSdWav5.play(banks[bank_number].sample5);
+          sampleplaySdWav5.play(banks[bank_number].sample5);
           break;
 
         case 5:
-          playSdWav6.play(banks[bank_number].sample6);
+          sampleplaySdWav6.play(banks[bank_number].sample6);
           break;
       }
     }
@@ -108,6 +108,15 @@ void control_sampleplayer(){
 }
 
 void init_banks(){
+    // Set mixers gain
+    samplemix1.gain(0, 3);
+    samplemix1.gain(1, 3);
+    samplemix2.gain(0, 3);
+    samplemix2.gain(1, 3);
+    samplemix2.gain(2, 3);
+    samplemix2.gain(3, 3);
+    samplemix3.gain(0, 3);
+    samplemix3.gain(1, 3);
   // if (SD.exists(_filename)) {
     // Open file for reading
     File file = SD.open(_filename);

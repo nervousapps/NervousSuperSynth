@@ -2,16 +2,28 @@
 #include <Wire.h>
 #include <Time.h>
 #include <TimeAlarms.h>
+#include <Audio.h>
 #include "hardware/pins.h"
 #include "display/Display.h"
 #include "hardware/HardwareControls.h"
+
+AudioMixer4                 mainMix;
+AudioOutputAnalogStereo     DACS1;
+AudioConnection             mainpatchcord(mainMix, 0, DACS1, 0);
+
 #include "sampleplayer/SamplePlayer.h"
 #include "kelpie/kelpiemaster.h"
+#include "chordOrgan/ChordOrgan.h"
+
+#define synthNumber 2
+
+int synthSelect = 0;
+char synthName[synthNumber][16] = {"Kelpie", "ChordOrgan"};
 
 
 void setup(){
   // Configure the ADCs
-  analogReadResolution(9);
+  analogReadResolution(7);
   analogReadAveraging(4);
   analogReference(EXTERNAL);
 
@@ -19,16 +31,6 @@ void setup(){
   analogWriteResolution(16);
   DACS1.analogReference(INTERNAL);
   AudioMemory(800);
-
-  // Set mixers gain
-  mix1.gain(0, 3);
-  mix1.gain(1, 3);
-  mix2.gain(0, 3);
-  mix2.gain(1, 3);
-  mix2.gain(2, 3);
-  mix2.gain(3, 3);
-  mix3.gain(0, 3);
-  mix3.gain(1, 3);
 
   //Serial.println("Initializing SD card...");
 
@@ -51,10 +53,70 @@ void setup(){
   init_banks();
 
   kelpie_setup();
+  setup_chordOrgan();
 }
 
 void loop(){
   control_sampleplayer();
   sampleplay();
-  kelpie_run();
+  selectSynth();
+  switch (synthSelect) {
+    case 0:
+    kelpie_run();
+    break;
+
+    case 1:
+    chordOrgan_run();
+    break;
+  }
+}
+
+void selectSynth(){
+  long newRight1;
+
+  // Get rotary encoder1 value
+  newRight1 = knobRight1.read()/2;
+  if (newRight1 != positionRight1) {
+    if (newRight1 >= synthNumber){
+      knobRight1.write(0);
+      newRight1 = 0;
+    }
+    if (newRight1 < 0){
+      newRight1 = synthNumber-1;
+      knobRight1.write(newRight1*2);
+    }
+    lcd.clear();
+    lcd.setCursor(0, 1);
+    lcd.print(synthName[newRight1]);
+    positionRight1 = newRight1;
+  }
+  if(digital_encsw[0].update()){
+    if(digital_encsw[0].fallingEdge()){
+      AudioNoInterrupts();
+      synthSelect = newRight1;
+      AudioInterrupts();
+      lcd.clear();
+      lcd.setCursor(0, 1);
+      lcd.print(synthName[synthSelect]);
+      lcd.print(" selected !");
+      switch (synthSelect) {
+        case 0:
+        chordOrganenvelope1.noteOff();
+        AudioNoInterrupts();
+        usbMIDI.setHandleNoteOff(KelpieOnNoteOff);
+        usbMIDI.setHandleNoteOn(KelpieOnNoteOn);
+        AudioInterrupts();
+        break;
+
+        case 1:
+        keyBuffPoly(0, 127, false);
+        AudioNoInterrupts();
+        usbMIDI.setHandleNoteOff(ChordOrganOnNoteOff);
+        usbMIDI.setHandleNoteOn(ChordOrganOnNoteOn);
+        AudioInterrupts();
+        chordOrganenvelope1.noteOn();
+        break;
+      }
+    }
+  }
 }

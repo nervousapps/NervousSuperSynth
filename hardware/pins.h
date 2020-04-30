@@ -10,12 +10,12 @@
 // #define U7_WS	      23
 
 // Encoders
-#define ENC1_1	      6
-#define ENC1_2	      7
-#define ENC1_SW	      37
-#define ENC2_1	      8
-#define ENC2_2	      9
-#define ENC2_SW	      10
+#define ENC1_1	      8
+#define ENC1_2	      9
+#define ENC1_SW	      10
+#define ENC2_1	      6
+#define ENC2_2	      7
+#define ENC2_SW	      37
 
 // Triggers
 #define TRIG1	        24
