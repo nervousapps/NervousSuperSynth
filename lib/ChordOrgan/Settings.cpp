@@ -1,7 +1,5 @@
-#ifndef Settings_h
-#define Settings_h
-
-#include <SD.h>
+#include "Arduino.h"
+#include "Settings.h"
 
 boolean settingsstacked = false;
 boolean settingsextraWaves = false;
@@ -61,6 +59,7 @@ int16_t settingsnotes[16][8] = {
       255,255,255,255,255,255,255,255}
   ,
 };
+
 int16_t settingsdefaultNotes[16][8] = {
   {
       0,4,7,12,0,255,255,255}
@@ -111,7 +110,6 @@ int16_t settingsdefaultNotes[16][8] = {
       -12,0,0,12,24,255,255,255}
   ,
 };
-
 
 void ChordOrgancopyDefaults() {
 	for(int i=0;i<16;i++) {
@@ -306,5 +304,3 @@ void ChordOrganinit(boolean hasSD) {
 	}
 
 }
-
-#endif

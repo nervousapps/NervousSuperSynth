@@ -1,214 +1,15 @@
-#ifndef Chord_Organ_h
-#define Chord_Organ_h
+#include "Arduino.h"
+#include "ChordOrgan.h"
 
-#include <Audio.h>
-#include <Wire.h>
-#include <SPI.h>
-#include <SD.h>
-#include <SerialFlash.h>
-// #include <EEPROM.h>
-
-#include "Settings.h"
-#include "Waves.h"
-
-// #define DEBUG_STARTUP
-// #define DEBUG_MODE
-// #define CHECK_CPU
-
-#define CHORD_POT_PIN SLIDE1 // pin for Chord pot
-#define CHORD_CV_PIN SLIDE2 // pin for Chord CV
-#define ROOT_POT_PIN SLIDE3 // pin for Root Note pot
-#define ROOT_CV_PIN SLIDE4 // pin for Root Note CV
-#define RESET_BUTTON ENC1_SW // Reset button
-// #define RESET_LED 11 // Reset LED indicator
-// #define RESET_CV 9 // Reset pulse in / out
-#define BANK_BUTTON ENC2_SW // Bank Button
-// #define LED0 6
-// #define LED1 5
-// #define LED2 4
-// #define LED3 3
-
-// REBOOT CODES
-// #define RESTART_ADDR       0xE000ED0C
-// #define READ_RESTART()     (*(volatile uint32_t *)RESTART_ADDR)
-// #define WRITE_RESTART(val) ((*(volatile uint32_t *)RESTART_ADDR) = (val))
-
-#define ADC_BITS 13
-#define ADC_MAX_VAL 8192
-#define CHANGE_TOLERANCE 64
-
-#define SINECOUNT 8
-#define LOW_NOTE 36
-
-// For arbitrary waveform, required but unused apparently.
-#define MAX_FREQ 600
-
-#define SHORT_PRESS_DURATION 10
-#define LONG_PRESS_DURATION 1000
-
-int chordCount = 16;
-
-// Target frequency of each oscillator
-float FREQ[SINECOUNT] = {
-    55,110, 220, 440, 880,1760,3520,7040};
-
-// Total distance between last note and new.
-// NOT distance per time step.
-float deltaFrequency[SINECOUNT] = {
-    0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-
-// Keep track of current frequency of each oscillator
-float currentFrequency[SINECOUNT]  = {
-    55,110, 220, 440, 880,1760,3520,7040};
-
-float AMP[SINECOUNT] = {
-    0.9, 0.9, 0.9, 0.9,0.9, 0.9, 0.9, 0.9};
-
-// Volume for a single voice for each chord size
-float AMP_PER_VOICE[SINECOUNT] = {
-  0.4,0.3,0.22,0.2,0.15,0.15,0.13,0.12};
-
-// Store midi note number to frequency in a table
-// Later can replace the table for custom tunings / scala support.
-float MIDI_TO_FREQ[128];
-
-int chordRaw;
 int chordCV = 0;
-int chordRawOld;
-int chordQuant;
-int chordQuantOld;
-int chordPot = 0;
-int rootCV = 0;
-int rootPot = 0;
 
-int rootPotOld;
-int rootCVOld;
-
-int rootQuant;
-int rootQuantOld;
-
-float rootMapCoeff;
-
-// Root CV Pin readings below this level are clamped to LOW_NOTE
-int rootClampLow;
-
-// Flag for either chord or root note change
-boolean changed = true;
-boolean rootChanged = false;
-
-// Bounce resetCV = Bounce( RESET_CV, 40 );
-boolean resetButton = false;
-boolean resetCVRose;
-
-elapsedMillis resetHold;
-elapsedMillis resetFlash;
-int updateCount = 0;
-
-elapsedMillis buttonTimer = 0;
-elapsedMillis lockOut = 0;
-boolean shortPress = false;
-boolean longPress = false;
-elapsedMillis pulseOutTimer = 0;
-uint32_t flashTime = 10;
-boolean flashing = false;
-
-// WAVEFORM
-// Default wave types
-short wave_type[4] = {
-    WAVEFORM_SINE,
-    WAVEFORM_SQUARE,
-    WAVEFORM_SAWTOOTH,
-    WAVEFORM_PULSE,
-};
-// Current waveform index
-int waveform = 0;
-
-// Waveform LED
-boolean flashingWave = false;
-elapsedMillis waveformIndicatorTimer = 0;
-
-int waveformPage = 0;
-int waveformPages = 1;
-
-// Custom wavetables
-int16_t const* waveTables[8] {
-    wave1,
-    wave7,
-    wave3,
-    wave4,
-
-    wave8,
-    wave9,
-    wave10,
-    wave11
-};
-
-// Per-waveform amp level
-// First 4 are default waves, last 8 are custom wavetables
-float WAVEFORM_AMP[12] = {
-  0.8,0.6,0.8,0.6,
-  0.8,0.8,0.8,0.8,
-  0.8,0.8,0.8,0.8,
-};
-
-// GLIDE
-// Main flag for glide on / off
-boolean glide = false;
-// msecs glide time.
-uint32_t glideTime = 50;
-// keep reciprocal
-float oneOverGlideTime = 0.02;
-// Time since glide started
-elapsedMillis glideTimer = 0;
-elapsedMillis ChordsynthParamMsec = 0;
-// Are we currently gliding notes
-boolean gliding = false;
-
-// Stack mode replicates first 4 voices into last 4 with tuning offset
-boolean stacked = false;
-float stackFreqScale = 1.001;
-
-int noteRange = 38;
-
-// GUItool: begin automatically generated code
-
-AudioSynthWaveform       chordOrganwaveform1;      //xy=215,232
-AudioSynthWaveform       chordOrganwaveform2;      //xy=243,295
-AudioSynthWaveform       chordOrganwaveform3;      //xy=273,354
-AudioSynthWaveform       chordOrganwaveform4;      //xy=292,394
-AudioSynthWaveform       chordOrganwaveform5;      //xy=215,232
-AudioSynthWaveform       chordOrganwaveform6;      //xy=243,295
-AudioSynthWaveform       chordOrganwaveform7;      //xy=273,354
-AudioSynthWaveform       chordOrganwaveform8;      //xy=292,394
-AudioMixer4              chordOrganmixer1;         //xy=424,117
-AudioMixer4              chordOrganmixer2;         //xy=424,181
-AudioMixer4              chordOrganmixer3;         //xy=571,84
-AudioEffectEnvelope      chordOrganenvelope1;      //xy=652,281
-// AudioOutputAnalog        dac1;           //xy=784,129
-AudioConnection          chordOrganpatchCord1(chordOrganwaveform1, 0, chordOrganmixer1, 0);
-AudioConnection          chordOrganpatchCord2(chordOrganwaveform2, 0, chordOrganmixer1, 1);
-AudioConnection          chordOrganpatchCord7(chordOrganwaveform3, 0, chordOrganmixer1, 2);
-AudioConnection          chordOrganpatchCord8(chordOrganwaveform4, 0, chordOrganmixer1, 3);
-AudioConnection          chordOrganpatchCord3(chordOrganwaveform5, 0, chordOrganmixer2, 0);
-AudioConnection          chordOrganpatchCord4(chordOrganwaveform6, 0, chordOrganmixer2, 1);
-AudioConnection          chordOrganpatchCord5(chordOrganwaveform7, 0, chordOrganmixer2, 2);
-AudioConnection          chordOrganpatchCord6(chordOrganwaveform8, 0, chordOrganmixer2, 3);
-AudioConnection          chordOrganpatchCord9(chordOrganmixer1, 0, chordOrganmixer3, 0);
-AudioConnection          chordOrganpatchCord10(chordOrganmixer2, 0, chordOrganmixer3, 1);
-AudioConnection          chordOrganpatchCord11(chordOrganmixer3, chordOrganenvelope1);
-AudioConnection          chordOrganpatchCord12(chordOrganenvelope1, 0, mainMix, 1);
-// GUItool: end automatically generated code
-// Pointers to waveforms
-AudioSynthWaveform* oscillator[8];
-
-
-void setWaveformType(short waveformType) {
+void ChordOrgan::setWaveformType(short waveformType) {
     for(int i=0;i<SINECOUNT;i++) {
         oscillator[i]->begin(1.0,FREQ[i],waveformType);
     }
 }
 
-void setupCustomWaveform(int waveselect) {
+void ChordOrgan::setupCustomWaveform(int waveselect) {
     waveselect = (waveselect - 4) % 8;
 
     const int16_t* wave = waveTables[waveselect];
@@ -219,7 +20,7 @@ void setupCustomWaveform(int waveselect) {
     setWaveformType(WAVEFORM_ARBITRARY);
 }
 
-void updateAmpAndFreq() {
+void ChordOrgan::updateAmpAndFreq() {
     int16_t* chord = settingsnotes[chordQuant];
 
     int noteNumber;
@@ -299,7 +100,7 @@ void updateAmpAndFreq() {
     }
 }
 
-void selectWaveform(int waveform) {
+void ChordOrgan::selectWaveform(int waveform) {
     waveformPage = waveform >> 2;
     if(waveformPage > 0) {
         flashingWave = true;
@@ -322,7 +123,7 @@ void selectWaveform(int waveform) {
 }
 
 
-void updateWaveformLEDs() {
+void ChordOrgan::updateWaveformLEDs() {
     // // Flash waveform LEDs for custom waves
     // if(waveformPage > 0) {
     //     uint32_t blinkTime = 100 + ((waveformPage - 1) * 300);
@@ -338,7 +139,7 @@ void updateWaveformLEDs() {
     // }
 }
 
-void updateFrequencies() {
+void ChordOrgan::updateFrequencies() {
 
     if(gliding) {
         // TODO : Replace division with reciprocal multiply.
@@ -363,7 +164,7 @@ void updateFrequencies() {
     }
 }
 
-void updateAmps(){
+void ChordOrgan::updateAmps(){
     float waveAmp = WAVEFORM_AMP[waveform];
     chordOrganmixer1.gain(0,AMP[0] * waveAmp);
     chordOrganmixer1.gain(1,AMP[1] * waveAmp);
@@ -376,20 +177,20 @@ void updateAmps(){
 }
 
 // WRITE A 4 DIGIT BINARY NUMBER TO LED0-LED3
-void ledWrite(int n){
+void ChordOrgan::ledWrite(int n){
     // digitalWrite(LED3, HIGH && (n==0));
     // digitalWrite(LED2, HIGH && (n==1));
     // digitalWrite(LED1, HIGH && (n==2));
     // digitalWrite(LED0, HIGH && (n==3));
 }
 
-void checkInterface(){
+void ChordOrgan::get_parameters(){
 
     // Read pots + CVs
-    for (int i=0;i<SLIDERS_PINS;i++){
-      analog_slide[i].update();
-      if (analog_slide[i].hasChanged()) {
-        int value = analog_slide[i].getValue();
+    for (int i=0;i<hardwarecontrols.SLIDERS_PINS;i++){
+      hardwarecontrols.analog_slide[i].update();
+      if (hardwarecontrols.analog_slide[i].hasChanged()) {
+        int value = hardwarecontrols.analog_slide[i].getValue();
         switch(i){
           case 0:
           lcd.setCursor(0,0);
@@ -501,17 +302,17 @@ void checkInterface(){
     }
 }
 
-void chord_get_encoders_parameters(){
+void ChordOrgan::get_encoders_parameters(){
   if(synthParam){
-    if(digital_encsw[0].update()){
-      if(digital_encsw[0].fallingEdge()){
+    if(hardwarecontrols.digital_encsw[0].update()){
+      if(hardwarecontrols.digital_encsw[0].fallingEdge()){
         if(ChordsynthParamMsec <= 300){
           synthParam = false;
         }else{
           buttonTimer = 0;
         }
       }
-      if(digital_encsw[0].risingEdge()){
+      if(hardwarecontrols.digital_encsw[0].risingEdge()){
         if (buttonTimer > SHORT_PRESS_DURATION && lockOut > 999 ){
             shortPress = true;
         }
@@ -526,13 +327,13 @@ void chord_get_encoders_parameters(){
   }
 }
 
-void reBoot(int delayTime){
+void ChordOrgan::reBoot(int delayTime){
     // if (delayTime > 0)
     //     delay (delayTime);
     // WRITE_RESTART(0x5FA0004);
 }
 
-void printRootInfo(int rootPot, int rootCV) {
+void ChordOrgan::printRootInfo(int rootPot, int rootCV) {
     Serial.print("Root ");
     Serial.print(rootPot);
     Serial.print(" ");
@@ -541,7 +342,7 @@ void printRootInfo(int rootPot, int rootCV) {
     Serial.println(rootQuant);
 }
 
-void printPlaying(){
+void ChordOrgan::printPlaying(){
     Serial.print("Chord: ");
     Serial.print(chordQuant);
     Serial.print(" Root: ");
@@ -559,13 +360,13 @@ void printPlaying(){
 
 }
 
-float numToFreq(int input) {
+float ChordOrgan::numToFreq(int input) {
     int number = input - 21; // set to midi note numbers = start with 21 at A0
     number = number - 48; // A0 is 48 steps below A4 = 440hz
     return 440*(pow (1.059463094359,number));
 }
 
-void ChordOrganOnNoteOn(byte channel, byte note, byte velocity) {
+void ChordOrgan::OnNoteOn(byte channel, byte note, byte velocity) {
   if (note > 23 && note < 108)
   {
     chordCV = note*64;
@@ -573,14 +374,14 @@ void ChordOrganOnNoteOn(byte channel, byte note, byte velocity) {
   }
 }
 
-void ChordOrganOnNoteOff(byte channel, byte note, byte velocity) {
+void ChordOrgan::OnNoteOff(byte channel, byte note, byte velocity) {
   if (note > 23 && note < 108)
   {
     chordOrganenvelope1.noteOff();
   }
 }
 
-void setup_chordOrgan(bool hasSD){
+void ChordOrgan::setup(bool hasSD){
     // pinMode(BANK_BUTTON,INPUT);
     // pinMode(RESET_BUTTON, INPUT);
     // pinMode(RESET_CV, INPUT);
@@ -687,6 +488,7 @@ void setup_chordOrgan(bool hasSD){
     chordOrganenvelope1.decay(1);
     chordOrganenvelope1.sustain(1.0);
     chordOrganenvelope1.release(1);
+    chordOrganenvelope1.noteOn();
 
     if(waveformPage == 0) {
         // First page is built in waveforms
@@ -713,10 +515,10 @@ void setup_chordOrgan(bool hasSD){
 }
 
 
-void chordOrgan_run(){
+void ChordOrgan::run(){
 
-    checkInterface();
-    chord_get_encoders_parameters();
+    get_parameters();
+    get_encoders_parameters();
 
     if (changed) {
 
@@ -782,5 +584,3 @@ void chordOrgan_run(){
 
     usbMIDI.read();
 }
-
-#endif

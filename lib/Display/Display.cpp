@@ -1,8 +1,5 @@
-#ifndef Display_h
-#define Display_h
-
 #include "Arduino.h"
-#include <LiquidCrystalFast.h>
+#include "Display.h"
 
 // initialize the library with the numbers of the interface pins
 // LiquidCrystal lcd(RS, RW, Enable, D4, D5, D6, D7)
@@ -10,7 +7,6 @@ LiquidCrystalFast lcd(DISPLAY_RS, DISPLAY_RW, DISPLAY_E, DISPLAY_DB4, DISPLAY_DB
 
 int LCD_NB_COLUMNS = 20;
 
-/* Caractères personnalisés */
 byte START_DIV_0_OF_1[8] = {
   B01111,
   B11000,
@@ -165,5 +161,3 @@ void draw_progressbar(byte percent) {
     }
   }
 }
-
-#endif

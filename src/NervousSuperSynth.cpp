@@ -3,24 +3,30 @@
 #include <Time.h>
 #include <TimeAlarms.h>
 #include <Audio.h>
-#include "hardware/pins.h"
-#include "display/Display.h"
-#include "hardware/HardwareControls.h"
+#include <SPI.h>
+#include <SD.h>
+#include <SerialFlash.h>
+
+#include <Display.h>
+#include <HardwareControls.h>
+#include <ChordOrgan.h>
+
+HardwareControls hardwarecontrols;
+ChordOrgan chordorgan;
 
 AudioMixer4                 mainMix;
 AudioOutputAnalogStereo     DACS1;
+AudioConnection             mainpatchCord12(chordOrganenvelope1, 0, mainMix, 1);
 AudioConnection             mainpatchcord(mainMix, 0, DACS1, 0);
 
-boolean synthParam = true;
-
-#include "sampleplayer/SamplePlayer.h"
-#include "kelpie/kelpiemaster.h"
-#include "chordOrgan/ChordOrgan.h"
+boolean synthParam = false;
 
 #define synthNumber 2
 
-int synthSelect = 0;
+int synthSelect = 1;
 char synthName[synthNumber][16] = {"Kelpie", "ChordOrgan"};
+
+const int chipSelect = BUILTIN_SDCARD;
 
 
 void selectSynth(){
@@ -28,23 +34,23 @@ void selectSynth(){
     long newRight1;
 
     // Get rotary encoder1 value
-    newRight1 = knobRight1.read()/2;
-    if (newRight1 != positionRight1) {
+    newRight1 = hardwarecontrols.knobRight1.read()/2;
+    if (newRight1 != hardwarecontrols.positionRight1) {
       if (newRight1 >= synthNumber){
-        knobRight1.write(0);
+        hardwarecontrols.knobRight1.write(0);
         newRight1 = 0;
       }
       if (newRight1 < 0){
         newRight1 = synthNumber-1;
-        knobRight1.write(newRight1*2);
+        hardwarecontrols.knobRight1.write(newRight1*2);
       }
       lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print(synthName[newRight1]);
-      positionRight1 = newRight1;
+      hardwarecontrols.positionRight1 = newRight1;
     }
-    if(digital_encsw[0].update()){
-      if(digital_encsw[0].fallingEdge()){
+    if(hardwarecontrols.digital_encsw[0].update()){
+      if(hardwarecontrols.digital_encsw[0].fallingEdge()){
         AudioNoInterrupts();
         synthSelect = newRight1;
         synthParam = !synthParam;
@@ -55,18 +61,18 @@ void selectSynth(){
         switch (synthSelect) {
           case 0:
           chordOrganenvelope1.noteOff();
-          AudioNoInterrupts();
-          kelpieOn();
-          usbMIDI.setHandleNoteOff(KelpieOnNoteOff);
-          usbMIDI.setHandleNoteOn(KelpieOnNoteOn);
-          AudioInterrupts();
+          // AudioNoInterrupts();
+          // kelpieOn();
+          // usbMIDI.setHandleNoteOff(KelpieOnNoteOff);
+          // usbMIDI.setHandleNoteOn(KelpieOnNoteOn);
+          // AudioInterrupts();
           break;
 
           case 1:
-          kelpieOff();
+          // kelpieOff();
           AudioNoInterrupts();
-          usbMIDI.setHandleNoteOff(ChordOrganOnNoteOff);
-          usbMIDI.setHandleNoteOn(ChordOrganOnNoteOn);
+          usbMIDI.setHandleNoteOff(chordorgan.OnNoteOff);
+          usbMIDI.setHandleNoteOn(chordorgan.OnNoteOn);
           AudioInterrupts();
           chordOrganenvelope1.noteOn();
           break;
@@ -116,29 +122,31 @@ void setup(){
   setup_lcd();
   setup_progressbar();
 
-  setup_hardware_controls();
+  hardwarecontrols.setup_hardware_controls();
 
   lcd.setCursor(0,0);
   lcd.print("SuperSynth");
-  delay(2000);
+  // delay(2000);
+  //
+  // init_banks();
+  //
+  // kelpie_setup();
+  chordorgan.setup(hasSD);
 
-  init_banks();
-
-  kelpie_setup();
-  setup_chordOrgan(hasSD);
+  chordOrganenvelope1.noteOn();
 }
 
 void loop(){
-  control_sampleplayer();
-  sampleplay();
+  // control_sampleplayer();
+  // sampleplay();
   selectSynth();
-  switch (synthSelect) {
-    case 0:
-    kelpie_run();
-    break;
-
-    case 1:
-    chordOrgan_run();
-    break;
-  }
+  // switch (synthSelect) {
+  //   case 0:
+  //   // kelpie_run();
+  //   break;
+  //
+  //   case 1:
+    chordorgan.run();
+    // break;
+  // }
 }
