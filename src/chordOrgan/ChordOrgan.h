@@ -392,8 +392,6 @@ void checkInterface(){
         int value = analog_slide[i].getValue();
         switch(i){
           case 0:
-          lcd.setCursor(0,0);
-          lcd.print(value*64);
           chordPot = value*64;
           break;
 
@@ -406,8 +404,6 @@ void checkInterface(){
           break;
 
           case 3:
-          lcd.setCursor(0,0);
-          lcd.print(value);
           chordOrganenvelope1.attack(value*10);
           break;
 
@@ -465,6 +461,7 @@ void checkInterface(){
     }
 
     chordQuant = map(chordRaw, 0, ADC_MAX_VAL, 0, chordCount);
+
     if (chordQuant != chordQuantOld){
         changed = true;
         chordQuantOld = chordQuant;
@@ -568,7 +565,7 @@ float numToFreq(int input) {
 void ChordOrganOnNoteOn(byte channel, byte note, byte velocity) {
   if (note > 23 && note < 108)
   {
-    chordCV = note*64;
+    chordCV = note*48;
     chordOrganenvelope1.noteOn();
   }
 }

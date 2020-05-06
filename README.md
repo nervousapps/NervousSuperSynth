@@ -1,2 +1,3 @@
 # NervousSuperSynth
-Synthesizer and sampler built around Teensy 3.5
+Synthesizer and sampler built arou
+nd Teensy 3.5

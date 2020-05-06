@@ -12,6 +12,7 @@ AudioOutputAnalogStereo     DACS1;
 AudioConnection             mainpatchcord(mainMix, 0, DACS1, 0);
 
 boolean synthParam = true;
+boolean firstTime = true;
 
 #include "sampleplayer/SamplePlayer.h"
 #include "kelpie/kelpiemaster.h"
@@ -73,6 +74,14 @@ void selectSynth(){
         }
       }
     }
+    if(firstTime){
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print(synthName[newRight1]);
+      firstTime = synthParam;
+    }
+  }else{
+    firstTime = synthParam;
   }
 }
 

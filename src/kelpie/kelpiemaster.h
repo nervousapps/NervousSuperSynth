@@ -279,33 +279,33 @@ void kelpie_get_encoders_parameters(){
                 polyVoices[i].waveformA.begin(globalState.WAVEFORM1);
               }
               break;
-              case 1:
-                switch(waveform2state){
-                  case 0:
-                  globalState.WAVEFORM2 = WAVEFORM_SQUARE;
-                  waveform2state = 1;
-                  break;
-                  case 1:
-                  globalState.WAVEFORM2 = WAVEFORM_SAWTOOTH;
-                  waveform2state = 2;
-                  break;
-                  case 2:
-                  globalState.WAVEFORM2 = WAVEFORM_SINE;
-                  waveform2state = 3;
-                  break;
-                  case 3:
-                  globalState.WAVEFORM2 = WAVEFORM_ARBITRARY;
-                  waveform2state = 0;
-                  break;
-                }
-                for (byte i = 0; i < numPolyVoices; i++)
-                {
-                  polyVoices[i].waveformB.begin(globalState.WAVEFORM2);
-                }
+            case 1:
+              switch(waveform2state){
+                case 0:
+                globalState.WAVEFORM2 = WAVEFORM_SQUARE;
+                waveform2state = 1;
                 break;
-              case 2:
-                globalState.IS_POLY = !globalState.IS_POLY;
+                case 1:
+                globalState.WAVEFORM2 = WAVEFORM_SAWTOOTH;
+                waveform2state = 2;
                 break;
+                case 2:
+                globalState.WAVEFORM2 = WAVEFORM_SINE;
+                waveform2state = 3;
+                break;
+                case 3:
+                globalState.WAVEFORM2 = WAVEFORM_ARBITRARY;
+                waveform2state = 0;
+                break;
+              }
+              for (byte i = 0; i < numPolyVoices; i++)
+              {
+                polyVoices[i].waveformB.begin(globalState.WAVEFORM2);
+              }
+              break;
+            case 2:
+              globalState.IS_POLY = !globalState.IS_POLY;
+              break;
           }
         }
         kelpiesynthParamMsec = 0;
@@ -317,10 +317,12 @@ void kelpie_get_encoders_parameters(){
     switch(newRight1){
       case 0:
       lcd.print(kelpirWaveforms[waveform1state]);
+      lcd.print("       ");
       break;
 
       case 1:
       lcd.print(kelpirWaveforms[waveform2state]);
+      lcd.print("       ");
       break;
 
       case 2:
