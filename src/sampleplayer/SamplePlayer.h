@@ -30,7 +30,7 @@ struct Bank {
   const char* sample6;
 };
 
-Bank banks[16];
+Bank banks[30];
 
 const char* _filename = "banks.txt";
 
@@ -85,10 +85,16 @@ void control_sampleplayer(){
     }
   }
 
+  if(digital_encsw[1].update()){
+    if(digital_encsw[1].fallingEdge()){
+      sampleParam = !sampleParam;
+    }
+  }
+
   // Get rotary encoder2 value
   newRight2 = knobRight2.read()/2;
   if (newRight2 != positionRight2) {
-    if (newRight2 >= number_banks-1){
+    if (newRight2 > number_banks-1){
       knobRight2.write(0);
       newRight2 = 0;
     }
@@ -105,16 +111,55 @@ void control_sampleplayer(){
   }
 }
 
+void volumeControl(){
+  // Read pots + CVs
+  for (int i=0;i<SLIDERS_PINS;i++){
+    analog_slide[i].update();
+    if (analog_slide[i].hasChanged()) {
+      int value = analog_slide[i].getValue();
+      switch(i){
+        case 0:
+        amp1.gain(value);
+        break;
+
+        case 1:
+        amp2.gain(value);
+        break;
+
+        case 2:
+        amp3.gain(value);
+        break;
+
+        case 3:
+        amp4.gain(value);
+        break;
+
+        case 4:
+        amp5.gain(value);
+        break;
+
+        case 5:
+        amp6.gain(value);
+        break;
+
+        case 6:
+        amp7.gain(value);
+        break;
+      }
+    }
+  }
+}
+
 void init_banks(){
     // Set mixers gain
-    samplemix1.gain(0, 3);
-    samplemix1.gain(1, 3);
-    samplemix2.gain(0, 3);
-    samplemix2.gain(1, 3);
-    samplemix2.gain(2, 3);
-    samplemix2.gain(3, 3);
-    samplemix3.gain(0, 3);
-    samplemix3.gain(1, 3);
+    samplemix1.gain(0, 0.25);
+    samplemix1.gain(1, 0.25);
+    samplemix2.gain(0, 0.25);
+    samplemix2.gain(1, 0.25);
+    samplemix2.gain(2, 0.25);
+    samplemix2.gain(3, 0.25);
+    samplemix3.gain(0, 0.5);
+    samplemix3.gain(1, 0.5);
   // if (SD.exists(_filename)) {
     // Open file for reading
     File file = SD.open(_filename);
@@ -122,7 +167,7 @@ void init_banks(){
     // Allocate the memory pool on the stack.
     // Don't forget to change the capacity to match your JSON document.
     // Use arduinojson.org/assistant to compute the capacity.
-    StaticJsonDocument<4096> jsonBuffer;
+    StaticJsonDocument<8192> jsonBuffer;
 
     // Parse the root object
     auto error = deserializeJson(jsonBuffer, file);
@@ -130,7 +175,8 @@ void init_banks(){
     if (error)
       Serial.println(F("Failed to read file, using default configuration"));
 
-    number_banks = jsonBuffer["banks"].size()-1;
+    number_banks = jsonBuffer["banks"].size();
+    Serial.println(number_banks);
 
     // Copy values from the JsonObject to the Config
     for(int i=0; i<number_banks; i++){
@@ -164,6 +210,14 @@ void init_banks(){
   lcd.setCursor(0, 1);
   lcd.print(banks[bank_number].name);
   return;
+}
+
+void runSamplePlayer(){
+  if(sampleParam){
+    volumeControl();
+  }
+  control_sampleplayer();
+  sampleplay();
 }
 
 

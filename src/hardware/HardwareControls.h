@@ -67,9 +67,6 @@ const int ENC_BUTTONS[ENC_BUTTONS_PINS] = {
 
 
 //******VARIABLES***********
-// a data array and a lagged copy to tell when MIDI changes are required
-byte data[SLIDERS_PINS];
-byte dataLag[SLIDERS_PINS]; // when lag and new are not the same then update MIDI CC value
 
 //************INITIALIZE LIBRARY OBJECTS**************
 // not sure if there is a better way... some way run a setup loop on global array??

@@ -20,12 +20,12 @@
 #define ENC2_SW	      37
 
 // Triggers
-#define TRIG1	        24
-#define TRIG2	        25
-#define TRIG3	        26
-#define TRIG4	        27
-#define TRIG5	        28
-#define TRIG6	        29
+#define TRIG1	        25
+#define TRIG2	        26
+#define TRIG3	        24
+#define TRIG4	        29
+#define TRIG5	        30
+#define TRIG6	        27
 
 // Display
 #define DISPLAY_RS	  12

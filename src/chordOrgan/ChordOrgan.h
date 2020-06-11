@@ -384,40 +384,41 @@ void ledWrite(int n){
 }
 
 void checkInterface(){
+    if(!sampleParam){
+      // Read pots + CVs
+      for (int i=0;i<SLIDERS_PINS;i++){
+        analog_slide[i].update();
+        if (analog_slide[i].hasChanged()) {
+          int value = analog_slide[i].getValue();
+          switch(i){
+            case 0:
+            chordPot = value*64;
+            break;
 
-    // Read pots + CVs
-    for (int i=0;i<SLIDERS_PINS;i++){
-      analog_slide[i].update();
-      if (analog_slide[i].hasChanged()) {
-        int value = analog_slide[i].getValue();
-        switch(i){
-          case 0:
-          chordPot = value*64;
-          break;
+            case 1:
+            rootPot = value*64;
+            break;
 
-          case 1:
-          rootPot = value*64;
-          break;
+            case 2:
+            rootCV = value*64;
+            break;
 
-          case 2:
-          rootCV = value*64;
-          break;
+            case 3:
+            chordOrganenvelope1.attack(value*10);
+            break;
 
-          case 3:
-          chordOrganenvelope1.attack(value*10);
-          break;
+            case 4:
+            chordOrganenvelope1.decay(value*10);
+            break;
 
-          case 4:
-          chordOrganenvelope1.decay(value*10);
-          break;
+            case 5:
+            chordOrganenvelope1.sustain(value*10);
+            break;
 
-          case 5:
-          chordOrganenvelope1.sustain(value*10);
-          break;
-
-          case 6:
-          chordOrganenvelope1.release(value*10);
-          break;
+            case 6:
+            chordOrganenvelope1.release(value*10);
+            break;
+          }
         }
       }
     }
