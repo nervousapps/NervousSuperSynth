@@ -8,16 +8,17 @@
 
 AudioMixer4                 mainMix;
 AudioOutputAnalogStereo     DACS1;
-AudioConnection             mainpatchcord(mainMix, 0, DACS1, 0);
+AudioOutputPT8211           pt8211_1;
+AudioConnection             mainpatchcord(mainMix, 0, DACS1, 1);
 
-boolean synthParam = true;
+boolean synthParam = false;
 boolean sampleParam = false;
 boolean firstTime = true;
 
 #include "sampleplayer/SamplePlayer.h"
 #include "kelpie/kelpiemaster.h"
 #include "chordOrgan/ChordOrgan.h"
-#include "braids/braids.h"
+// #include "braids/braids.h"
 
 
 #define synthNumber 3
@@ -57,7 +58,7 @@ void selectSynth(){
         lcd.print(synthName[synthSelect]);
         switch (synthSelect) {
           case 0:
-          toggle_braids(0,1,0);
+          // toggle_braids(0,1,0);
           chordOrganenvelope1.noteOff();
           AudioNoInterrupts();
           kelpieOn();
@@ -67,7 +68,7 @@ void selectSynth(){
           break;
 
           case 1:
-          toggle_braids(0,1,0);
+          // toggle_braids(0,1,0);
           kelpieOff();
           AudioNoInterrupts();
           usbMIDI.setHandleNoteOff(ChordOrganOnNoteOff);
@@ -77,12 +78,12 @@ void selectSynth(){
           break;
 
           case 2:
-          chordOrganenvelope1.noteOff();
-          kelpieOff();
-          AudioNoInterrupts();
-          usbMIDI.setHandleNoteOn(handleNoteOn);
-          // AudioInterrupts();
-          toggle_braids(0,1,3);
+          // chordOrganenvelope1.noteOff();
+          // kelpieOff();
+          // AudioNoInterrupts();
+          // usbMIDI.setHandleNoteOn(handleNoteOn);
+          // // AudioInterrupts();
+          // toggle_braids(0,1,3);
           break;
         }
       }
@@ -121,14 +122,16 @@ void setup(){
   // Configure the DACs
   analogWriteResolution(16);
   DACS1.analogReference(INTERNAL);
-  AudioMemory(600);
+  AudioMemory(800);
 
-  //Serial.println("Initializing SD card...");
+  // mainMix.gain(0, 1);
+
+  Serial.println("Initializing SD card...");
 
   boolean hasSD = openSDCard();
 
   if (!hasSD) {
-    //Serial.println("initialization failed!");
+    Serial.println("initialization failed!");
     return;
   }
 
@@ -148,8 +151,8 @@ void setup(){
 
   kelpie_setup();
   setup_chordOrgan(hasSD);
-  setup_braids();
-  toggle_braids(0,1,0);
+  // setup_braids();
+  // toggle_braids(0,1,0);
 }
 
 void loop(){
@@ -158,6 +161,37 @@ void loop(){
   switch (synthSelect) {
     case 0:
     kelpie_run();
+    for (int i=0;i<TRIGGER_PINS;i++){
+      digital_trig[i].update();
+      if (digital_trig[i].fallingEdge()) {
+        switch (i) {
+          case 0:
+            KelpieOnNoteOn(1, 30, 100);
+            break;
+
+          case 1:
+          KelpieOnNoteOn(1, 40, 100);
+            break;
+
+          case 2:
+          KelpieOnNoteOn(1, 50, 100);
+            break;
+
+          case 3:
+          KelpieOnNoteOn(1, 60, 100);
+            break;
+
+          case 4:
+          KelpieOnNoteOn(1, 70, 100);
+            break;
+
+          case 5:
+          KelpieOnNoteOn(1, 80, 100);
+            break;
+          }
+        }
+        KelpieOnNoteOff(1, 80, 100);
+      }
     break;
 
     case 1:
@@ -165,7 +199,7 @@ void loop(){
     break;
 
     case 2:
-    run_braids();
+    // run_braids();
     break;
   }
 }

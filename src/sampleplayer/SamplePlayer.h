@@ -117,33 +117,35 @@ void volumeControl(){
     analog_slide[i].update();
     if (analog_slide[i].hasChanged()) {
       int value = analog_slide[i].getValue();
+      Serial.print(((float)value/(float)20)+0.1);
+      Serial.print("\n");
       switch(i){
         case 0:
-        amp1.gain(value);
+        amp1.gain(((float)value/(float)20)+0.1);
         break;
 
         case 1:
-        amp2.gain(value);
+        amp2.gain(((float)value/(float)20)+0.1);
         break;
 
         case 2:
-        amp3.gain(value);
+        amp3.gain(((float)value/(float)20)+0.1);
         break;
 
         case 3:
-        amp4.gain(value);
+        amp4.gain(((float)value/(float)20)+0.1);
         break;
 
         case 4:
-        amp5.gain(value);
+        amp5.gain(((float)value/(float)20)+0.1);
         break;
 
         case 5:
-        amp6.gain(value);
+        amp6.gain(((float)value/(float)20)+0.1);
         break;
 
         case 6:
-        amp7.gain(value);
+        amp7.gain(((float)value/(float)20)+5);
         break;
       }
     }
@@ -152,14 +154,23 @@ void volumeControl(){
 
 void init_banks(){
     // Set mixers gain
-    samplemix1.gain(0, 0.25);
+    samplemix1.gain(0, 0.5);
     samplemix1.gain(1, 0.25);
+    samplemix1.gain(2, 0.25);
     samplemix2.gain(0, 0.25);
     samplemix2.gain(1, 0.25);
-    samplemix2.gain(2, 0.25);
-    samplemix2.gain(3, 0.25);
+    samplemix2.gain(2, 0.5);
     samplemix3.gain(0, 0.5);
     samplemix3.gain(1, 0.5);
+
+    amp1.gain(0.1);
+    amp2.gain(0.1);
+    amp3.gain(0.1);
+    amp4.gain(0.1);
+    amp5.gain(0.1);
+    amp6.gain(0.1);
+    amp7.gain(5);
+
   // if (SD.exists(_filename)) {
     // Open file for reading
     File file = SD.open(_filename);

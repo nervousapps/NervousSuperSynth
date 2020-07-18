@@ -1,0 +1,100 @@
+{
+  "banks": [
+    {
+      "name": "P7T1",
+      "value": ["VOCALS/VAWOU.WAV","909/9HHCD2.WAV","909/9MT0D3.WAV","909/9RIDED2.WAV","909/9RIDED6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "P7T2",
+      "value": ["VOCALS/VGIRLS.WAV","909/9HHCD0.WAV","909/9MT0D3.WAV","909/9RIDED2.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "P7T3",
+      "value": ["VOCALS/VGIRLS.WAV","909/9HHCD0.WAV","909/9MT0D3.WAV","909/9RIDED2.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "P7T4",
+      "value": ["VOCALS/VGIRLS.WAV","909/9HHCD0.WAV","909/9MT0D3.WAV","909/9RIDED2.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "P7T5",
+      "value": ["VOCALS/VGIRLS.WAV","909/9HHCD0.WAV","909/9MT0D3.WAV","909/9RIDED2.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "P7T6",
+      "value": ["VOCALS/VGIRLS.WAV","909/9HHCD0.WAV","909/9MT0D3.WAV","909/9RIDED2.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "P7T7",
+      "value": ["VOCALS/VGIRLS.WAV","VOCALS/VEXCTASY.WAV","VOCALS/VFORGETIT.WAV","VOCALS/VDRUGS.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "P7T8",
+      "value": ["VOCALS/VGIRLS.WAV","VOCALS/VEXCTASY.WAV","VOCALS/VFORGETIT.WAV","VOCALS/VDRUGS.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "P7T9",
+      "value": ["VOCALS/VGIRLS.WAV","909/9HHCD0.WAV","909/9MT0D3.WAV","909/9RIDED2.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "P7T10",
+      "value": ["VOCALS/VGIRLS.WAV","909/9HHCD0.WAV","909/9MT0D3.WAV","909/9RIDED2.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "P7T11",
+      "value": ["VOCALS/VGIRLS.WAV","909/9HHCD0.WAV","909/9MT0D3.WAV","909/9RIDED2.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "P7T12",
+      "value": ["VOCALS/VGIRLS.WAV","909/9HHCD0.WAV","909/9MT0D3.WAV","909/9RIDED2.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "P7T13",
+      "value": ["VOCALS/VGIRLS.WAV","909/9HHCD0.WAV","909/9MT0D3.WAV","909/9RIDED2.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "P7T14",
+      "value": ["VOCALS/VGIRLS.WAV","909/9HHCD0.WAV","909/9MT0D3.WAV","909/9RIDED2.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "P7T15",
+      "value": ["VOCALS/VGIRLS.WAV","909/9HHCD0.WAV","909/9MT0D3.WAV","909/9RIDED2.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "P7T16",
+      "value": ["VOCALS/VLAST.WAV","909/9HHCD0.WAV","909/9MT0D3.WAV","909/9RIDED2.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "909",
+      "value": ["909/9CLOP1","909/9HHCD0.WAV","909/9MT0D3.WAV","909/9LT3D7.WAV","909/9RIDED2.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "808",
+      "value": ["808/8Cym1.WAV","808/8HConga1.WAV","808/8HTom1.WAV","808/8MTom2.WAV","808/8LTom3.WAV","808/8LConga1.WAV"]
+    },
+    {
+      "name": "707",
+      "value": ["707/7Cash3.WAV","707/7HC3.WAV","707/7Cow3.WAV","707/7ide3.WAV","707/7im3.WAV","707/7Tom22.WAV"]
+    },
+    {
+      "name": "RX11",
+      "value": ["RX11/RCLHAT1.WAV","RX11/RCOW1.WAV","RX11/ROPHAT2.WAV","RX11/RCOW2.WAV","RX11/ROPHAT1.WAV","RX11/RSHAKER.WAV"]
+    },
+    {
+      "name": "DARB",
+      "value": ["DARB/Darb1.WAV","DARB/Darb2.WAV","DARB/Darb3.WAV","DARB/Darb4.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "PIANO",
+      "value": ["VOCALS/VGIRLS.WAV","PIANO/Piano1.WAV","909/9MT0D3.WAV","909/9RIDED2.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "909-VOCALS",
+      "value": ["VOCALS/VGIRLS.WAV","909/9HHCD0.WAV","909/9MT0D3.WAV","909/9RIDED2.WAV","909/9HHCD6.WAV","909/9HHCD8.WAV"]
+    },
+    {
+      "name": "PERSO",
+      "value": ["VOCALS/VGIRLS.WAV","VOCALS/VRUB.WAV","VOCALS/VEXCTASY.WAV","909/9MT0D3.WAV","VOCALS/VORGAN1.WAV","VOCALS/VPOWER.WAV"]
+    }
+  ]
+}
