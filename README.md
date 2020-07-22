@@ -19,7 +19,7 @@ PlatformIO
 # SCHEMATICS & PCB
 https://easyeda.com/xtreemechille/supersynth-copy
 
-I have some PCBs in stock, assembled, kit or bare, contact me if you are interested.
+I have some PCBs in stock, assembled, kit or bare, contact me at nervousrvoltage@icloud.com if you are interested.
 
 # BOM
 https://docs.google.com/spreadsheets/d/1-4hl6AcAoJYJrRvISyrwIaEGTYHwAB_IcKs__rtEGYY/edit?usp=sharing
