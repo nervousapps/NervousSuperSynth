@@ -7,7 +7,7 @@ It is mainly a development platform using almost all the ports on Teensy.
 - ...
 
 # Firmware
-The firmware is an aggregation of several synths port to Teensy 3.5:
+The firmware is an aggregation of several synths ported to Teensy 3.5:
 - Kelpie (https://github.com/friedpies/kelpie-pocket-synth)
 - Braids (https://github.com/pichenettes/eurorack and https://github.com/modlfo/teensy-braids)
 - ChordOrgan (https://github.com/TomWhitwell/Chord-Organ)
