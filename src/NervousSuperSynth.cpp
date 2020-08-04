@@ -4,12 +4,18 @@
 #include <Audio.h>
 #include "hardware/pins.h"
 #include "display/Display.h"
+#include <MIDI.h>
 #include "hardware/HardwareControls.h"
 
+MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
+
 AudioMixer4                 mainMix;
+AudioAmplifier              mainAMP;
 AudioOutputAnalogStereo     DACS1;
 AudioOutputPT8211           pt8211_1;
-AudioConnection             mainpatchcord(mainMix, 0, DACS1, 1);
+AudioConnection             mainpatchcord0(mainMix, 0, mainAMP, 0);
+AudioConnection             mainpatchcord2(mainAMP, 0, DACS1, 0);
+AudioConnection             mainpatchcord3(mainAMP, 0, DACS1, 1);
 
 boolean synthParam = false;
 boolean sampleParam = false;
@@ -18,13 +24,15 @@ boolean firstTime = true;
 #include "sampleplayer/SamplePlayer.h"
 #include "kelpie/kelpiemaster.h"
 #include "chordOrgan/ChordOrgan.h"
-// #include "braids/braids.h"
+#include "braids/braids.h"
 
 
 #define synthNumber 3
 
 int synthSelect = 0;
 char synthName[synthNumber][16] = {"Kelpie", "ChordOrgan", "Braids"};
+
+const int chipSelect = BUILTIN_SDCARD;
 
 
 void selectSynth(){
@@ -49,6 +57,7 @@ void selectSynth(){
     }
     if(digital_encsw[0].update()){
       if(digital_encsw[0].fallingEdge()){
+        Serial.print("Note ON");
         AudioNoInterrupts();
         synthSelect = newRight1;
         synthParam = !synthParam;
@@ -58,32 +67,32 @@ void selectSynth(){
         lcd.print(synthName[synthSelect]);
         switch (synthSelect) {
           case 0:
-          // toggle_braids(0,1,0);
+          toggle_braids(0,1,0);
           chordOrganenvelope1.noteOff();
           AudioNoInterrupts();
           kelpieOn();
-          usbMIDI.setHandleNoteOff(KelpieOnNoteOff);
-          usbMIDI.setHandleNoteOn(KelpieOnNoteOn);
+          MIDI.setHandleNoteOff(KelpieOnNoteOff);
+          MIDI.setHandleNoteOn(KelpieOnNoteOn);
           AudioInterrupts();
           break;
 
           case 1:
-          // toggle_braids(0,1,0);
+          toggle_braids(0,1,0);
           kelpieOff();
           AudioNoInterrupts();
-          usbMIDI.setHandleNoteOff(ChordOrganOnNoteOff);
-          usbMIDI.setHandleNoteOn(ChordOrganOnNoteOn);
+          MIDI.setHandleNoteOff(ChordOrganOnNoteOff);
+          MIDI.setHandleNoteOn(ChordOrganOnNoteOn);
           AudioInterrupts();
           chordOrganenvelope1.noteOn();
           break;
 
           case 2:
-          // chordOrganenvelope1.noteOff();
-          // kelpieOff();
-          // AudioNoInterrupts();
-          // usbMIDI.setHandleNoteOn(handleNoteOn);
-          // // AudioInterrupts();
-          // toggle_braids(0,1,3);
+          chordOrganenvelope1.noteOff();
+          kelpieOff();
+          AudioNoInterrupts();
+          usbMIDI.setHandleNoteOn(braidsHandleNoteOn);
+          AudioInterrupts();
+          toggle_braids(0,1,3);
           break;
         }
       }
@@ -120,11 +129,12 @@ void setup(){
   analogReference(EXTERNAL);
 
   // Configure the DACs
-  analogWriteResolution(16);
+  analogWriteResolution(12);
   DACS1.analogReference(INTERNAL);
-  AudioMemory(800);
+  AudioMemory(600);
 
-  // mainMix.gain(0, 1);
+  mainMix.gain(0, 1);
+  mainAMP.gain(5);
 
   Serial.println("Initializing SD card...");
 
@@ -143,55 +153,29 @@ void setup(){
 
   setup_hardware_controls();
 
+  Serial.print(ANALOG_CONTROL_PINS);
+
   lcd.setCursor(0,0);
   lcd.print("SuperSynth");
   delay(2000);
 
   init_banks();
 
+  MIDI.begin();
+
   kelpie_setup();
   setup_chordOrgan(hasSD);
-  // setup_braids();
-  // toggle_braids(0,1,0);
+  setup_braids();
+  toggle_braids(0,1,0);
 }
 
 void loop(){
+  MIDI.read();
   runSamplePlayer();
   selectSynth();
   switch (synthSelect) {
     case 0:
     kelpie_run();
-    for (int i=0;i<TRIGGER_PINS;i++){
-      digital_trig[i].update();
-      if (digital_trig[i].fallingEdge()) {
-        switch (i) {
-          case 0:
-            KelpieOnNoteOn(1, 30, 100);
-            break;
-
-          case 1:
-          KelpieOnNoteOn(1, 40, 100);
-            break;
-
-          case 2:
-          KelpieOnNoteOn(1, 50, 100);
-            break;
-
-          case 3:
-          KelpieOnNoteOn(1, 60, 100);
-            break;
-
-          case 4:
-          KelpieOnNoteOn(1, 70, 100);
-            break;
-
-          case 5:
-          KelpieOnNoteOn(1, 80, 100);
-            break;
-          }
-        }
-        KelpieOnNoteOff(1, 80, 100);
-      }
     break;
 
     case 1:
@@ -199,7 +183,7 @@ void loop(){
     break;
 
     case 2:
-    // run_braids();
+    run_braids();
     break;
   }
 }

@@ -119,8 +119,8 @@ void putSample(void){
     }
 
     // // FOR teensy 3.5
-    analogWrite(A21, val);
-    // analogWrite(A22, val);
+    // analogWrite(A21, val);
+    analogWrite(A22, val);
     // FOR teensy 3.2
     // analogWrite(A14, val);
 
@@ -247,9 +247,9 @@ void braids_get_shape(){
 }
 
 // sequencer
-void handleNoteOn(byte channel, byte note, byte velocity){
+void braidsHandleNoteOn(byte channel, byte note, byte velocity){
   pitch = note << 7;
-  //osc.Strike();
+  osc.Strike();
 }
 
 void toggle_braids(byte channel, byte control, byte value){
@@ -287,8 +287,7 @@ void setup_braids() {
   // synthBraids.init_braids();
   init_braids();
 
-  usbMIDI.setHandleNoteOn(handleNoteOn);
-  usbMIDI.setHandleControlChange(toggle_braids);
+  MIDI.setHandleNoteOn(braidsHandleNoteOn);
 }
 
 //************LOOP**************

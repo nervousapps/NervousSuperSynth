@@ -11,14 +11,13 @@
 
 
 File root;
-const int chipSelect = BUILTIN_SDCARD;
 
 boolean directory = true;
 boolean sample = false;
-boolean bank = true;
 int bank_number = 0;
 int number_banks;
 int number_sample_per_bank = 6;
+elapsedMillis sampleParamMsec;
 
 struct Bank {
   const char* name;
@@ -34,12 +33,37 @@ Bank banks[30];
 
 const char* _filename = "banks.txt";
 
+int ampVolnum = 0;
+boolean selectingAmp = false;
+boolean sampleVolCtrl = false;
+float ampVol[7] = {
+  0.1,
+  0.1,
+  0.1,
+  0.1,
+  0.1,
+  0.1,
+  10
+};
+
+String splitString(String data, char separator, int index)
+{
+    int found = 0;
+    int strIndex[] = { 0, -1 };
+    int maxIndex = data.length() - 1;
+
+    for (int i = 0; i <= maxIndex && found <= index; i++) {
+        if (data.charAt(i) == separator || i == maxIndex) {
+            found++;
+            strIndex[0] = strIndex[1] + 1;
+            strIndex[1] = (i == maxIndex) ? i+1 : i;
+        }
+    }
+    return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
+}
+
 
 void sampleplay(){
-  lcd.setCursor(0, 1);
-  lcd.print("BANK : ");
-  lcd.print(banks[bank_number].name);
-  lcd.print("      ");
   for (int i=0;i<TRIGGER_PINS;i++){
     digital_trig[i].update();
     if (digital_trig[i].fallingEdge()) {
@@ -75,81 +99,106 @@ void sampleplay(){
 void control_sampleplayer(){
   long newRight2;
 
-  // Update bank or editor mode
-  analog_sw[2].update();
-  if(analog_sw[2].hasChanged()){
-    if(analog_sw[2].getValue() > 90){
-      bank = true;
-    }else{
-      bank = false;
-    }
-  }
-
-  if(digital_encsw[1].update()){
-    if(digital_encsw[1].fallingEdge()){
-      sampleParam = !sampleParam;
-    }
-  }
+  // TODO : add editor mode !
 
   // Get rotary encoder2 value
   newRight2 = knobRight2.read()/2;
   if (newRight2 != positionRight2) {
-    if (newRight2 > number_banks-1){
-      knobRight2.write(0);
-      newRight2 = 0;
-    }
-    if (newRight2 < 0){
-      newRight2 = number_banks-1;
-      knobRight2.write(newRight2*2);
-    }
-    if(bank){
-      bank_number = newRight2;
-    }else{
+    if(sampleVolCtrl){
+      if(selectingAmp){
+        if (newRight2 > 7){
+          knobRight2.write(0);
+          newRight2 = 0;
+        }
+        if (newRight2 < 0){
+          newRight2 = 6;
+          knobRight2.write(newRight2*2);
+        }
+        ampVolnum = newRight2;
+      }else{
+        ampVol[ampVolnum] = abs(int(newRight2));
+      }
+      lcd.setCursor(0, 1);
+      switch (ampVolnum) {
+        case 0:
+          lcd.print(splitString(splitString(banks[bank_number].sample1, '/', 1), '.', 0));
+          break;
 
+        case 1:
+          lcd.print(splitString(splitString(banks[bank_number].sample2, '/', 1), '.', 0));
+          break;
+
+        case 2:
+          lcd.print(splitString(splitString(banks[bank_number].sample3, '/', 1), '.', 0));
+          break;
+
+        case 3:
+          lcd.print(splitString(splitString(banks[bank_number].sample4, '/', 1), '.', 0));
+          break;
+
+        case 4:
+          lcd.print(splitString(splitString(banks[bank_number].sample5, '/', 1), '.', 0));
+          break;
+
+        case 5:
+          lcd.print(splitString(splitString(banks[bank_number].sample6, '/', 1), '.', 0));
+          break;
+
+        case 6:
+          lcd.print("MAINAMP");
+          break;
+      }
+      lcd.print(" : ");
+      lcd.print(ampVol[ampVolnum]);
+    }else{
+      if (newRight2 > number_banks-1){
+        knobRight2.write(0);
+        newRight2 = 0;
+      }
+      if (newRight2 < 0){
+        newRight2 = number_banks-1;
+        knobRight2.write(newRight2*2);
+      }
+      bank_number = newRight2;
+      lcd.setCursor(0, 1);
+      lcd.print("BANK : ");
+      lcd.print(banks[bank_number].name);
+      lcd.print("      ");
     }
     positionRight2 = newRight2;
   }
+
+  // Switch to volume control mode
+  if(digital_encsw[1].update()){
+    if(digital_encsw[1].fallingEdge()){
+      sampleParamMsec = 0;
+    }
+
+    if(digital_encsw[1].risingEdge()){
+      if(sampleParamMsec < 300){
+        if(sampleVolCtrl){
+          selectingAmp = !selectingAmp;
+        }
+      }
+      else if(sampleParamMsec >= 600){
+        lcd.setCursor(0, 1);
+        sampleVolCtrl = !sampleVolCtrl;
+        selectingAmp = true;
+      }
+      sampleParamMsec = 0;
+    }
+  }
+
 }
 
 void volumeControl(){
-  // Read pots + CVs
-  for (int i=0;i<SLIDERS_PINS;i++){
-    analog_slide[i].update();
-    if (analog_slide[i].hasChanged()) {
-      int value = analog_slide[i].getValue();
-      Serial.print(((float)value/(float)20)+0.1);
-      Serial.print("\n");
-      switch(i){
-        case 0:
-        amp1.gain(((float)value/(float)20)+0.1);
-        break;
-
-        case 1:
-        amp2.gain(((float)value/(float)20)+0.1);
-        break;
-
-        case 2:
-        amp3.gain(((float)value/(float)20)+0.1);
-        break;
-
-        case 3:
-        amp4.gain(((float)value/(float)20)+0.1);
-        break;
-
-        case 4:
-        amp5.gain(((float)value/(float)20)+0.1);
-        break;
-
-        case 5:
-        amp6.gain(((float)value/(float)20)+0.1);
-        break;
-
-        case 6:
-        amp7.gain(((float)value/(float)20)+5);
-        break;
-      }
-    }
-  }
+  amp1.gain(((float)ampVol[0]/(float)20)+0.1);
+  amp2.gain(((float)ampVol[1]/(float)20)+0.1);
+  amp3.gain(((float)ampVol[2]/(float)20)+0.1);
+  amp4.gain(((float)ampVol[3]/(float)20)+0.1);
+  amp5.gain(((float)ampVol[4]/(float)20)+0.1);
+  amp6.gain(((float)ampVol[5]/(float)20)+0.1);
+  amp7.gain(((float)ampVol[6]/(float)20)+10);
 }
 
 void init_banks(){
@@ -163,13 +212,13 @@ void init_banks(){
     samplemix3.gain(0, 0.5);
     samplemix3.gain(1, 0.5);
 
-    amp1.gain(0.1);
-    amp2.gain(0.1);
-    amp3.gain(0.1);
-    amp4.gain(0.1);
-    amp5.gain(0.1);
-    amp6.gain(0.1);
-    amp7.gain(5);
+    amp1.gain(ampVol[0]);
+    amp2.gain(ampVol[1]);
+    amp3.gain(ampVol[2]);
+    amp4.gain(ampVol[3]);
+    amp5.gain(ampVol[4]);
+    amp6.gain(ampVol[5]);
+    amp7.gain(ampVol[6]);
 
   // if (SD.exists(_filename)) {
     // Open file for reading
@@ -224,7 +273,7 @@ void init_banks(){
 }
 
 void runSamplePlayer(){
-  if(sampleParam){
+  if(sampleVolCtrl){
     volumeControl();
   }
   control_sampleplayer();

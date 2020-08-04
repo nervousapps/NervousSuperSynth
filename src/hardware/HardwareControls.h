@@ -44,6 +44,28 @@ const int SWITCHES[SWITCH_PINS] = {
   SW3
 };
 
+const int ANALOG_CONTROL_PINS = 18;
+const int ANALOG_CONTROL[ANALOG_CONTROL_PINS] = {
+  SLIDE1,
+  SLIDE2,
+  SLIDE3,
+  SLIDE4,
+  SLIDE5,
+  SLIDE6,
+  SLIDE7,
+  SLIDE8,
+  SLIDE9,
+  SLIDE10,
+  POT1,
+  POT2,
+  POT3,
+  POT4,
+  POT5,
+  SW1,
+  SW2,
+  SW3
+};
+
 // ******DIGITAL CONSTANT VALUES********
 const int TRIGGER_PINS = 6; // number of Digital trigger PINS
 const int ENC_BUTTONS_PINS = 2; // number of Digital encoders switch PINS
@@ -73,6 +95,27 @@ const int ENC_BUTTONS[ENC_BUTTONS_PINS] = {
 // use comment tags to comment out unused portions of array definitions
 
 // initialize the ReponsiveAnalogRead objects
+ResponsiveAnalogRead analog_controls[]{
+  {SLIDERS[0],true},
+  {SLIDERS[1],true},
+  {SLIDERS[2],true},
+  {SLIDERS[3],true},
+  {SLIDERS[4],true},
+  {SLIDERS[5],true},
+  {SLIDERS[6],true},
+  {SLIDERS[7],true},
+  {SLIDERS[8],true},
+  {SLIDERS[9],true},
+  {POTARDS[0],true},
+  {POTARDS[1],true},
+  {POTARDS[2],true},
+  {POTARDS[3],true},
+  {POTARDS[4],true},
+  {SWITCHES[0],true},
+  {SWITCHES[1],true},
+  {SWITCHES[2],true}
+};
+
 ResponsiveAnalogRead analog_slide[]{
   {SLIDERS[0],true},
   {SLIDERS[1],true},

@@ -20,7 +20,7 @@ AudioAmplifier           amp7;
 
 // Create Audio connections between the components
 AudioConnection          samplepatchCord1(sampleplaySdWav1, 0, amp1, 0);
-AudioConnection          samplepatchCord2(amp1, 0, DACS1, 0);
+AudioConnection          samplepatchCord2(amp1, 0, samplemix1, 0);
 // AudioConnection          samplepatchCord2(amp1, 0, samplemix1, 0);
 AudioConnection          samplepatchCord3(sampleplaySdWav2, 0, amp2, 0);
 AudioConnection          samplepatchCord4(amp2, 0, samplemix1, 1);
@@ -35,6 +35,7 @@ AudioConnection          samplepatchCord12(amp6, 0, samplemix2, 2);
 AudioConnection          samplepatchCord13(samplemix1, 0, samplemix3, 0);
 AudioConnection          samplepatchCord14(samplemix2, 0, samplemix3, 1);
 AudioConnection          samplepatchCord15(samplemix3, 0, amp7, 0);
-AudioConnection          samplepatchCord16(amp7, 0, DACS1, 0);
+AudioConnection          samplepatchCord16(amp7, 0, pt8211_1, 0);
+AudioConnection          samplepatchCord17(amp7, 0, pt8211_1, 1);
 // AudioConnection          patchCord12(mix3, 0, dacs1, 0);
 #endif

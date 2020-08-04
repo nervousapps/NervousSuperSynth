@@ -564,14 +564,16 @@ float numToFreq(int input) {
 }
 
 void ChordOrganOnNoteOn(byte channel, byte note, byte velocity) {
+  Serial.print("Note ON");
   if (note > 23 && note < 108)
   {
-    chordCV = note*48;
+    chordCV = note*64.5;
     chordOrganenvelope1.noteOn();
   }
 }
 
 void ChordOrganOnNoteOff(byte channel, byte note, byte velocity) {
+  Serial.print("Note OFF");
   if (note > 23 && note < 108)
   {
     chordOrganenvelope1.noteOff();
@@ -778,7 +780,7 @@ void chordOrgan_run(){
         flashing = false;
     }
 
-    usbMIDI.read();
+    // usbMIDI.read();
 }
 
 #endif
