@@ -24,13 +24,13 @@ boolean firstTime = true;
 #include "sampleplayer/SamplePlayer.h"
 #include "kelpie/kelpiemaster.h"
 #include "chordOrgan/ChordOrgan.h"
-#include "braids/braids.h"
+// #include "braids/braids.h"
 
 
-#define synthNumber 3
+#define synthNumber 2
 
 int synthSelect = 0;
-char synthName[synthNumber][16] = {"Kelpie", "ChordOrgan", "Braids"};
+char synthName[synthNumber][16] = {"Kelpie", "ChordOrgan"};  //, "Braids"};
 
 const int chipSelect = BUILTIN_SDCARD;
 
@@ -67,7 +67,7 @@ void selectSynth(){
         lcd.print(synthName[synthSelect]);
         switch (synthSelect) {
           case 0:
-          toggle_braids(0,1,0);
+          // toggle_braids(0,1,0);
           chordOrganenvelope1.noteOff();
           AudioNoInterrupts();
           kelpieOn();
@@ -77,7 +77,7 @@ void selectSynth(){
           break;
 
           case 1:
-          toggle_braids(0,1,0);
+          // toggle_braids(0,1,0);
           kelpieOff();
           AudioNoInterrupts();
           MIDI.setHandleNoteOff(ChordOrganOnNoteOff);
@@ -86,14 +86,14 @@ void selectSynth(){
           chordOrganenvelope1.noteOn();
           break;
 
-          case 2:
-          chordOrganenvelope1.noteOff();
-          kelpieOff();
-          AudioNoInterrupts();
-          usbMIDI.setHandleNoteOn(braidsHandleNoteOn);
-          AudioInterrupts();
-          toggle_braids(0,1,3);
-          break;
+          // case 2:
+          // chordOrganenvelope1.noteOff();
+          // kelpieOff();
+          // AudioNoInterrupts();
+          // usbMIDI.setHandleNoteOn(braidsHandleNoteOn);
+          // AudioInterrupts();
+          // toggle_braids(0,1,3);
+          // break;
         }
       }
     }
@@ -165,8 +165,8 @@ void setup(){
 
   kelpie_setup();
   setup_chordOrgan(hasSD);
-  setup_braids();
-  toggle_braids(0,1,0);
+  // setup_braids();
+  // toggle_braids(0,1,0);
 }
 
 void loop(){
@@ -182,8 +182,8 @@ void loop(){
     chordOrgan_run();
     break;
 
-    case 2:
-    run_braids();
-    break;
+    // case 2:
+    // run_braids();
+    // break;
   }
 }

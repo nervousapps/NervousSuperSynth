@@ -10,6 +10,7 @@
 
 #include "Settings.h"
 #include "Waves.h"
+#include "chordOrganAudioConnections.h"
 
 // #define DEBUG_STARTUP
 // #define DEBUG_MODE
@@ -170,34 +171,6 @@ float stackFreqScale = 1.001;
 
 int noteRange = 38;
 
-// GUItool: begin automatically generated code
-
-AudioSynthWaveform       chordOrganwaveform1;      //xy=215,232
-AudioSynthWaveform       chordOrganwaveform2;      //xy=243,295
-AudioSynthWaveform       chordOrganwaveform3;      //xy=273,354
-AudioSynthWaveform       chordOrganwaveform4;      //xy=292,394
-AudioSynthWaveform       chordOrganwaveform5;      //xy=215,232
-AudioSynthWaveform       chordOrganwaveform6;      //xy=243,295
-AudioSynthWaveform       chordOrganwaveform7;      //xy=273,354
-AudioSynthWaveform       chordOrganwaveform8;      //xy=292,394
-AudioMixer4              chordOrganmixer1;         //xy=424,117
-AudioMixer4              chordOrganmixer2;         //xy=424,181
-AudioMixer4              chordOrganmixer3;         //xy=571,84
-AudioEffectEnvelope      chordOrganenvelope1;      //xy=652,281
-// AudioOutputAnalog        dac1;           //xy=784,129
-AudioConnection          chordOrganpatchCord1(chordOrganwaveform1, 0, chordOrganmixer1, 0);
-AudioConnection          chordOrganpatchCord2(chordOrganwaveform2, 0, chordOrganmixer1, 1);
-AudioConnection          chordOrganpatchCord7(chordOrganwaveform3, 0, chordOrganmixer1, 2);
-AudioConnection          chordOrganpatchCord8(chordOrganwaveform4, 0, chordOrganmixer1, 3);
-AudioConnection          chordOrganpatchCord3(chordOrganwaveform5, 0, chordOrganmixer2, 0);
-AudioConnection          chordOrganpatchCord4(chordOrganwaveform6, 0, chordOrganmixer2, 1);
-AudioConnection          chordOrganpatchCord5(chordOrganwaveform7, 0, chordOrganmixer2, 2);
-AudioConnection          chordOrganpatchCord6(chordOrganwaveform8, 0, chordOrganmixer2, 3);
-AudioConnection          chordOrganpatchCord9(chordOrganmixer1, 0, chordOrganmixer3, 0);
-AudioConnection          chordOrganpatchCord10(chordOrganmixer2, 0, chordOrganmixer3, 1);
-AudioConnection          chordOrganpatchCord11(chordOrganmixer3, chordOrganenvelope1);
-AudioConnection          chordOrganpatchCord12(chordOrganenvelope1, 0, mainMix, 1);
-// GUItool: end automatically generated code
 // Pointers to waveforms
 AudioSynthWaveform* oscillator[8];
 
@@ -567,7 +540,7 @@ void ChordOrganOnNoteOn(byte channel, byte note, byte velocity) {
   Serial.print("Note ON");
   if (note > 23 && note < 108)
   {
-    chordCV = note*64.5;
+    chordCV = numToFreq(note);
     chordOrganenvelope1.noteOn();
   }
 }

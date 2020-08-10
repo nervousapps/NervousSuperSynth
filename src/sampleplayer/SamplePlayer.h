@@ -106,7 +106,7 @@ void control_sampleplayer(){
   if (newRight2 != positionRight2) {
     if(sampleVolCtrl){
       if(selectingAmp){
-        if (newRight2 > 7){
+        if (newRight2 > 6){
           knobRight2.write(0);
           newRight2 = 0;
         }
@@ -118,6 +118,7 @@ void control_sampleplayer(){
       }else{
         ampVol[ampVolnum] = abs(int(newRight2));
       }
+      lcd.clear();
       lcd.setCursor(0, 1);
       switch (ampVolnum) {
         case 0:
@@ -160,6 +161,7 @@ void control_sampleplayer(){
         knobRight2.write(newRight2*2);
       }
       bank_number = newRight2;
+      lcd.clear();
       lcd.setCursor(0, 1);
       lcd.print("BANK : ");
       lcd.print(banks[bank_number].name);
