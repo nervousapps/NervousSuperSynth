@@ -3,8 +3,27 @@ Synthesizer and sampler built around Teensy 3.5
 
 It is mainly a development platform using almost all the ports on Teensy.
 
+SMD and TH parts, one PCB.
+
 # I/O
-- ...
+- 6 trigger/gate input
+- MIDI IN
+- DAC0 output
+- DAC1 output with analog volume control
+- PT8211 DAC stereo output
+- LED screen 20x2 with contrast control
+
+# Analog controls
+- 10 sliders
+- 5 potentiometers
+- 3 switches
+
+# Digital controls
+- 2 encoders with pushbutton
+
+# Hardware controls
+- RESET
+- PROGRAM
 
 # Firmware
 The firmware is an aggregation of several synths ported to Teensy 3.5:
