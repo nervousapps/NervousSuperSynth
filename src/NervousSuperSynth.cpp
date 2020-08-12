@@ -3,7 +3,6 @@
 #include <TimeAlarms.h>
 #include <Audio.h>
 #include "hardware/pins.h"
-#include "display/Display.h"
 #include <MIDI.h>
 #include "hardware/HardwareControls.h"
 
@@ -19,13 +18,10 @@ AudioConnection             mainpatchcord3(mainAMP, 0, DACS1, 1);
 
 boolean synthParam = false;
 boolean sampleParam = false;
-boolean firstTime = true;
 
-#include "sampleplayer/SamplePlayer.h"
-#include "kelpie/kelpiemaster.h"
-#include "chordOrgan/ChordOrgan.h"
-// #include "braids/braids.h"
+bool displayChange = true;
 
+IntervalTimer			displayTimer;
 
 #define synthNumber 2
 
@@ -34,11 +30,16 @@ char synthName[synthNumber][16] = {"Kelpie", "ChordOrgan"};  //, "Braids"};
 
 const int chipSelect = BUILTIN_SDCARD;
 
+#include "sampleplayer/SamplePlayer.h"
+#include "kelpie/kelpiemaster.h"
+#include "chordOrgan/ChordOrgan.h"
+// #include "braids/braids.h"
+
+#include "display/Display.h"
 
 void selectSynth(){
+  long newRight1;
   if(!synthParam){
-    long newRight1;
-
     // Get rotary encoder1 value
     newRight1 = knobRight1.read()/2;
     if (newRight1 != positionRight1) {
@@ -50,21 +51,15 @@ void selectSynth(){
         newRight1 = synthNumber-1;
         knobRight1.write(newRight1*2);
       }
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print(synthName[newRight1]);
       positionRight1 = newRight1;
+      displayChange = true;
     }
     if(digital_encsw[0].update()){
       if(digital_encsw[0].fallingEdge()){
-        Serial.print("Note ON");
         AudioNoInterrupts();
         synthSelect = newRight1;
         synthParam = !synthParam;
         AudioInterrupts();
-        lcd.clear();
-        lcd.setCursor(0, 0);
-        lcd.print(synthName[synthSelect]);
         switch (synthSelect) {
           case 0:
           // toggle_braids(0,1,0);
@@ -95,16 +90,9 @@ void selectSynth(){
           // toggle_braids(0,1,3);
           // break;
         }
+        displayChange = true;
       }
     }
-    if(firstTime){
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print(synthName[newRight1]);
-      firstTime = synthParam;
-    }
-  }else{
-    firstTime = synthParam;
   }
 }
 
@@ -131,7 +119,7 @@ void setup(){
   // Configure the DACs
   analogWriteResolution(12);
   DACS1.analogReference(INTERNAL);
-  AudioMemory(600);
+  AudioMemory(700);
 
   mainMix.gain(0, 1);
   mainAMP.gain(5);
@@ -156,8 +144,11 @@ void setup(){
   Serial.print(ANALOG_CONTROL_PINS);
 
   lcd.setCursor(0,0);
-  lcd.print("SuperSynth");
-  delay(2000);
+  lcd.print("!    SuperSynth    !");
+  for(int i=0; i<100; i++){
+    draw_progressbar(i);
+    delay(2.5);
+  }
 
   init_banks();
 
@@ -167,6 +158,7 @@ void setup(){
   setup_chordOrgan(hasSD);
   // setup_braids();
   // toggle_braids(0,1,0);
+  // displayTimer.begin(printInfos, 1);
 }
 
 void loop(){
@@ -186,4 +178,5 @@ void loop(){
     // run_braids();
     // break;
   }
+  printInfos();
 }

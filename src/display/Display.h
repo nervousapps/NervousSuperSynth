@@ -118,7 +118,7 @@ void setup_lcd(){
  */
 void draw_progressbar(byte percent) {
  /* Déplace le curseur sur la seconde ligne */
-  lcd.setCursor(0, 0);
+  lcd.setCursor(0, 1);
 
   /* Map la plage (0 ~ 100) vers la plage (0 ~ LCD_NB_COLUMNS * 2 - 2) */
   byte nb_columns = map(percent, 0, 100, 0, LCD_NB_COLUMNS * 2 - 2);
@@ -162,6 +162,86 @@ void draw_progressbar(byte percent) {
       } else {
         lcd.write(2); // Char div 0 / 2
       }
+    }
+  }
+}
+
+void printInfos(){
+  if(displayChange){
+    displayChange = !displayChange;
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    if(!synthParam){
+      lcd.print(synthName[positionRight1]);
+    }else{
+      switch(synthSelect){
+        case 0:
+        lcd.print(kelpieEncoderParam[positionRight1]);
+        lcd.print(" : ");
+        switch(positionRight1){
+          case 0:
+          lcd.print(kelpirWaveforms[waveform1state]);
+          break;
+
+          case 1:
+          lcd.print(kelpirWaveforms[waveform2state]);
+          break;
+
+          case 2:
+          if(globalState.IS_POLY){
+            lcd.print("TRUE");
+          }else{
+            lcd.print("FALSE");
+          }
+          break;
+        }
+        break;
+
+        case 1:
+        lcd.print("Waveform : ");
+        lcd.print(waveform);
+        break;
+      }
+    }
+
+    lcd.setCursor(0, 1);
+
+    if(sampleVolCtrl){
+      switch (ampVolnum) {
+        case 0:
+          lcd.print(splitString(splitString(banks[bank_number].sample1, '/', 1), '.', 0));
+          break;
+
+        case 1:
+          lcd.print(splitString(splitString(banks[bank_number].sample2, '/', 1), '.', 0));
+          break;
+
+        case 2:
+          lcd.print(splitString(splitString(banks[bank_number].sample3, '/', 1), '.', 0));
+          break;
+
+        case 3:
+          lcd.print(splitString(splitString(banks[bank_number].sample4, '/', 1), '.', 0));
+          break;
+
+        case 4:
+          lcd.print(splitString(splitString(banks[bank_number].sample5, '/', 1), '.', 0));
+          break;
+
+        case 5:
+          lcd.print(splitString(splitString(banks[bank_number].sample6, '/', 1), '.', 0));
+          break;
+
+        case 6:
+          lcd.print("MAINAMP");
+          break;
+      }
+      lcd.print(" : ");
+      lcd.print(ampVol[ampVolnum]);
+    }else{
+      lcd.print("BANK : ");
+      lcd.print(banks[bank_number].name);
     }
   }
 }

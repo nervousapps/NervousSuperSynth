@@ -9,7 +9,6 @@
 #include <SD.h>
 #include <SerialFlash.h>
 
-
 File root;
 
 boolean directory = true;
@@ -97,10 +96,9 @@ void sampleplay(){
 }
 
 void control_sampleplayer(){
-  long newRight2;
 
   // TODO : add editor mode !
-
+  long newRight2;
   // Get rotary encoder2 value
   newRight2 = knobRight2.read()/2;
   if (newRight2 != positionRight2) {
@@ -118,39 +116,6 @@ void control_sampleplayer(){
       }else{
         ampVol[ampVolnum] = abs(int(newRight2));
       }
-      lcd.clear();
-      lcd.setCursor(0, 1);
-      switch (ampVolnum) {
-        case 0:
-          lcd.print(splitString(splitString(banks[bank_number].sample1, '/', 1), '.', 0));
-          break;
-
-        case 1:
-          lcd.print(splitString(splitString(banks[bank_number].sample2, '/', 1), '.', 0));
-          break;
-
-        case 2:
-          lcd.print(splitString(splitString(banks[bank_number].sample3, '/', 1), '.', 0));
-          break;
-
-        case 3:
-          lcd.print(splitString(splitString(banks[bank_number].sample4, '/', 1), '.', 0));
-          break;
-
-        case 4:
-          lcd.print(splitString(splitString(banks[bank_number].sample5, '/', 1), '.', 0));
-          break;
-
-        case 5:
-          lcd.print(splitString(splitString(banks[bank_number].sample6, '/', 1), '.', 0));
-          break;
-
-        case 6:
-          lcd.print("MAINAMP");
-          break;
-      }
-      lcd.print(" : ");
-      lcd.print(ampVol[ampVolnum]);
     }else{
       if (newRight2 > number_banks-1){
         knobRight2.write(0);
@@ -161,13 +126,9 @@ void control_sampleplayer(){
         knobRight2.write(newRight2*2);
       }
       bank_number = newRight2;
-      lcd.clear();
-      lcd.setCursor(0, 1);
-      lcd.print("BANK : ");
-      lcd.print(banks[bank_number].name);
-      lcd.print("      ");
     }
     positionRight2 = newRight2;
+    displayChange = true;
   }
 
   // Switch to volume control mode
@@ -179,18 +140,22 @@ void control_sampleplayer(){
     if(digital_encsw[1].risingEdge()){
       if(sampleParamMsec < 300){
         if(sampleVolCtrl){
+          if(selectingAmp){
+            knobRight2.write(ampVol[ampVolnum]*2);
+          }else{
+            knobRight2.write(ampVolnum*2);
+          }
           selectingAmp = !selectingAmp;
         }
       }
       else if(sampleParamMsec >= 600){
-        lcd.setCursor(0, 1);
         sampleVolCtrl = !sampleVolCtrl;
         selectingAmp = true;
       }
       sampleParamMsec = 0;
+      displayChange = true;
     }
   }
-
 }
 
 void volumeControl(){
@@ -269,8 +234,6 @@ void init_banks(){
     // Close the file (File's destructor doesn't close the file)
     file.close();
   // }
-  lcd.setCursor(0, 1);
-  lcd.print(banks[bank_number].name);
   return;
 }
 

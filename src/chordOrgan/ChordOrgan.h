@@ -280,10 +280,6 @@ void selectWaveform(int waveform) {
     }
     // ledWrite(waveform % 4);
     // EEPROM.write(1234, waveform);
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Waveform : ");
-    lcd.print(waveform);
 
     AudioNoInterrupts();
     if(waveformPage == 0) {
@@ -478,6 +474,7 @@ void chord_get_encoders_parameters(){
       if(digital_encsw[0].fallingEdge()){
         if(ChordsynthParamMsec <= 300){
           synthParam = false;
+          displayChange = true;
         }else{
           buttonTimer = 0;
         }
@@ -717,6 +714,7 @@ void chordOrgan_run(){
         selectWaveform(waveform);
         changed = true;
         shortPress = false;
+        displayChange = true;
     }
 
     if (changed)  {

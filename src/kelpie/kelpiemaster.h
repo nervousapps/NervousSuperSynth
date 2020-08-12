@@ -274,8 +274,8 @@ void get_parameters(){
 }
 
 void kelpie_get_encoders_parameters(){
+  long newRight1;
   if(synthParam){
-    long newRight1;
     // Get rotary encoder1 value
     newRight1 = knobRight1.read()/2;
     if (newRight1 != positionRight1) {
@@ -288,11 +288,13 @@ void kelpie_get_encoders_parameters(){
         knobRight1.write(newRight1*2);
       }
       positionRight1 = newRight1;
+      displayChange = true;
     }
     if(digital_encsw[0].update()){
       if(digital_encsw[0].fallingEdge()){
         if(kelpiesynthParamMsec <= 300){
           synthParam = false;
+          displayChange = true;
         }else{
           switch(newRight1){
             case 0:
@@ -349,29 +351,8 @@ void kelpie_get_encoders_parameters(){
           }
         }
         kelpiesynthParamMsec = 0;
+        displayChange = true;
       }
-    }
-    lcd.setCursor(0, 0);
-    lcd.print(kelpieEncoderParam[newRight1]);
-    lcd.print(" : ");
-    switch(newRight1){
-      case 0:
-      lcd.print(kelpirWaveforms[waveform1state]);
-      lcd.print("       ");
-      break;
-
-      case 1:
-      lcd.print(kelpirWaveforms[waveform2state]);
-      lcd.print("       ");
-      break;
-
-      case 2:
-      if(globalState.IS_POLY){
-        lcd.print("TRUE            ");
-      }else{
-        lcd.print("FALSE           ");
-      }
-      break;
     }
   }
 }
