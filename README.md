@@ -5,6 +5,9 @@ It is mainly a development platform using almost all the ports on Teensy.
 
 SMD and TH parts, one PCB.
 
+![Image of NervousSuperSynth]
+(https://www.instagram.com/p/CCwd2ZUKM5E/)
+
 # I/O
 - 6 trigger/gate input
 - MIDI IN
