@@ -5,20 +5,15 @@ It is mainly a development platform using almost all the ports on Teensy.
 
 SMD and TH parts, one PCB.
 
-![Image of NervousSuperSynth bare pcb]
-(https://github.com/nervousapps/NervousSuperSynth/raw/proto_1/images/bare_pcb.png)
+![Image of NervousSuperSynth bare pcb](https://github.com/nervousapps/NervousSuperSynth/raw/proto_1/images/bare_pcb.png)
 
-![Image of NervousSuperSynth monster vs proto_1 1]
-(https://github.com/nervousapps/NervousSuperSynth/blob/proto_1/images/monstervsproto1_1.png)
+![Image of NervousSuperSynth monster vs proto_1 1](https://github.com/nervousapps/NervousSuperSynth/blob/proto_1/images/monstervsproto1_1.png)
 
-![Image of NervousSuperSynth monster vs proto_1 2]
-(https://github.com/nervousapps/NervousSuperSynth/blob/proto_1/images/monstervsproto1_2.png)
+![Image of NervousSuperSynth monster vs proto_1 2](https://github.com/nervousapps/NervousSuperSynth/blob/proto_1/images/monstervsproto1_2.png)
 
-![Image of NervousSuperSynth monster vs proto_1 3]
-(https://github.com/nervousapps/NervousSuperSynth/blob/proto_1/images/monstervsproto1_3.png)
+![Image of NervousSuperSynth monster vs proto_1 3](https://github.com/nervousapps/NervousSuperSynth/blob/proto_1/images/monstervsproto1_3.png)
 
-![Image of NervousSuperSynth monster vs proto_1 4]
-(https://github.com/nervousapps/NervousSuperSynth/blob/proto_1/images/monstervsproto1_4.png)
+![Image of NervousSuperSynth monster vs proto_1 4](https://github.com/nervousapps/NervousSuperSynth/blob/proto_1/images/monstervsproto1_4.png)
 
 # I/O
 - 6 trigger/gate input
