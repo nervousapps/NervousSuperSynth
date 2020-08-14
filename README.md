@@ -47,3 +47,14 @@ https://docs.google.com/spreadsheets/d/1-4hl6AcAoJYJrRvISyrwIaEGTYHwAB_IcKs__rtE
 https://cad.onshape.com/documents/76309e780cb99c0f2066b519/w/a28c1d39745cdb4e42b1148c/e/933dfecdfdc7ae9463372842
 
 I made the panel here : https://www.john-steel.com/
+
+# TODO
+- add editor mode to SamplePlayer
+- add some synths:
+    - https://github.com/ElectroTechnique/TSynth/
+    - https://github.com/otem/teensypolysynth/
+    - https://github.com/mattybrad/polymod
+    - https://github.com/marshalltaylorSFE/Proto-8
+    - https://github.com/ghostintranslation/SimpleSynth
+    - https://github.com/kbob/drum-machine
+    - https://github.com/RyoKosaka/HelloDrum-arduino-Library (https://gist.github.com/RyoKosaka/2046d4af9e4f12aaba618d9c9036d89e)
