@@ -5,6 +5,8 @@ It is mainly a development platform using almost all the ports on Teensy.
 
 SMD and TH parts, one PCB.
 
+# ModularGrid : https://www.modulargrid.net/e/other-unknown-nervoussupersynth
+
 ![Image of NervousSuperSynth bare pcb](https://github.com/nervousapps/NervousSuperSynth/raw/proto_1/images/bare_pcb.png)
 
 ![Image of NervousSuperSynth monster vs proto_1 1](https://github.com/nervousapps/NervousSuperSynth/blob/proto_1/images/monstervsproto1_1.png)
