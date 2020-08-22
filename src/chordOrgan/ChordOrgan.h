@@ -1,7 +1,6 @@
 #ifndef Chord_Organ_h
 #define Chord_Organ_h
 
-#include <Audio.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
@@ -468,12 +467,23 @@ void checkInterface(){
     }
 }
 
+void chordOrganOff(){
+  chordOrganenvelope1.noteOff();
+  chordOrgan_AOstop();
+}
+
+void chordOrganOn(){
+  chordOrgan_AOstart();
+}
+
 void chord_get_encoders_parameters(){
   if(synthParam){
     if(digital_encsw[0].update()){
       if(digital_encsw[0].fallingEdge()){
         if(ChordsynthParamMsec <= 300){
           synthParam = false;
+          chordOrganOff();
+          knobRight1.write(synthSelect*2);
           displayChange = true;
         }else{
           buttonTimer = 0;

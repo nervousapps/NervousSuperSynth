@@ -202,6 +202,11 @@ void printInfos(){
         lcd.print("Waveform : ");
         lcd.print(waveform);
         break;
+
+        case 2:
+        lcd.print("Patch : ");
+        lcd.print(patches[patchNo-1].patchName);
+        break;
       }
     }
 

@@ -1,8 +1,6 @@
 #ifndef Settings_h
 #define Settings_h
 
-#include <SD.h>
-
 boolean settingsstacked = false;
 boolean settingsextraWaves = false;
 boolean settingsglide = false;

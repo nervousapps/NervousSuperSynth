@@ -3,11 +3,7 @@
 
 #include "Arduino.h"
 #include <ArduinoJson.h>
-#include <Audio.h>
 #include "SamplePlayerAudioConnections.h"
-#include <SPI.h>
-#include <SD.h>
-#include <SerialFlash.h>
 
 File root;
 

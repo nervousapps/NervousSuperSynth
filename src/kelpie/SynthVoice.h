@@ -2,7 +2,6 @@
 #ifndef SynthVoice_h
 #define SynthVoice_h
 
-#include <Audio.h>
 struct SynthVoice
 {
   byte note;
@@ -12,11 +11,11 @@ struct SynthVoice
   AudioSynthWaveform &waveformA;
   AudioSynthWaveform &waveformB;
   AudioSynthNoiseWhite &noise;
-  AudioMixer4 &waveformMixer;
-  AudioAmplifier &waveformAmplifier;
-  AudioEffectEnvelope &ampEnv;
-  AudioEffectEnvelope &filterEnv;
-  AudioFilterStateVariable &filter;
+  AudioMixer4Private &waveformMixer;
+  AudioAmplifierPrivate &waveformAmplifier;
+  AudioEffectEnvelopePrivate &ampEnv;
+  AudioEffectEnvelopePrivate &filterEnv;
+  AudioFilterStateVariablePrivate &filter;
 };
 
 

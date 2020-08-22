@@ -4,7 +4,6 @@
 #define Kelpie_Helpers_h
 
 #include <Arduino.h>
-#include <Audio.h>
 // #include <HardwareInputs.h>
 #include "keyMappings.h"
 #include "SynthVoice.h"
@@ -16,10 +15,10 @@ extern SynthVoice polyVoices[];
 extern SynthVoice monoVoices[];
 extern SynthState globalState;
 extern boolean prevButtonsState[];
-extern AudioAmplifier MASTER_GAIN;
+extern AudioAmplifierPrivate MASTER_GAIN;
 extern AudioSynthWaveformSine LFO;
-extern AudioMixer4 LFO_MIXER_FILTER;
-extern AudioMixer4 LFO_MIXER_AMP;
+extern AudioMixer4Private LFO_MIXER_FILTER;
+extern AudioMixer4Private LFO_MIXER_AMP;
 extern const byte MONOBUFFERSIZE;
 extern byte monoBuffer[];
 
@@ -160,10 +159,7 @@ void keyBuffPoly(byte note, float noteGain, boolean playNote)
 }
 
 void kelpieOff(){
-  for (byte i = 0; i < numPolyVoices; i++)
-  {
-    deactivateVoice(i);
-  }
+  kelpie_AOstop();
 }
 
 // this function is responsible to balancing OSC1, OSC2, and NOISE for each voice. This is necessary because KNOB 1 balances OSC1 and 2, while Knob 6 adds and subtracts noise presense from audio
