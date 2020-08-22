@@ -63,7 +63,7 @@ I made the panel here : https://www.john-steel.com/
 # TODO
 - add editor mode to SamplePlayer
 - add some synths:
-    - https://github.com/ElectroTechnique/TSynth/
+    - https://github.com/ElectroTechnique/TSynth/  (Almost done !)
     - https://github.com/otem/teensypolysynth/
     - https://github.com/mattybrad/polymod
     - https://github.com/marshalltaylorSFE/Proto-8
@@ -71,5 +71,5 @@ I made the panel here : https://www.john-steel.com/
     - https://github.com/kbob/drum-machine
     - https://github.com/RyoKosaka/HelloDrum-arduino-Library (https://gist.github.com/RyoKosaka/2046d4af9e4f12aaba618d9c9036d89e)
 - display parameters when changing
-- review kelpie paramters for switches
+- review kelpie parameters for switches
 - clean code
