@@ -14,11 +14,12 @@ MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
 
 AudioMixer4Private          mainMix;
 AudioAmplifierPrivate       mainAMP;
-AudioOutputAnalogStereo     DACS1;
+// AudioOutputAnalogStereo     DACS1;
+AudioOutputAnalog     DACS1;
 AudioOutputPT8211           pt8211_1;
 AudioConnection             mainpatchcord0(mainMix, 0, mainAMP, 0);
 AudioConnection             mainpatchcord2(mainAMP, 0, DACS1, 0);
-AudioConnection             mainpatchcord3(mainAMP, 0, DACS1, 1);
+// AudioConnection             mainpatchcord3(mainAMP, 0, DACS1, 1);
 
 boolean synthParam = false;
 boolean sampleParam = false;
@@ -26,12 +27,10 @@ boolean hasSD = false;
 
 bool displayChange = true;
 
-IntervalTimer			displayTimer;
-
-#define synthNumber 3
+#define synthNumber 4
 
 int synthSelect = -9;
-char synthName[synthNumber][16] = {"Kelpie", "ChordOrgan", "Tsynth"};  //, "Braids"};
+char synthName[synthNumber][16] = {"Kelpie", "ChordOrgan", "Tsynth", "Braids"};
 
 const int chipSelect = BUILTIN_SDCARD;
 
@@ -39,7 +38,7 @@ const int chipSelect = BUILTIN_SDCARD;
 #include "kelpie/kelpiemaster.h"
 #include "chordOrgan/ChordOrgan.h"
 #include "tsynth/TSynth.h"
-// #include "braids/braids.h"
+#include "braids/braids.h"
 
 #include "display/Display.h"
 
@@ -69,7 +68,7 @@ void selectSynth(){
         switch (synthSelect) {
           case 0:
           AudioNoInterrupts();
-          // toggle_braids(0,1,0);
+          toggle_braids(0,1,0);
           chordOrganOff();
           Tsynth_off();
           kelpieOn();
@@ -80,7 +79,7 @@ void selectSynth(){
 
           case 1:
           AudioNoInterrupts();
-          // toggle_braids(0,1,0);
+          toggle_braids(0,1,0);
           kelpieOff();
           Tsynth_off();
           chordOrganOn();
@@ -92,7 +91,7 @@ void selectSynth(){
 
           case 2:
           AudioNoInterrupts();
-          // toggle_braids(0,1,0);
+          toggle_braids(0,1,0);
           chordOrganOff();
           kelpieOff();
           Tsynth_setup();
@@ -101,14 +100,15 @@ void selectSynth(){
           AudioInterrupts();
           break;
 
-          // case 2:
-          // chordOrganenvelope1.noteOff();
-          // kelpieOff();
-          // AudioNoInterrupts();
-          // usbMIDI.setHandleNoteOn(braidsHandleNoteOn);
-          // AudioInterrupts();
-          // toggle_braids(0,1,3);
-          // break;
+          case 3:
+          chordOrganOff();
+          Tsynth_off();
+          kelpieOff();
+          AudioNoInterrupts();
+          MIDI.setHandleNoteOn(braidsHandleNoteOn);
+          AudioInterrupts();
+          toggle_braids(0,1,3);
+          break;
         }
         displayChange = true;
       }
@@ -141,54 +141,65 @@ void setup(){
   DACS1.analogReference(INTERNAL);
   AudioMemory(500);
 
+  // Set main mixer volume
   mainMix.gain(0, 0.25);
   mainMix.gain(1, 0.25);
   mainMix.gain(2, 0.25);
   mainMix.gain(3, 0.25);
   mainAMP.gain(5);
 
+  // Init SD card
   Serial.println("Initializing SD card...");
-
   hasSD = openSDCard();
-
   if (!hasSD) {
     Serial.println("initialization failed!");
     return;
   }
 
+  // Init serial
   Serial.begin(9600);
   Serial.print("Begin");
 
+  // Init LCD
   setup_lcd();
   setup_progressbar();
+  lcd.setCursor(0,0);
 
+  // Init hardware controls
   setup_hardware_controls();
-
   Serial.print(ANALOG_CONTROL_PINS);
 
+  // Init LCD
   lcd.setCursor(0,0);
+
+  // Starting animation
   lcd.print("!    SuperSynth    !");
   for(int i=0; i<100; i++){
     draw_progressbar(i);
     delay(2);
   }
 
+  // Init sampleplayer banks
   init_banks();
 
+  // Init MIDI
   MIDI.begin();
 
+  // Init Kelpie and power off
   kelpie_setup();
   kelpieOff();
 
+  // Init Tsynth and power off
   Tsynth_setup();
   Tsynth_off();
 
+  // Init chordOrgan and power off
   setup_chordOrgan(hasSD);
   chordOrganOff();
 
-  // setup_braids();
-  // toggle_braids(0,1,0);
-  // displayTimer.begin(printInfos, 1);
+  // Init Braids and power off
+  setup_braids();
+  toggle_braids(0,1,0);
 }
 
 volatile uint32_t cpu_load = 0;
@@ -241,9 +252,9 @@ void loop(){
       Tsynth_run();
       break;
 
-      // case 2:
-      // run_braids();
-      // break;
+      case 3:
+      run_braids();
+      break;
     }
   }
   cpuLoadSleep();

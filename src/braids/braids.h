@@ -175,8 +175,6 @@ void main_braids(){
   else{
       osc.Render(sync_buffer, bufferB, kAudioBlockSize);
   }
-  // Reads the midi data
-  usbMIDI.read();
 
   // Waits until the buffer is ready to render again
   wait = 1;
@@ -227,9 +225,7 @@ void braids_get_shape(){
         knobRight1.write(newRight1*2);
       }
       positionRight1 = newRight1;
-      lcd.setCursor(0, 0);
-      lcd.print("SHAPE : ");
-      lcd.print(shape_values[newRight1]);
+      displayChange = true;
     }
     if(digital_encsw[0].update()){
       if(digital_encsw[0].fallingEdge()){
@@ -292,9 +288,9 @@ void setup_braids() {
 
 //************LOOP**************
 void run_braids() {
-  braids_get_shape();
-  braids_get_parameters();
   if(braidsOn){
+    braids_get_shape();
+    braids_get_parameters();
     main_braids();
   }
 }

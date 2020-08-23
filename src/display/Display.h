@@ -207,6 +207,12 @@ void printInfos(){
         lcd.print("Patch : ");
         lcd.print(patches[patchNo-1].patchName);
         break;
+
+        case 3:
+        lcd.setCursor(0, 0);
+        lcd.print("SHAPE : ");
+        lcd.print(shape_values[positionRight1]);
+        break;
       }
     }
 
