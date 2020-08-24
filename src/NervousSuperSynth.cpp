@@ -12,8 +12,8 @@
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
 
-AudioMixer4Private          mainMix;
-AudioAmplifierPrivate       mainAMP;
+AudioMixer4          mainMix;
+AudioAmplifier       mainAMP;
 // AudioOutputAnalogStereo     DACS1;
 AudioOutputAnalog     DACS1;
 AudioOutputPT8211           pt8211_1;
@@ -26,6 +26,7 @@ boolean sampleParam = false;
 boolean hasSD = false;
 
 bool displayChange = true;
+bool debug = false;
 
 #define synthNumber 4
 
@@ -68,7 +69,7 @@ void selectSynth(){
         switch (synthSelect) {
           case 0:
           AudioNoInterrupts();
-          toggle_braids(0,1,0);
+          braids_off();
           chordOrganOff();
           Tsynth_off();
           kelpieOn();
@@ -79,7 +80,7 @@ void selectSynth(){
 
           case 1:
           AudioNoInterrupts();
-          toggle_braids(0,1,0);
+          braids_off();
           kelpieOff();
           Tsynth_off();
           chordOrganOn();
@@ -91,7 +92,7 @@ void selectSynth(){
 
           case 2:
           AudioNoInterrupts();
-          toggle_braids(0,1,0);
+          braids_off();
           chordOrganOff();
           kelpieOff();
           Tsynth_setup();
@@ -107,7 +108,7 @@ void selectSynth(){
           AudioNoInterrupts();
           MIDI.setHandleNoteOn(braidsHandleNoteOn);
           AudioInterrupts();
-          toggle_braids(0,1,3);
+          braids_on();
           break;
         }
         displayChange = true;
@@ -131,6 +132,19 @@ boolean openSDCard() {
 }
 
 void setup(){
+  // Catch debug mode
+  if(digital_encsw[0].update()){
+    if(digital_encsw[0].fallingEdge()){
+      debug = true;
+      // Init serial
+      Serial.begin(9600);
+      Serial.print("Begin");
+    }
+  }
+  debug = true;
+  Serial.begin(9600);
+  Serial.print("Begin");
+
   // Configure the ADCs
   analogReadResolution(7);
   analogReadAveraging(4);
@@ -139,26 +153,21 @@ void setup(){
   // Configure the DACs
   analogWriteResolution(12);
   DACS1.analogReference(INTERNAL);
-  AudioMemory(500);
+  AudioMemory(200);
 
   // Set main mixer volume
   mainMix.gain(0, 0.25);
   mainMix.gain(1, 0.25);
   mainMix.gain(2, 0.25);
   mainMix.gain(3, 0.25);
-  mainAMP.gain(5);
+  mainAMP.gain(50);
 
   // Init SD card
-  Serial.println("Initializing SD card...");
+  if(debug) Serial.println("Initializing SD card...");
   hasSD = openSDCard();
   if (!hasSD) {
-    Serial.println("initialization failed!");
-    return;
+    if(debug) Serial.println("initialization failed!");
   }
-
-  // Init serial
-  Serial.begin(9600);
-  Serial.print("Begin");
 
   // Init LCD
   setup_lcd();
@@ -167,17 +176,7 @@ void setup(){
 
   // Init hardware controls
   setup_hardware_controls();
-  Serial.print(ANALOG_CONTROL_PINS);
-
-  // Init LCD
-  lcd.setCursor(0,0);
-
-  // Starting animation
-  lcd.print("!    SuperSynth    !");
-  for(int i=0; i<100; i++){
-    draw_progressbar(i);
-    delay(2);
-  }
+  if(debug) Serial.print(ANALOG_CONTROL_PINS);
 
   // Init sampleplayer banks
   init_banks();
@@ -199,7 +198,17 @@ void setup(){
 
   // Init Braids and power off
   setup_braids();
-  toggle_braids(0,1,0);
+  braids_off();
+
+  // Init LCD
+  lcd.setCursor(0,0);
+
+  // Starting animation
+  lcd.print("!    SuperSynth    !");
+  for(int i=0; i<100; i++){
+    draw_progressbar(i);
+    delay(2);
+  }
 }
 
 volatile uint32_t cpu_load = 0;
@@ -232,6 +241,10 @@ void CPUMonitor() {
   Serial.print(AudioProcessorUsage());
   Serial.print("  MEM:");
   Serial.println(AudioMemoryUsage());
+  Serial.print("CPU MAX:");
+  Serial.print(AudioProcessorUsageMax());
+  Serial.print("  MEM MAX:");
+  Serial.println(AudioMemoryUsageMax());
 }
 
 void loop(){
@@ -257,10 +270,13 @@ void loop(){
       break;
     }
   }
-  cpuLoadSleep();
-  if(has_result){
-    Serial.println(cpu_load);
-  }
-  CPUMonitor();
   printInfos();
+
+  if(debug){
+    cpuLoadSleep();
+    if(has_result){
+      Serial.println(cpu_load);
+    }
+    CPUMonitor();
+  }
 }

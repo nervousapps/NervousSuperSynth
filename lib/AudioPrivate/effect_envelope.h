@@ -24,18 +24,18 @@
  * THE SOFTWARE.
  */
 
-#ifndef private_effect_envelope_h_
-#define private_effect_envelope_h_
+#ifndef effect_envelope_h_
+#define effect_envelope_h_
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "utility/dspinst.h"
 
 #define SAMPLES_PER_MSEC (AUDIO_SAMPLE_RATE_EXACT/1000.0)
 
-class AudioEffectEnvelopePrivate : public AudioStream
+class AudioEffectEnvelope : public AudioStream
 {
 public:
-	AudioEffectEnvelopePrivate() : AudioStream(1, inputQueueArray) {
+	AudioEffectEnvelope() : AudioStream(1, inputQueueArray) {
 		state = 0;
 		begin();
 		delay(0.0f);  // default values...

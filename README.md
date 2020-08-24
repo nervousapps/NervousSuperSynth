@@ -1,9 +1,10 @@
 # NervousSuperSynth
-Synthesizer and sampler built around Teensy 3.5
+Synthesizer and sampler built around Teensy 3.5/3.6
 
 It is mainly a development platform using almost all the ports on Teensy.
 
-SMD and TH parts, one PCB.
+The audio library is based on Teensy's one with the ability to stop the update process
+of audio objects in order to save CPU load.
 
 # ModularGrid : https://www.modulargrid.net/e/other-unknown-nervoussupersynth
 
@@ -42,6 +43,7 @@ The firmware is an aggregation of several synths ported to Teensy 3.5:
 - Kelpie (https://github.com/friedpies/kelpie-pocket-synth)
 - Braids (https://github.com/pichenettes/eurorack and https://github.com/modlfo/teensy-braids)
 - ChordOrgan (https://github.com/TomWhitwell/Chord-Organ)
+- Tsynth (https://github.com/ElectroTechnique/TSynth/) (works only with Teensy 3.6, testing ...)
 - SamplePlayer
 
 # Compilation
@@ -49,6 +51,8 @@ PlatformIO
 
 # SCHEMATICS & PCB
 https://easyeda.com/xtreemechille/supersynth-copy
+
+SMD and TH parts, one PCB.
 
 I have some PCBs in stock, assembled, kit or bare, contact me at nervousrvoltage@icloud.com if you are interested.
 
@@ -63,7 +67,6 @@ I made the panel here : https://www.john-steel.com/
 # TODO
 - add editor mode to SamplePlayer
 - add some synths:
-    - https://github.com/ElectroTechnique/TSynth/  (Almost done !)
     - https://github.com/otem/teensypolysynth/
     - https://github.com/mattybrad/polymod
     - https://github.com/marshalltaylorSFE/Proto-8

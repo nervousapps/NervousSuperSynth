@@ -98,22 +98,22 @@ void get_parameters(){
           switch (i)
           {
             case 0: // MASTER VOLUME
-              Serial.print("\nMASTER VOL : ");
-              Serial.print(normalizedKnobVal);
+              // Serial.print("\nMASTER VOL : ");
+              // Serial.print(normalizedKnobVal);
               globalState.MASTER_VOL = normalizedKnobVal * MAX_MASTER_GAIN;
               MASTER_GAIN.gain(globalState.MASTER_VOL * globalState.POLY_GAIN_MULTIPLIER);
             break;
             case 1: // OSC BALANCE
-              Serial.print("\nOSC BALANCE : ");
-              Serial.print(normalizedKnobVal);
+              // Serial.print("\nOSC BALANCE : ");
+              // Serial.print(normalizedKnobVal);
               globalState.OSC1_VOL = normalizedKnobVal;
               globalState.OSC2_VOL = 1 - (normalizedKnobVal);
               globalState.OSC_CONSTANT = calculateOscConstant(globalState.OSC1_VOL, globalState.OSC2_VOL, globalState.NOISE_VOL);
               setWaveformLevels(globalState.OSC1_VOL, globalState.OSC2_VOL, globalState.NOISE_VOL, globalState.OSC_CONSTANT);
             break;
             case 2: // OSCILLATOR PWM
-              Serial.print("\nOSC PWM : ");
-              Serial.print(normalizedKnobVal);
+              // Serial.print("\nOSC PWM : ");
+              // Serial.print(normalizedKnobVal);
               globalState.PWM = 0.1 + 0.4 * (1 - normalizedKnobVal);
               for (byte i = 0; i < numPolyVoices; i++)
               {
@@ -122,15 +122,15 @@ void get_parameters(){
               }
             break;
             case 3: // NOISE VOLUME
-            Serial.print("\nNOISE VOL : ");
-            Serial.print(normalizedKnobVal);
+            // Serial.print("\nNOISE VOL : ");
+            // Serial.print(normalizedKnobVal);
               globalState.NOISE_VOL = normalizedKnobVal;
               globalState.OSC_CONSTANT = calculateOscConstant(globalState.OSC1_VOL, globalState.OSC2_VOL, globalState.NOISE_VOL);
               setWaveformLevels(globalState.OSC1_VOL, globalState.OSC2_VOL, globalState.NOISE_VOL, globalState.OSC_CONSTANT);
             break;
             case 4: // OSC DETUNE
-            Serial.print("\nOSC DETUNE : ");
-            Serial.print(normalizedKnobVal);
+            // Serial.print("\nOSC DETUNE : ");
+            // Serial.print(normalizedKnobVal);
               globalState.DETUNE = calculateDetuneValue(normalizedKnobVal);
               for (byte i = 0; i < numPolyVoices; i++)
               {
@@ -138,8 +138,8 @@ void get_parameters(){
               }
             break;
             case 5: // FILTER FREQUENCY
-            Serial.print("\nFILTER FREQ : ");
-            Serial.print(normalizedKnobVal);
+            // Serial.print("\nFILTER FREQ : ");
+            // Serial.print(normalizedKnobVal);
               globalState.FILTER_FREQ = FILTER_CUTOFF_MAX * pow(normalizedKnobVal, 3);
               for (byte i = 0; i < numPolyVoices; i++)
               {
@@ -147,8 +147,8 @@ void get_parameters(){
               }
             break;
             case 6: // FILTER RESONANCE
-            Serial.print("\nFILTER RES : ");
-            Serial.print(normalizedKnobVal);
+            // Serial.print("\nFILTER RES : ");
+            // Serial.print(normalizedKnobVal);
               globalState.FILTER_Q = (FILTER_Q_MAX * normalizedKnobVal) + 1.1;
               globalState.PREFILTER_GAIN = 1 / globalState.FILTER_Q;
               for (byte i = 0; i < numPolyVoices; i++)
@@ -157,8 +157,8 @@ void get_parameters(){
               }
             break;
             case 7: // FILTER DEPTH
-            Serial.print("\nFILTER DEPTH : ");
-            Serial.print(normalizedKnobVal);
+            // Serial.print("\nFILTER DEPTH : ");
+            // Serial.print(normalizedKnobVal);
               globalState.FILTER_OCTAVE = FILTER_OCTAVE_DEPTH * normalizedKnobVal;
               for (byte i = 0; i < numPolyVoices; i++)
               {
@@ -166,26 +166,26 @@ void get_parameters(){
               }
             break;
             case 8: // LFO RATE
-            Serial.print("\nLFO RATE : ");
-            Serial.print(normalizedKnobVal);
+            // Serial.print("\nLFO RATE : ");
+            // Serial.print(normalizedKnobVal);
               globalState.LFO_FREQ = LFO_FREQ_MAX * pow(normalizedKnobVal, 5);
               LFO.frequency(globalState.LFO_FREQ);
             break;
             case 9: // LFO DESTINATION FILTER
-            Serial.print("\nLFO DEST : ");
-            Serial.print(normalizedKnobVal);
+            // Serial.print("\nLFO DEST : ");
+            // Serial.print(normalizedKnobVal);
               globalState.LFO_FILTER_GAIN = (normalizedKnobVal);
               LFO_MIXER_FILTER.gain(1, globalState.LFO_FILTER_GAIN);
             break;
             case 10: // LFO DESTINATION AMP
-            Serial.print("\nLFO DEST AMP : ");
-            Serial.print(normalizedKnobVal);
+            // Serial.print("\nLFO DEST AMP : ");
+            // Serial.print(normalizedKnobVal);
               globalState.LFO_AMP_GAIN = (normalizedKnobVal);
               LFO_MIXER_AMP.gain(1, globalState.LFO_AMP_GAIN);
             break;
             case 11: // AMP ATTACK
-            Serial.print("\nAMP ATTACK : ");
-            Serial.print(normalizedKnobVal);
+            // Serial.print("\nAMP ATTACK : ");
+            // Serial.print(normalizedKnobVal);
             globalState.AMP_ATTACK = AMP_ATTACK_MAX * (normalizedKnobVal);
             if (globalState.AMP_ATTACK < 15) //
             {
@@ -197,8 +197,8 @@ void get_parameters(){
             }
             break;
             case 12: // AMP DECAY
-            Serial.print("\nAMP DECAY : ");
-            Serial.print(normalizedKnobVal);
+            // Serial.print("\nAMP DECAY : ");
+            // Serial.print(normalizedKnobVal);
               globalState.AMP_DECAY = AMP_DECAY_MAX * normalizedKnobVal;
               for (byte i = 0; i < numPolyVoices; i++)
               {
@@ -206,8 +206,8 @@ void get_parameters(){
               }
             break;
             case 13: // AMP SUSTAIN
-            Serial.print("\nAMP SUSTAIN : ");
-            Serial.print(normalizedKnobVal);
+            // Serial.print("\nAMP SUSTAIN : ");
+            // Serial.print(normalizedKnobVal);
               globalState.AMP_SUSTAIN = normalizedKnobVal;
               for (byte i = 0; i < numPolyVoices; i++)
               {
@@ -215,8 +215,8 @@ void get_parameters(){
               }
             break;
             case 14: // AMP RELEASE
-            Serial.print("\nAMP RELEASE : ");
-            Serial.print(normalizedKnobVal);
+            // Serial.print("\nAMP RELEASE : ");
+            // Serial.print(normalizedKnobVal);
               globalState.AMP_RELEASE = AMP_RELEASE_MAX * normalizedKnobVal;
               for (byte i = 0; i < numPolyVoices; i++)
               {
@@ -224,8 +224,8 @@ void get_parameters(){
               }
             break;
             case 15: // FILTER ATTACK
-            Serial.print("\nFILETER ATTACK : ");
-            Serial.print(normalizedKnobVal);
+            // Serial.print("\nFILETER ATTACK : ");
+            // Serial.print(normalizedKnobVal);
                   globalState.FILTER_ATTACK = FILTER_ATTACK_MAX * normalizedKnobVal;
             if (globalState.FILTER_ATTACK < 15) //
             {
@@ -237,8 +237,8 @@ void get_parameters(){
             }
             break;
             case 16: // FILTER DECAY
-            Serial.print("\nFILTER DECAY : ");
-            Serial.print(normalizedKnobVal);
+            // Serial.print("\nFILTER DECAY : ");
+            // Serial.print(normalizedKnobVal);
               globalState.FILTER_DECAY = FILTER_DECAY_MAX * normalizedKnobVal;
               for (byte i = 0; i < numPolyVoices; i++)
               {
@@ -246,8 +246,8 @@ void get_parameters(){
               }
             break;
             case 17: // FILTER SUSTAIN
-            Serial.print("\nFILTER SUSTAIN : ");
-            Serial.print(normalizedKnobVal);
+            // Serial.print("\nFILTER SUSTAIN : ");
+            // Serial.print(normalizedKnobVal);
               globalState.FILTER_SUSTAIN = normalizedKnobVal;
               for (byte i = 0; i < numPolyVoices; i++)
               {
@@ -255,8 +255,8 @@ void get_parameters(){
               }
             break;
             case 18: // FILTER RELEASE
-            Serial.print("\nFILTER RELEASE : ");
-            Serial.print(normalizedKnobVal);
+            // Serial.print("\nFILTER RELEASE : ");
+            // Serial.print(normalizedKnobVal);
               globalState.FILTER_RELEASE = FILTER_RELEASE_MAX * normalizedKnobVal;
               for (byte i = 0; i < numPolyVoices; i++)
               {
@@ -368,22 +368,22 @@ void kelpieOn(){
     switch (i)
     {
       case 0: // MASTER VOLUME
-        Serial.print("\nMASTER VOL : ");
-        Serial.print(normalizedKnobVal);
+        // Serial.print("\nMASTER VOL : ");
+        // Serial.print(normalizedKnobVal);
         globalState.MASTER_VOL = normalizedKnobVal * MAX_MASTER_GAIN;
         MASTER_GAIN.gain(globalState.MASTER_VOL * globalState.POLY_GAIN_MULTIPLIER);
       break;
       case 1: // OSC BALANCE
-        Serial.print("\nOSC BALANCE : ");
-        Serial.print(normalizedKnobVal);
+        // Serial.print("\nOSC BALANCE : ");
+        // Serial.print(normalizedKnobVal);
         globalState.OSC1_VOL = normalizedKnobVal;
         globalState.OSC2_VOL = 1 - (normalizedKnobVal);
         globalState.OSC_CONSTANT = calculateOscConstant(globalState.OSC1_VOL, globalState.OSC2_VOL, globalState.NOISE_VOL);
         setWaveformLevels(globalState.OSC1_VOL, globalState.OSC2_VOL, globalState.NOISE_VOL, globalState.OSC_CONSTANT);
       break;
       case 2: // OSCILLATOR PWM
-        Serial.print("\nOSC PWM : ");
-        Serial.print(normalizedKnobVal);
+        // Serial.print("\nOSC PWM : ");
+        // Serial.print(normalizedKnobVal);
         globalState.PWM = 0.1 + 0.4 * (1 - normalizedKnobVal);
         for (byte i = 0; i < numPolyVoices; i++)
         {
@@ -392,15 +392,15 @@ void kelpieOn(){
         }
       break;
       case 3: // NOISE VOLUME
-      Serial.print("\nNOISE VOL : ");
-      Serial.print(normalizedKnobVal);
+      // Serial.print("\nNOISE VOL : ");
+      // Serial.print(normalizedKnobVal);
         globalState.NOISE_VOL = normalizedKnobVal;
         globalState.OSC_CONSTANT = calculateOscConstant(globalState.OSC1_VOL, globalState.OSC2_VOL, globalState.NOISE_VOL);
         setWaveformLevels(globalState.OSC1_VOL, globalState.OSC2_VOL, globalState.NOISE_VOL, globalState.OSC_CONSTANT);
       break;
       case 4: // OSC DETUNE
-      Serial.print("\nOSC DETUNE : ");
-      Serial.print(normalizedKnobVal);
+      // Serial.print("\nOSC DETUNE : ");
+      // Serial.print(normalizedKnobVal);
         globalState.DETUNE = calculateDetuneValue(normalizedKnobVal);
         for (byte i = 0; i < numPolyVoices; i++)
         {
@@ -408,8 +408,8 @@ void kelpieOn(){
         }
       break;
       case 5: // FILTER FREQUENCY
-      Serial.print("\nFILTER FREQ : ");
-      Serial.print(normalizedKnobVal);
+      // Serial.print("\nFILTER FREQ : ");
+      // Serial.print(normalizedKnobVal);
         globalState.FILTER_FREQ = FILTER_CUTOFF_MAX * pow(normalizedKnobVal, 3);
         for (byte i = 0; i < numPolyVoices; i++)
         {
@@ -417,8 +417,8 @@ void kelpieOn(){
         }
       break;
       case 6: // FILTER RESONANCE
-      Serial.print("\nFILTER RES : ");
-      Serial.print(normalizedKnobVal);
+      // Serial.print("\nFILTER RES : ");
+      // Serial.print(normalizedKnobVal);
         globalState.FILTER_Q = (FILTER_Q_MAX * normalizedKnobVal) + 1.1;
         globalState.PREFILTER_GAIN = 1 / globalState.FILTER_Q;
         for (byte i = 0; i < numPolyVoices; i++)
@@ -427,8 +427,8 @@ void kelpieOn(){
         }
       break;
       case 7: // FILTER DEPTH
-      Serial.print("\nFILTER DEPTH : ");
-      Serial.print(normalizedKnobVal);
+      // Serial.print("\nFILTER DEPTH : ");
+      // Serial.print(normalizedKnobVal);
         globalState.FILTER_OCTAVE = FILTER_OCTAVE_DEPTH * normalizedKnobVal;
         for (byte i = 0; i < numPolyVoices; i++)
         {
@@ -436,26 +436,26 @@ void kelpieOn(){
         }
       break;
       case 8: // LFO RATE
-      Serial.print("\nLFO RATE : ");
-      Serial.print(normalizedKnobVal);
+      // Serial.print("\nLFO RATE : ");
+      // Serial.print(normalizedKnobVal);
         globalState.LFO_FREQ = LFO_FREQ_MAX * pow(normalizedKnobVal, 5);
         LFO.frequency(globalState.LFO_FREQ);
       break;
       case 9: // LFO DESTINATION FILTER
-      Serial.print("\nLFO DEST : ");
-      Serial.print(normalizedKnobVal);
+      // Serial.print("\nLFO DEST : ");
+      // Serial.print(normalizedKnobVal);
         globalState.LFO_FILTER_GAIN = (normalizedKnobVal);
         LFO_MIXER_FILTER.gain(1, globalState.LFO_FILTER_GAIN);
       break;
       case 10: // LFO DESTINATION AMP
-      Serial.print("\nLFO DEST AMP : ");
-      Serial.print(normalizedKnobVal);
+      // Serial.print("\nLFO DEST AMP : ");
+      // Serial.print(normalizedKnobVal);
         globalState.LFO_AMP_GAIN = (normalizedKnobVal);
         LFO_MIXER_AMP.gain(1, globalState.LFO_AMP_GAIN);
       break;
       case 11: // AMP ATTACK
-      Serial.print("\nAMP ATTACK : ");
-      Serial.print(normalizedKnobVal);
+      // Serial.print("\nAMP ATTACK : ");
+      // Serial.print(normalizedKnobVal);
       globalState.AMP_ATTACK = AMP_ATTACK_MAX * (normalizedKnobVal);
       if (globalState.AMP_ATTACK < 15) //
       {
@@ -467,8 +467,8 @@ void kelpieOn(){
       }
       break;
       case 12: // AMP DECAY
-      Serial.print("\nAMP DECAY : ");
-      Serial.print(normalizedKnobVal);
+      // Serial.print("\nAMP DECAY : ");
+      // Serial.print(normalizedKnobVal);
         globalState.AMP_DECAY = AMP_DECAY_MAX * normalizedKnobVal;
         for (byte i = 0; i < numPolyVoices; i++)
         {
@@ -476,8 +476,8 @@ void kelpieOn(){
         }
       break;
       case 13: // AMP SUSTAIN
-      Serial.print("\nAMP SUSTAIN : ");
-      Serial.print(normalizedKnobVal);
+      // Serial.print("\nAMP SUSTAIN : ");
+      // Serial.print(normalizedKnobVal);
         globalState.AMP_SUSTAIN = normalizedKnobVal;
         for (byte i = 0; i < numPolyVoices; i++)
         {
@@ -485,8 +485,8 @@ void kelpieOn(){
         }
       break;
       case 14: // AMP RELEASE
-      Serial.print("\nAMP RELEASE : ");
-      Serial.print(normalizedKnobVal);
+      // Serial.print("\nAMP RELEASE : ");
+      // Serial.print(normalizedKnobVal);
         globalState.AMP_RELEASE = AMP_RELEASE_MAX * normalizedKnobVal;
         for (byte i = 0; i < numPolyVoices; i++)
         {
@@ -494,8 +494,8 @@ void kelpieOn(){
         }
       break;
       case 15: // FILTER ATTACK
-      Serial.print("\nFILETER ATTACK : ");
-      Serial.print(normalizedKnobVal);
+      // Serial.print("\nFILETER ATTACK : ");
+      // Serial.print(normalizedKnobVal);
             globalState.FILTER_ATTACK = FILTER_ATTACK_MAX * normalizedKnobVal;
       if (globalState.FILTER_ATTACK < 15) //
       {
@@ -507,8 +507,8 @@ void kelpieOn(){
       }
       break;
       case 16: // FILTER DECAY
-      Serial.print("\nFILTER DECAY : ");
-      Serial.print(normalizedKnobVal);
+      // Serial.print("\nFILTER DECAY : ");
+      // Serial.print(normalizedKnobVal);
         globalState.FILTER_DECAY = FILTER_DECAY_MAX * normalizedKnobVal;
         for (byte i = 0; i < numPolyVoices; i++)
         {
@@ -516,8 +516,8 @@ void kelpieOn(){
         }
       break;
       case 17: // FILTER SUSTAIN
-      Serial.print("\nFILTER SUSTAIN : ");
-      Serial.print(normalizedKnobVal);
+      // Serial.print("\nFILTER SUSTAIN : ");
+      // Serial.print(normalizedKnobVal);
         globalState.FILTER_SUSTAIN = normalizedKnobVal;
         for (byte i = 0; i < numPolyVoices; i++)
         {
@@ -525,8 +525,8 @@ void kelpieOn(){
         }
       break;
       case 18: // FILTER RELEASE
-      Serial.print("\nFILTER RELEASE : ");
-      Serial.print(normalizedKnobVal);
+      // Serial.print("\nFILTER RELEASE : ");
+      // Serial.print(normalizedKnobVal);
         globalState.FILTER_RELEASE = FILTER_RELEASE_MAX * normalizedKnobVal;
         for (byte i = 0; i < numPolyVoices; i++)
         {
@@ -538,7 +538,7 @@ void kelpieOn(){
 }
 
 void KelpieOnNoteOn(byte channel, byte note, byte velocity) {
-  Serial.print("Note ON");
+  // Serial.print("Note ON");
   if (note > 23 && note < 108)
   {
     LFO.phase(0); // retrigger LFO on keypress
@@ -556,7 +556,7 @@ void KelpieOnNoteOn(byte channel, byte note, byte velocity) {
 }
 
 void KelpieOnNoteOff(byte channel, byte note, byte velocity) {
-  Serial.print("Note OFF");
+  // Serial.print("Note OFF");
   if (note > 23 && note < 108)
   {
     if (globalState.IS_POLY == true) // depending on mode send to buffer
@@ -638,23 +638,22 @@ void kelpie_run(){
     {
       fps = 0;
       int monoPeak = PEAK.read() * 100.0;
-      Serial.print("|");
+      // Serial.print("|");
       for (int cnt = 0; cnt < 100; cnt++)
       if (cnt < monoPeak)
       {
-        Serial.print(">");
+        // Serial.print(">");
       } else if (cnt >= monoPeak && cnt < 99)
       {
-        Serial.print(" ");
+        // Serial.print(" ");
       } else if (cnt > 99)
       {
-        Serial.println("|");
+        // Serial.println("|");
       }
-      Serial.print(monoPeak);
-      Serial.println();
+      // Serial.print(monoPeak);
+      // Serial.println();
     }
   }
-  // usbMIDI.read();
 }
 
 

@@ -26,13 +26,13 @@
 //  Combining white noise or dynamic incoming audio results in aggressive digital distortion.
 
 #include <Arduino.h>
-#include "private_effect_combine.h"
+#include "effect_combine.h"
 
-void AudioEffectDigitalCombinePrivate::begin(void){
+void AudioEffectDigitalCombine::begin(void){
 	run = true;
 }
 
-void AudioEffectDigitalCombinePrivate::stop(void)
+void AudioEffectDigitalCombine::stop(void)
 {
 	__disable_irq();
 	if (run) {
@@ -43,7 +43,7 @@ void AudioEffectDigitalCombinePrivate::stop(void)
 	}
 }
 
-void AudioEffectDigitalCombinePrivate::start(void)
+void AudioEffectDigitalCombine::start(void)
 {
 	__disable_irq();
 	if (!run) {
@@ -54,7 +54,7 @@ void AudioEffectDigitalCombinePrivate::start(void)
 	}
 }
 
-void AudioEffectDigitalCombinePrivate::update(void)
+void AudioEffectDigitalCombine::update(void)
 {
 	if(!run) return;
 

@@ -101,9 +101,9 @@ CircularBuffer<SettingsOption, SETTINGSOPTIONSNO>  settingsOptions;
 
 // add settings to the circular buffer
 void setUpSettings() {
-  settingsOptions.push(SettingsOption{"MIDI Ch.", {"All", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", '\0'}, settingsMIDICh, currentIndexMIDICh});
-  settingsOptions.push(SettingsOption{"Key Tracking", {"None", "Half", "Full", '\0'}, settingsKeyTracking, currentIndexKeyTracking});
-  settingsOptions.push(SettingsOption{"Pitch Bend", {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", '\0'}, settingsPitchBend, currentIndexPitchBend});
-  settingsOptions.push(SettingsOption{"MW Depth", {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", '\0'}, settingsModWheelDepth, currentIndexModWheelDepth});
-  settingsOptions.push(SettingsOption{"Encoder", {"Type 1", "Type 2", '\0'}, settingsEncoderDir, currentIndexEncoderDir});
+  // settingsOptions.push(SettingsOption{(char*)"MIDI Ch.", {"All", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", '\0'}, settingsMIDICh, currentIndexMIDICh});
+  // settingsOptions.push(SettingsOption{(char*)"Key Tracking", {"None", "Half", "Full", '\0'}, settingsKeyTracking, currentIndexKeyTracking});
+  // settingsOptions.push(SettingsOption{(char*)"Pitch Bend", {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", '\0'}, settingsPitchBend, currentIndexPitchBend});
+  // settingsOptions.push(SettingsOption{(char*)"MW Depth", {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", '\0'}, settingsModWheelDepth, currentIndexModWheelDepth});
+  // settingsOptions.push(SettingsOption{(char*)"Encoder", {"Type 1", "Type 2", '\0'}, settingsEncoderDir, currentIndexEncoderDir});
 }

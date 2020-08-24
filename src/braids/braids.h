@@ -210,6 +210,23 @@ void braids_get_parameters(){
   }
 }
 
+void braids_off(){
+  AudioNoInterrupts();
+  MIDI.setHandleNoteOn(nothing);
+  myTimer.end();
+  braidsOn = false;
+  myTimer.end();
+  analogWrite(A22, (((uint16_t)(0+0x7FFF))>>4));
+  AudioInterrupts();
+}
+
+void braids_on(){
+  AudioNoInterrupts();
+  init_braids();
+  braidsOn = true;
+  AudioInterrupts();
+}
+
 void braids_get_shape(){
   if(synthParam){
     long newRight1;
@@ -231,6 +248,8 @@ void braids_get_shape(){
       if(digital_encsw[0].fallingEdge()){
         if(kelpiesynthParamMsec <= 300){
           synthParam = false;
+          knobRight1.write(synthSelect*2);
+          displayChange = true;
         }else{
           if(newRight1 <= 56){
             shape = newRight1;
@@ -248,39 +267,8 @@ void braidsHandleNoteOn(byte channel, byte note, byte velocity){
   osc.Strike();
 }
 
-void toggle_braids(byte channel, byte control, byte value){
-  if(control == 1){
-    if(value == 0){
-      braidsOn = false;
-      myTimer.end();
-    }
-    if(value>0 && braidsOn == false){
-      init_braids();
-      braidsOn = true;
-    }
-  }
-}
-
 //************SETUP**************
 void setup_braids() {
-  // // Open serial communications and wait for port to open:
-  // Serial.begin(9600);
-  //
-  // pinMode(13, OUTPUT);
-  // digitalWriteFast(13,HIGH);
-  //
-  // // Configure the ADCs
-  // analogReadResolution(9);
-  // analogReadAveraging(4);
-  // analogReference(EXTERNAL);
-  //
-  // analogWriteResolution(12);
-
-  // start the parameters thread
-  // th1 = threads.addThread(braids_get_parameters);
-
-  // init the audio object AudioSynthBraids
-  // synthBraids.init_braids();
   init_braids();
 
   MIDI.setHandleNoteOn(braidsHandleNoteOn);
@@ -288,9 +276,7 @@ void setup_braids() {
 
 //************LOOP**************
 void run_braids() {
-  if(braidsOn){
-    braids_get_shape();
-    braids_get_parameters();
-    main_braids();
-  }
+  braids_get_shape();
+  braids_get_parameters();
+  main_braids();
 }

@@ -914,7 +914,7 @@ void updateKeyTracking()
 void updateOscLFOAmt()
 {
   pitchLfo.amplitude(oscLfoAmt);
-  char buf[10];
+  // char buf[10];
   // showCurrentParameterPage("LFO Amount", dtostrf(oscLfoAmt, 4, 3, buf));
 }
 
@@ -1117,12 +1117,12 @@ void updateOscFX()
 {
   if (oscFX == 1)
   {
-    oscFX1.setCombineMode(AudioEffectDigitalCombinePrivate::XOR);
-    oscFX2.setCombineMode(AudioEffectDigitalCombinePrivate::XOR);
-    oscFX3.setCombineMode(AudioEffectDigitalCombinePrivate::XOR);
-    oscFX4.setCombineMode(AudioEffectDigitalCombinePrivate::XOR);
-    oscFX5.setCombineMode(AudioEffectDigitalCombinePrivate::XOR);
-    oscFX6.setCombineMode(AudioEffectDigitalCombinePrivate::XOR);
+    oscFX1.setCombineMode(AudioEffectDigitalCombine::XOR);
+    oscFX2.setCombineMode(AudioEffectDigitalCombine::XOR);
+    oscFX3.setCombineMode(AudioEffectDigitalCombine::XOR);
+    oscFX4.setCombineMode(AudioEffectDigitalCombine::XOR);
+    oscFX5.setCombineMode(AudioEffectDigitalCombine::XOR);
+    oscFX6.setCombineMode(AudioEffectDigitalCombine::XOR);
     waveformMixer1.gain(3, (oscALevel + oscBLevel) / 2.0); //Osc FX
     waveformMixer2.gain(3, (oscALevel + oscBLevel) / 2.0); //Osc FX
     waveformMixer3.gain(3, (oscALevel + oscBLevel) / 2.0); //Osc FX
@@ -1134,12 +1134,12 @@ void updateOscFX()
   }
   else
   {
-    oscFX1.setCombineMode(AudioEffectDigitalCombinePrivate::OFF);
-    oscFX2.setCombineMode(AudioEffectDigitalCombinePrivate::OFF);
-    oscFX3.setCombineMode(AudioEffectDigitalCombinePrivate::OFF);
-    oscFX4.setCombineMode(AudioEffectDigitalCombinePrivate::OFF);
-    oscFX5.setCombineMode(AudioEffectDigitalCombinePrivate::OFF);
-    oscFX6.setCombineMode(AudioEffectDigitalCombinePrivate::OFF);
+    oscFX1.setCombineMode(AudioEffectDigitalCombine::OFF);
+    oscFX2.setCombineMode(AudioEffectDigitalCombine::OFF);
+    oscFX3.setCombineMode(AudioEffectDigitalCombine::OFF);
+    oscFX4.setCombineMode(AudioEffectDigitalCombine::OFF);
+    oscFX5.setCombineMode(AudioEffectDigitalCombine::OFF);
+    oscFX6.setCombineMode(AudioEffectDigitalCombine::OFF);
     waveformMixer1.gain(3, 0); //Osc FX
     waveformMixer2.gain(3, 0); //Osc FX
     waveformMixer3.gain(3, 0); //Osc FX
@@ -1590,8 +1590,10 @@ void setCurrentPatchData(String data[])
   updateFXAmt();
   updateFXMix();
   updatePitchEnv();
-  Serial.print("Set Patch: ");
-  Serial.println(patchName);
+  if(debug){
+    Serial.print("Set Patch: ");
+    Serial.println(patchName);
+  }
 }
 
 String getCurrentPatchData()
@@ -1619,19 +1621,21 @@ void closeEnvelopes() {
 
 void recallPatch(int patchNo)
 {
-  allNotesOff();
-  closeEnvelopes();
-  File patchFile = SD.open(("TSPATCH/" + String(patchNo)).c_str());
-  if (!patchFile)
-  {
-    Serial.println("File not found");
-  }
-  else
-  {
-    String data[NO_OF_PARAMS]; //Array of data read in
-    recallPatchData(patchFile, data);
-    setCurrentPatchData(data);
-    patchFile.close();
+  if(hasSD){
+    allNotesOff();
+    closeEnvelopes();
+    File patchFile = SD.open(("TSPATCH/" + String(patchNo)).c_str());
+    if (!patchFile)
+    {
+      if(debug) Serial.println("File not found");
+    }
+    else
+    {
+      String data[NO_OF_PARAMS]; //Array of data read in
+      recallPatchData(patchFile, data);
+      setCurrentPatchData(data);
+      patchFile.close();
+    }
   }
 }
 
@@ -1640,8 +1644,10 @@ void TsynthProgramChange(byte channel, byte program)
   state = PATCH;
   // patchNo = program + 1;
   recallPatch(patchNo);
-  Serial.print("MIDI Pgm Change:");
-  Serial.println(patchNo);
+  if(debug){
+    Serial.print("MIDI Pgm Change:");
+    Serial.println(patchNo);
+  }
   state = PARAMETER;
 }
 
@@ -2163,9 +2169,7 @@ void checkMux()
 //   }
 // }
 
-void nothing(){
-
-}
+void nothing(byte channel, byte note, byte velocity){}
 
 void Tsynth_off(){
   ampEnvelope1.noteOff();
@@ -2179,10 +2183,10 @@ void Tsynth_off(){
   MIDI.setHandleControlChange(nothing);
   MIDI.setHandleNoteOff(nothing);
   MIDI.setHandleNoteOn(nothing);
-  MIDI.setHandleProgramChange(nothing);
-  MIDI.setHandleClock(nothing);
-  MIDI.setHandleStart(nothing);
-  MIDI.setHandleStop(nothing);
+  // MIDI.setHandleProgramChange(nothing);
+  // MIDI.setHandleClock(nothing);
+  // MIDI.setHandleStart(nothing);
+  // MIDI.setHandleStop(nothing);
 
   Tsynth_AOstop();
 }
@@ -2575,7 +2579,7 @@ void Tsynth_setup()
 
   if (hasSD)
   {
-    Serial.println("SD card is connected");
+    if(debug) Serial.println("SD card is connected");
     //Get patch numbers and names from SD card
     loadPatches();
     if (patches.size() == 0)
@@ -2587,14 +2591,14 @@ void Tsynth_setup()
   }
   else
   {
-    Serial.println("SD card is not connected or unusable");
+    if(debug) Serial.println("SD card is not connected or unusable");
     reinitialiseToPanel();
     // showPatchPage("No SD", "conn'd / usable");
   }
 
   //Read MIDI Channel from EEPROM
   midiChannel = 1; //getMIDIChannel();
-  Serial.println("MIDI Ch:" + String(midiChannel) + " (0 is Omni On)");
+  if(debug) Serial.println("MIDI Ch:" + String(midiChannel) + " (0 is Omni On)");
 
   // USB HOST MIDI Class Compliant
   // delay(200); //Wait to turn on USB Host
@@ -2633,7 +2637,7 @@ void Tsynth_setup()
   MIDI.setHandleClock(TsynthMIDIClock);
   MIDI.setHandleStart(TsynthMIDIClockStart);
   MIDI.setHandleStop(TsynthMIDIClockStop);
-  Serial.println("MIDI In DIN Listening");
+  if(debug) Serial.println("MIDI In DIN Listening");
 
   constant1Dc.amplitude(ONE);
 

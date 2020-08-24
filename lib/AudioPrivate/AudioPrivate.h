@@ -73,12 +73,12 @@
 #include "analyze_peak.h"
 
 // Private audio objects
-#include "private_synth_waveform.h"
-#include "private_synth_dc.h"
-#include "private_effect_combine.h"
-#include "private_effect_ensemble.h"
-#include "private_effect_envelope.h"
-#include "private_filter_variable.h"
-#include "private_mixer.h"
+#include "synth_waveform.h"
+#include "synth_dc.h"
+#include "effect_combine.h"
+#include "effect_ensemble.h"
+#include "effect_envelope.h"
+#include "filter_variable.h"
+#include "mixer.h"
 
 #endif

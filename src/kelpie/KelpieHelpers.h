@@ -15,10 +15,10 @@ extern SynthVoice polyVoices[];
 extern SynthVoice monoVoices[];
 extern SynthState globalState;
 extern boolean prevButtonsState[];
-extern AudioAmplifierPrivate MASTER_GAIN;
+extern AudioAmplifier MASTER_GAIN;
 extern AudioSynthWaveformSine LFO;
-extern AudioMixer4Private LFO_MIXER_FILTER;
-extern AudioMixer4Private LFO_MIXER_AMP;
+extern AudioMixer4 LFO_MIXER_FILTER;
+extern AudioMixer4 LFO_MIXER_AMP;
 extern const byte MONOBUFFERSIZE;
 extern byte monoBuffer[];
 

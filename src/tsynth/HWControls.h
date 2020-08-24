@@ -76,9 +76,9 @@ static int mux2ValuesPrev[MUXCHANNELS] = {};
 
 // static int mux1Read = 0;
 // static int mux2Read = 0;
-static int volumeRead = 0;
+// static int volumeRead = 0;
 static int volumePrevious = 0;
-static long encPrevious = 0;
+// static long encPrevious = 0;
 
 //These are pushbuttons and require debouncing
 // Bounce oscFXSwitch = Bounce(OSC_FX_SW, DEBOUNCE);

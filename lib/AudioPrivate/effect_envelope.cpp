@@ -25,7 +25,7 @@
  */
 
 #include <Arduino.h>
-#include "private_effect_envelope.h"
+#include "effect_envelope.h"
 
 #define STATE_IDLE	0
 #define STATE_DELAY	1
@@ -36,11 +36,11 @@
 #define STATE_RELEASE	6
 #define STATE_FORCED	7
 
-void AudioEffectEnvelopePrivate::begin(void){
+void AudioEffectEnvelope::begin(void){
 	run = true;
 }
 
-void AudioEffectEnvelopePrivate::stop(void)
+void AudioEffectEnvelope::stop(void)
 {
 	__disable_irq();
 	if (run) {
@@ -51,7 +51,7 @@ void AudioEffectEnvelopePrivate::stop(void)
 	}
 }
 
-void AudioEffectEnvelopePrivate::start(void)
+void AudioEffectEnvelope::start(void)
 {
 	__disable_irq();
 	if (!run) {
@@ -62,7 +62,7 @@ void AudioEffectEnvelopePrivate::start(void)
 	}
 }
 
-void AudioEffectEnvelopePrivate::noteOn(void)
+void AudioEffectEnvelope::noteOn(void)
 {
 	__disable_irq();
 	if (state == STATE_IDLE || state == STATE_DELAY || release_forced_count == 0) {
@@ -84,7 +84,7 @@ void AudioEffectEnvelopePrivate::noteOn(void)
 	__enable_irq();
 }
 
-void AudioEffectEnvelopePrivate::noteOff(void)
+void AudioEffectEnvelope::noteOff(void)
 {
 	__disable_irq();
 	if (state != STATE_IDLE && state != STATE_FORCED) {
@@ -95,7 +95,7 @@ void AudioEffectEnvelopePrivate::noteOff(void)
 	__enable_irq();
 }
 
-void AudioEffectEnvelopePrivate::update(void)
+void AudioEffectEnvelope::update(void)
 {
 	if(!run) return;
 
@@ -208,14 +208,14 @@ void AudioEffectEnvelopePrivate::update(void)
 	release(block);
 }
 
-bool AudioEffectEnvelopePrivate::isActive()
+bool AudioEffectEnvelope::isActive()
 {
 	uint8_t current_state = *(volatile uint8_t *)&state;
 	if (current_state == STATE_IDLE) return false;
 	return true;
 }
 
-bool AudioEffectEnvelopePrivate::isSustain()
+bool AudioEffectEnvelope::isSustain()
 {
 	uint8_t current_state = *(volatile uint8_t *)&state;
 	if (current_state == STATE_SUSTAIN) return true;

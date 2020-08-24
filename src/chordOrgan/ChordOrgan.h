@@ -699,7 +699,6 @@ void chordOrgan_run(){
     chord_get_encoders_parameters();
 
     if (changed) {
-
         // Serial.println("Changed");
         updateAmpAndFreq();
         if(glide) {
@@ -728,12 +727,8 @@ void chordOrgan_run(){
     }
 
     if (changed)  {
-        // Serial.println("Trig Out");
         pulseOutTimer = 0;
         flashing = true;
-        // pinMode(RESET_CV, OUTPUT);
-        // digitalWrite (RESET_LED, HIGH);
-        // digitalWrite (RESET_CV, HIGH);
 
         AudioNoInterrupts();
         updateFrequencies();
@@ -752,16 +747,9 @@ void chordOrgan_run(){
         AudioInterrupts();
     }
 
-    // updateWaveformLEDs();
-
     if (flashing && (pulseOutTimer > flashTime)) {
-        // digitalWrite (RESET_LED, LOW);
-        // digitalWrite (RESET_CV, LOW);
-        // pinMode(RESET_CV, INPUT);
         flashing = false;
     }
-
-    // usbMIDI.read();
 }
 
 #endif

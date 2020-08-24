@@ -2,21 +2,21 @@
 #define Sample_Player_connections_h
 
 AudioPlaySdWav           sampleplaySdWav1;     //xy=185,396
-AudioAmplifierPrivate           amp1;
+AudioAmplifier           amp1;
 AudioPlaySdWav           sampleplaySdWav2;     //xy=199,472
-AudioAmplifierPrivate           amp2;
+AudioAmplifier           amp2;
 AudioPlaySdWav           sampleplaySdWav3;     //xy=207,519
-AudioAmplifierPrivate           amp3;
+AudioAmplifier           amp3;
 AudioPlaySdWav           sampleplaySdWav4;     //xy=219,562
-AudioAmplifierPrivate           amp4;
+AudioAmplifier           amp4;
 AudioPlaySdWav           sampleplaySdWav5;     //xy=228,200
-AudioAmplifierPrivate           amp5;
+AudioAmplifier           amp5;
 AudioPlaySdWav           sampleplaySdWav6;     //xy=233,333
-AudioAmplifierPrivate           amp6;
-AudioMixer4Private              samplemix1;         //xy=505,293
-AudioMixer4Private              samplemix2;         //xy=512,420
-AudioMixer4Private              samplemix3;         //xy=694,351
-AudioAmplifierPrivate           amp7;
+AudioAmplifier           amp6;
+AudioMixer4              samplemix1;         //xy=505,293
+AudioMixer4              samplemix2;         //xy=512,420
+AudioMixer4              samplemix3;         //xy=694,351
+AudioAmplifier           amp7;
 
 // Create Audio connections between the components
 AudioConnection          samplepatchCord1(sampleplaySdWav1, 0, amp1, 0);

@@ -27,16 +27,16 @@
  Increased resonance max to 15.0
  */
 
-#ifndef private_filter_variable_h_
-#define private_filter_variable_h_
+#ifndef filter_variable_h_
+#define filter_variable_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
 
-class AudioFilterStateVariablePrivate: public AudioStream
+class AudioFilterStateVariable: public AudioStream
 {
 public:
-	AudioFilterStateVariablePrivate() : AudioStream(2, inputQueueArray) {
+	AudioFilterStateVariable() : AudioStream(2, inputQueueArray) {
 		begin();
 		frequency(1000);
 		octaveControl(1.0); // default values

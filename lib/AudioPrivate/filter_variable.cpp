@@ -25,7 +25,7 @@
  */
 
 #include <Arduino.h>
-#include "private_filter_variable.h"
+#include "filter_variable.h"
 #include "utility/dspinst.h"
 
 // State Variable Filter (Chamberlin) with 2X oversampling
@@ -46,11 +46,11 @@
 // no audible difference.
 //#define IMPROVE_EXPONENTIAL_ACCURACY
 
-void AudioFilterStateVariablePrivate::begin(void){
+void AudioFilterStateVariable::begin(void){
 	run = true;
 }
 
-void AudioFilterStateVariablePrivate::stop(void)
+void AudioFilterStateVariable::stop(void)
 {
 	__disable_irq();
 	if (run) {
@@ -61,7 +61,7 @@ void AudioFilterStateVariablePrivate::stop(void)
 	}
 }
 
-void AudioFilterStateVariablePrivate::start(void)
+void AudioFilterStateVariable::start(void)
 {
 	__disable_irq();
 	if (!run) {
@@ -74,7 +74,7 @@ void AudioFilterStateVariablePrivate::start(void)
 
 #if defined(__ARM_ARCH_7EM__)
 
-void AudioFilterStateVariablePrivate::update_fixed(const int16_t *in,
+void AudioFilterStateVariable::update_fixed(const int16_t *in,
 	int16_t *lp, int16_t *bp, int16_t *hp)
 {
 	const int16_t *end = in + AUDIO_BLOCK_SAMPLES;
@@ -113,7 +113,7 @@ void AudioFilterStateVariablePrivate::update_fixed(const int16_t *in,
 }
 
 
-void AudioFilterStateVariablePrivate::update_variable(const int16_t *in,
+void AudioFilterStateVariable::update_variable(const int16_t *in,
 	const int16_t *ctl, int16_t *lp, int16_t *bp, int16_t *hp)
 {
 	const int16_t *end = in + AUDIO_BLOCK_SAMPLES;
@@ -194,7 +194,7 @@ void AudioFilterStateVariablePrivate::update_variable(const int16_t *in,
 }
 
 
-void AudioFilterStateVariablePrivate::update(void)
+void AudioFilterStateVariable::update(void)
 {
 	if(!run) return;
 
@@ -254,7 +254,7 @@ void AudioFilterStateVariablePrivate::update(void)
 
 #elif defined(KINETISL)
 
-void AudioFilterStateVariablePrivate::update(void)
+void AudioFilterStateVariable::update(void)
 {
 	if(!run) return;
 

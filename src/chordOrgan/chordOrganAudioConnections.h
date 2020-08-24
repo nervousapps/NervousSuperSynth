@@ -8,10 +8,10 @@ AudioSynthWaveform       chordOrganwaveform5;      //xy=215,232
 AudioSynthWaveform       chordOrganwaveform6;      //xy=243,295
 AudioSynthWaveform       chordOrganwaveform7;      //xy=273,354
 AudioSynthWaveform       chordOrganwaveform8;      //xy=292,394
-AudioMixer4Private              chordOrganmixer1;         //xy=424,117
-AudioMixer4Private              chordOrganmixer2;         //xy=424,181
-AudioMixer4Private              chordOrganmixer3;         //xy=571,84
-AudioEffectEnvelopePrivate      chordOrganenvelope1;      //xy=652,281
+AudioMixer4              chordOrganmixer1;         //xy=424,117
+AudioMixer4              chordOrganmixer2;         //xy=424,181
+AudioMixer4              chordOrganmixer3;         //xy=571,84
+AudioEffectEnvelope      chordOrganenvelope1;      //xy=652,281
 // AudioOutputAnalog        dac1;           //xy=784,129
 AudioConnection          chordOrganpatchCord1(chordOrganwaveform1, 0, chordOrganmixer1, 0);
 AudioConnection          chordOrganpatchCord2(chordOrganwaveform2, 0, chordOrganmixer1, 1);

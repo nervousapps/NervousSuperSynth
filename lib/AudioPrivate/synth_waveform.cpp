@@ -28,7 +28,7 @@
  */
 
 #include <Arduino.h>
-#include "private_synth_waveform.h"
+#include "synth_waveform.h"
 #include "arm_math.h"
 #include "utility/dspinst.h"
 
@@ -690,7 +690,7 @@ void AudioSynthWaveformModulated::start(void)
 void AudioSynthWaveformModulated::update(void)
 {
 	if(!run) return;
-	
+
 	audio_block_t *block, *moddata, *shapedata;
 	int16_t *bp, *end;
 	int32_t val1, val2;

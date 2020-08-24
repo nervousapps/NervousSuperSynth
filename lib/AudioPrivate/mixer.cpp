@@ -25,7 +25,7 @@
  */
 
 #include <Arduino.h>
-#include "private_mixer.h"
+#include "mixer.h"
 #include "utility/dspinst.h"
 
 #if defined(__ARM_ARCH_7EM__)
@@ -109,11 +109,11 @@ static void applyGainThenAdd(int16_t *dst, const int16_t *src, int32_t mult)
 
 #endif
 
-void AudioMixer4Private::begin(void){
+void AudioMixer4::begin(void){
 	run = true;
 }
 
-void AudioMixer4Private::stop(void)
+void AudioMixer4::stop(void)
 {
 	__disable_irq();
 	if (run) {
@@ -124,7 +124,7 @@ void AudioMixer4Private::stop(void)
 	}
 }
 
-void AudioMixer4Private::start(void)
+void AudioMixer4::start(void)
 {
 	__disable_irq();
 	if (!run) {
@@ -135,7 +135,7 @@ void AudioMixer4Private::start(void)
 	}
 }
 
-void AudioMixer4Private::update(void)
+void AudioMixer4::update(void)
 {
 	if(!run) return;
 
@@ -163,11 +163,11 @@ void AudioMixer4Private::update(void)
 	}
 }
 
-void AudioAmplifierPrivate::begin(void){
+void AudioAmplifier::begin(void){
 	run = true;
 }
 
-void AudioAmplifierPrivate::stop(void)
+void AudioAmplifier::stop(void)
 {
 	__disable_irq();
 	if (run) {
@@ -178,7 +178,7 @@ void AudioAmplifierPrivate::stop(void)
 	}
 }
 
-void AudioAmplifierPrivate::start(void)
+void AudioAmplifier::start(void)
 {
 	__disable_irq();
 	if (!run) {
@@ -189,7 +189,7 @@ void AudioAmplifierPrivate::start(void)
 	}
 }
 
-void AudioAmplifierPrivate::update(void)
+void AudioAmplifier::update(void)
 {
 	if(!run) return;
 

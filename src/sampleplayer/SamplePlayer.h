@@ -183,7 +183,7 @@ void init_banks(){
     amp6.gain(ampVol[5]);
     amp7.gain(ampVol[6]);
 
-  // if (SD.exists(_filename)) {
+  if (hasSD) {
     // Open file for reading
     File file = SD.open(_filename);
 
@@ -196,10 +196,10 @@ void init_banks(){
     auto error = deserializeJson(jsonBuffer, file);
 
     if (error)
-      Serial.println(F("Failed to read file, using default configuration"));
+      if(debug) Serial.println(F("Failed to read file, using default configuration"));
 
     number_banks = jsonBuffer["banks"].size();
-    Serial.println(number_banks);
+    if(debug) Serial.println(number_banks);
 
     // Copy values from the JsonObject to the Config
     for(int i=0; i<number_banks; i++){
@@ -229,7 +229,7 @@ void init_banks(){
     }
     // Close the file (File's destructor doesn't close the file)
     file.close();
-  // }
+  }
   return;
 }
 

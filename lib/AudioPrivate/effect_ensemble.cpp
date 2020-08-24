@@ -26,7 +26,7 @@
 // which then modulates three delay lines 120 degrees apart in the LFO waveform.
 
 #include <Arduino.h>
-#include "private_effect_ensemble.h"
+#include "effect_ensemble.h"
 #include "utility/dspinst.h"
 #include "arm_math.h"
 

@@ -11,11 +11,11 @@ struct SynthVoice
   AudioSynthWaveform &waveformA;
   AudioSynthWaveform &waveformB;
   AudioSynthNoiseWhite &noise;
-  AudioMixer4Private &waveformMixer;
-  AudioAmplifierPrivate &waveformAmplifier;
-  AudioEffectEnvelopePrivate &ampEnv;
-  AudioEffectEnvelopePrivate &filterEnv;
-  AudioFilterStateVariablePrivate &filter;
+  AudioMixer4 &waveformMixer;
+  AudioAmplifier &waveformAmplifier;
+  AudioEffectEnvelope &ampEnv;
+  AudioEffectEnvelope &filterEnv;
+  AudioFilterStateVariable &filter;
 };
 
 

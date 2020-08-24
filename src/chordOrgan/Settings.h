@@ -174,9 +174,11 @@ void ChordOrganread() {
         } else if(state == SETTING) {
             if(character == '\n') {
                 //
-                Serial.print("Config ");
-                Serial.print(settingValue);
-                Serial.println(".");
+                if(debug){
+                  Serial.print("Config ");
+                  Serial.print(settingValue);
+                  Serial.println(".");
+                }
 
                 if(settingValue.startsWith("!WAVES")) {
                     settingsextraWaves = true;
@@ -199,9 +201,11 @@ void ChordOrganread() {
                 } else if(settingValue.startsWith("!STACK")) {
                 	settingsstacked = true;
                 } else {
+                  if(debug){
                     Serial.print("Unknown option:");
                     Serial.print(settingValue);
                     Serial.println(":");
+                  }
                 }
                 settingValue = "";
                 state = NONE;

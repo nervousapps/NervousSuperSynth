@@ -24,17 +24,17 @@
  * THE SOFTWARE.
  */
 
-#ifndef private_mixer_h_
-#define private_mixer_h_
+#ifndef mixer_h_
+#define mixer_h_
 
 #include "Arduino.h"
 #include "AudioStream.h"
 
-class AudioMixer4Private : public AudioStream
+class AudioMixer4 : public AudioStream
 {
 #if defined(__ARM_ARCH_7EM__)
 public:
-	AudioMixer4Private(void) : AudioStream(4, inputQueueArray) {
+	AudioMixer4(void) : AudioStream(4, inputQueueArray) {
 		begin();
 		for (int i=0; i<4; i++) multiplier[i] = 65536;
 	}
@@ -57,7 +57,7 @@ private:
 
 #elif defined(KINETISL)
 public:
-	AudioMixer4Private(void) : AudioStream(4, inputQueueArray) {
+	AudioMixer4(void) : AudioStream(4, inputQueueArray) {
 		begin();
 		for (int i=0; i<4; i++) multiplier[i] = 256;
 	}
@@ -80,10 +80,10 @@ private:
 #endif
 };
 
-class AudioAmplifierPrivate : public AudioStream
+class AudioAmplifier : public AudioStream
 {
 public:
-	AudioAmplifierPrivate(void) : AudioStream(1, inputQueueArray), multiplier(65536) {
+	AudioAmplifier(void) : AudioStream(1, inputQueueArray), multiplier(65536) {
 		begin();
 	}
 

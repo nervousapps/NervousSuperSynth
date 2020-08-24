@@ -25,13 +25,13 @@
  */
 
 #include <Arduino.h>
-#include "private_synth_dc.h"
+#include "synth_dc.h"
 
-void AudioSynthWaveformDcPrivate::begin(void){
+void AudioSynthWaveformDc::begin(void){
 	run = true;
 }
 
-void AudioSynthWaveformDcPrivate::stop(void)
+void AudioSynthWaveformDc::stop(void)
 {
 	__disable_irq();
 	if (run) {
@@ -42,7 +42,7 @@ void AudioSynthWaveformDcPrivate::stop(void)
 	}
 }
 
-void AudioSynthWaveformDcPrivate::start(void)
+void AudioSynthWaveformDc::start(void)
 {
 	__disable_irq();
 	if (!run) {
@@ -53,7 +53,7 @@ void AudioSynthWaveformDcPrivate::start(void)
 	}
 }
 
-void AudioSynthWaveformDcPrivate::update(void)
+void AudioSynthWaveformDc::update(void)
 {
 	if(!run) return;
 

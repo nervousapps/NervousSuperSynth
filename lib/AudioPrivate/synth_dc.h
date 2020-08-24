@@ -24,8 +24,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef private_synth_dc_h_
-#define private_synth_dc_h_
+#ifndef synth_dc_h_
+#define synth_dc_h_
 #include "Arduino.h"
 #include "AudioStream.h"
 #include "utility/dspinst.h"
@@ -33,7 +33,7 @@
 // compute (a - b) / c
 // handling 32 bit interger overflow at every step
 // without resorting to slow 64 bit math
-#ifndef synth_dc_h_
+// #ifndef synth_dc_h_
 #if defined(__ARM_ARCH_7EM__)
 static inline int32_t substract_int32_then_divide_int32(int32_t a, int32_t b, int32_t c) __attribute__((always_inline, unused));
 static inline int32_t substract_int32_then_divide_int32(int32_t a, int32_t b, int32_t c)
@@ -85,12 +85,12 @@ static inline int32_t substract_int32_then_divide_int32(int32_t a, int32_t b, in
 }
 
 #endif
-#endif
+// #endif
 
-class AudioSynthWaveformDcPrivate : public AudioStream
+class AudioSynthWaveformDc : public AudioStream
 {
 public:
-	AudioSynthWaveformDcPrivate() : AudioStream(0, NULL), state(0), magnitude(0) {}
+	AudioSynthWaveformDc() : AudioStream(0, NULL), state(0), magnitude(0) {}
 	// immediately jump to the new DC level
 	void amplitude(float n) {
 		if (n > 1.0) n = 1.0;

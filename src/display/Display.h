@@ -218,41 +218,45 @@ void printInfos(){
 
     lcd.setCursor(0, 1);
 
-    if(sampleVolCtrl){
-      switch (ampVolnum) {
-        case 0:
-          lcd.print(splitString(splitString(banks[bank_number].sample1, '/', 1), '.', 0));
-          break;
+    if(hasSD){
+      if(sampleVolCtrl){
+        switch (ampVolnum) {
+          case 0:
+            lcd.print(splitString(splitString(banks[bank_number].sample1, '/', 1), '.', 0));
+            break;
 
-        case 1:
-          lcd.print(splitString(splitString(banks[bank_number].sample2, '/', 1), '.', 0));
-          break;
+          case 1:
+            lcd.print(splitString(splitString(banks[bank_number].sample2, '/', 1), '.', 0));
+            break;
 
-        case 2:
-          lcd.print(splitString(splitString(banks[bank_number].sample3, '/', 1), '.', 0));
-          break;
+          case 2:
+            lcd.print(splitString(splitString(banks[bank_number].sample3, '/', 1), '.', 0));
+            break;
 
-        case 3:
-          lcd.print(splitString(splitString(banks[bank_number].sample4, '/', 1), '.', 0));
-          break;
+          case 3:
+            lcd.print(splitString(splitString(banks[bank_number].sample4, '/', 1), '.', 0));
+            break;
 
-        case 4:
-          lcd.print(splitString(splitString(banks[bank_number].sample5, '/', 1), '.', 0));
-          break;
+          case 4:
+            lcd.print(splitString(splitString(banks[bank_number].sample5, '/', 1), '.', 0));
+            break;
 
-        case 5:
-          lcd.print(splitString(splitString(banks[bank_number].sample6, '/', 1), '.', 0));
-          break;
+          case 5:
+            lcd.print(splitString(splitString(banks[bank_number].sample6, '/', 1), '.', 0));
+            break;
 
-        case 6:
-          lcd.print("MAINAMP");
-          break;
+          case 6:
+            lcd.print("MAINAMP");
+            break;
+        }
+        lcd.print(" : ");
+        lcd.print(ampVol[ampVolnum]);
+      }else{
+        lcd.print("BANK : ");
+        lcd.print(banks[bank_number].name);
       }
-      lcd.print(" : ");
-      lcd.print(ampVol[ampVolnum]);
     }else{
-      lcd.print("BANK : ");
-      lcd.print(banks[bank_number].name);
+      lcd.print("NO SD CARD INSERTED");
     }
   }
 }

@@ -30,12 +30,12 @@
 
  //SD - Added OFF mode to stop module running programmically
 
-#ifndef private_effect_digital_combine_h_
-#define private_effect_digital_combine_h_
+#ifndef effect_digital_combine_h_
+#define effect_digital_combine_h_
 #include <Arduino.h>
 #include "AudioStream.h"
 
-class AudioEffectDigitalCombinePrivate : public AudioStream
+class AudioEffectDigitalCombine : public AudioStream
 {
 public:
 	enum combineMode {
@@ -45,7 +45,7 @@ public:
 		MODULO = 3,
 		OFF = 4,
 	};
-	AudioEffectDigitalCombinePrivate() : AudioStream(2, inputQueueArray), mode_sel(OR) { begin(); }
+	AudioEffectDigitalCombine() : AudioStream(2, inputQueueArray), mode_sel(OR) { begin(); }
 	void setCombineMode(int mode_in) {
 		if (mode_in > 4) {
 	  		mode_in = 4;
