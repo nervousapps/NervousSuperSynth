@@ -291,8 +291,8 @@ void kelpie_get_encoders_parameters(){
       if(digital_encsw[0].fallingEdge()){
         if(kelpiesynthParamMsec <= 300){
           synthParam = false;
-          kelpieOff();
           knobRight1.write(synthSelect*2);
+          firstSampleParam = true;
           displayChange = true;
         }else{
           switch(newRight1){

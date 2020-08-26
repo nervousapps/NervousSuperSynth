@@ -482,8 +482,8 @@ void chord_get_encoders_parameters(){
       if(digital_encsw[0].fallingEdge()){
         if(ChordsynthParamMsec <= 300){
           synthParam = false;
-          chordOrganOff();
           knobRight1.write(synthSelect*2);
+          firstSampleParam = true;
           displayChange = true;
         }else{
           buttonTimer = 0;

@@ -9,6 +9,7 @@
 #include <SPI.h>
 #include <SerialFlash.h>
 #include "hardware/HardwareControls.h"
+#include <TeensyThreads.h>
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
 
@@ -23,6 +24,7 @@ AudioConnection             mainpatchcord2(mainAMP, 0, DACS1, 0);
 
 boolean synthParam = false;
 boolean sampleParam = false;
+boolean firstSampleParam = true;
 boolean hasSD = false;
 
 bool displayChange = true;
@@ -45,6 +47,13 @@ const int chipSelect = BUILTIN_SDCARD;
 
 void selectSynth(){
   long newRight1;
+  if(firstSampleParam){
+    firstSampleParam = !firstSampleParam;
+    braids_off();
+    chordOrganOff();
+    Tsynth_off();
+    kelpieOff();
+  }
   if(!synthParam){
     // Get rotary encoder1 value
     newRight1 = knobRight1.read()/2;
@@ -69,9 +78,6 @@ void selectSynth(){
         switch (synthSelect) {
           case 0:
           AudioNoInterrupts();
-          braids_off();
-          chordOrganOff();
-          Tsynth_off();
           kelpieOn();
           MIDI.setHandleNoteOff(KelpieOnNoteOff);
           MIDI.setHandleNoteOn(KelpieOnNoteOn);
@@ -80,9 +86,6 @@ void selectSynth(){
 
           case 1:
           AudioNoInterrupts();
-          braids_off();
-          kelpieOff();
-          Tsynth_off();
           chordOrganOn();
           MIDI.setHandleNoteOff(ChordOrganOnNoteOff);
           MIDI.setHandleNoteOn(ChordOrganOnNoteOn);
@@ -92,9 +95,6 @@ void selectSynth(){
 
           case 2:
           AudioNoInterrupts();
-          braids_off();
-          chordOrganOff();
-          kelpieOff();
           Tsynth_setup();
           MIDI.setHandleNoteOff(TsynthNoteOff);
           MIDI.setHandleNoteOn(TsynthNoteOn);
@@ -102,13 +102,10 @@ void selectSynth(){
           break;
 
           case 3:
-          chordOrganOff();
-          Tsynth_off();
-          kelpieOff();
           AudioNoInterrupts();
+          braids_on();
           MIDI.setHandleNoteOn(braidsHandleNoteOn);
           AudioInterrupts();
-          braids_on();
           break;
         }
         displayChange = true;
@@ -141,9 +138,9 @@ void setup(){
       Serial.print("Begin");
     }
   }
-  debug = true;
-  Serial.begin(9600);
-  Serial.print("Begin");
+  // debug = true;
+  // Serial.begin(9600);
+  // Serial.print("Begin");
 
   // Configure the ADCs
   analogReadResolution(7);
@@ -153,14 +150,14 @@ void setup(){
   // Configure the DACs
   analogWriteResolution(12);
   DACS1.analogReference(INTERNAL);
-  AudioMemory(200);
+  AudioMemory(400);
 
   // Set main mixer volume
   mainMix.gain(0, 0.25);
   mainMix.gain(1, 0.25);
   mainMix.gain(2, 0.25);
   mainMix.gain(3, 0.25);
-  mainAMP.gain(50);
+  mainAMP.gain(10);
 
   // Init SD card
   if(debug) Serial.println("Initializing SD card...");
@@ -180,6 +177,7 @@ void setup(){
 
   // Init sampleplayer banks
   init_banks();
+  // threads.addThread(runSamplePlayer);
 
   // Init MIDI
   MIDI.begin();
@@ -247,29 +245,37 @@ void CPUMonitor() {
   Serial.println(AudioMemoryUsageMax());
 }
 
+bool alternate = true;
+
 void loop(){
   MIDI.read();
-  runSamplePlayer();
   selectSynth();
-  if(synthParam){
-    switch (synthSelect) {
-      case 0:
-      kelpie_run();
-      break;
+  if(alternate){
+    if(synthParam){
+      switch (synthSelect) {
+        case 0:
+        kelpie_run();
+        break;
 
-      case 1:
-      chordOrgan_run();
-      break;
+        case 1:
+        chordOrgan_run();
+        break;
 
-      case 2:
-      Tsynth_run();
-      break;
+        case 2:
+        Tsynth_run();
+        break;
 
-      case 3:
-      run_braids();
-      break;
+        case 3:
+        run_braids();
+        break;
+      }
     }
+    alternate = !alternate;
+  }else{
+    runSamplePlayer();
+    alternate = !alternate;
   }
+
   printInfos();
 
   if(debug){

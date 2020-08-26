@@ -7,11 +7,11 @@
 
 File root;
 
-boolean directory = true;
-boolean sample = false;
-int bank_number = 0;
-int number_banks;
-int number_sample_per_bank = 6;
+volatile boolean directory = true;
+volatile boolean sample = false;
+volatile int bank_number = 0;
+volatile int number_banks;
+volatile int number_sample_per_bank = 6;
 elapsedMillis sampleParamMsec;
 
 struct Bank {
@@ -24,14 +24,14 @@ struct Bank {
   const char* sample6;
 };
 
-Bank banks[30];
+volatile Bank banks[30];
 
 const char* _filename = "banks.txt";
 
-int ampVolnum = 0;
-boolean selectingAmp = false;
-boolean sampleVolCtrl = false;
-float ampVol[7] = {
+volatile int ampVolnum = 0;
+volatile boolean selectingAmp = false;
+volatile boolean sampleVolCtrl = false;
+volatile float ampVol[7] = {
   0.1,
   0.1,
   0.1,
@@ -56,7 +56,6 @@ String splitString(String data, char separator, int index)
     }
     return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
-
 
 void sampleplay(){
   for (int i=0;i<TRIGGER_PINS;i++){

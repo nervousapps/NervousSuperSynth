@@ -215,7 +215,6 @@ void braids_off(){
   MIDI.setHandleNoteOn(nothing);
   myTimer.end();
   braidsOn = false;
-  myTimer.end();
   analogWrite(A22, (((uint16_t)(0+0x7FFF))>>4));
   AudioInterrupts();
 }
@@ -249,6 +248,7 @@ void braids_get_shape(){
         if(kelpiesynthParamMsec <= 300){
           synthParam = false;
           knobRight1.write(synthSelect*2);
+          firstSampleParam = true;
           displayChange = true;
         }else{
           if(newRight1 <= 56){
