@@ -73,6 +73,7 @@ I made the panel here : https://www.john-steel.com/
     - https://github.com/ghostintranslation/SimpleSynth
     - https://github.com/kbob/drum-machine
     - https://github.com/RyoKosaka/HelloDrum-arduino-Library (https://gist.github.com/RyoKosaka/2046d4af9e4f12aaba618d9c9036d89e)
+    - https://forum.pjrc.com/threads/32167-My-Teensy-3-1-Commodore-SID-Emulation-Player
 - display parameters when changing
 - review kelpie parameters for switches
 - clean code
