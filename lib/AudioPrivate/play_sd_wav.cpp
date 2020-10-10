@@ -58,24 +58,23 @@ void AudioPlaySdWav::begin(void)
 	}
 }
 
-
 bool AudioPlaySdWav::play(const char *filename)
 {
 	stop();
-#if defined(HAS_KINETIS_SDHC)	
+#if defined(HAS_KINETIS_SDHC)
 	if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStartUsingSPI();
-#else 	
+#else
 	AudioStartUsingSPI();
 #endif
 	__disable_irq();
 	wavfile = SD.open(filename);
 	__enable_irq();
-	if (!wavfile) {
-	#if defined(HAS_KINETIS_SDHC)	
+	#if defined(HAS_KINETIS_SDHC)
 		if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
-	#else 	
+	#else
 		AudioStopUsingSPI();
-	#endif			
+	#endif
+	if (!wavfile) {
 		return false;
 	}
 	buffer_length = 0;
@@ -100,11 +99,11 @@ void AudioPlaySdWav::stop(void)
 		if (b1) release(b1);
 		if (b2) release(b2);
 		wavfile.close();
-	#if defined(HAS_KINETIS_SDHC)	
+	#if defined(HAS_KINETIS_SDHC)
 		if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
-	#else 	
+	#else
 		AudioStopUsingSPI();
-	#endif	
+	#endif
 	} else {
 		__enable_irq();
 	}
@@ -165,11 +164,11 @@ void AudioPlaySdWav::update(void)
 	}
 end:	// end of file reached or other reason to stop
 	wavfile.close();
-#if defined(HAS_KINETIS_SDHC)	
+#if defined(HAS_KINETIS_SDHC)
 	if (!(SIM_SCGC3 & SIM_SCGC3_SDHC)) AudioStopUsingSPI();
-#else 	
+#else
 	AudioStopUsingSPI();
-#endif	
+#endif
 	state_play = STATE_STOP;
 	state = STATE_STOP;
 cleanup:
@@ -479,7 +478,7 @@ start:
 
 
 /*
-00000000  52494646 66EA6903 57415645 666D7420  RIFFf.i.WAVEfmt 
+00000000  52494646 66EA6903 57415645 666D7420  RIFFf.i.WAVEfmt
 00000010  10000000 01000200 44AC0000 10B10200  ........D.......
 00000020  04001000 4C495354 3A000000 494E464F  ....LIST:...INFO
 00000030  494E414D 14000000 49205761 6E742054  INAM....I Want T
@@ -592,9 +591,3 @@ uint32_t AudioPlaySdWav::lengthMillis(void)
 	uint32_t b2m = *(volatile uint32_t *)&bytes2millis;
 	return ((uint64_t)tlength * b2m) >> 32;
 }
-
-
-
-
-
-

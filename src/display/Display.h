@@ -166,8 +166,13 @@ void draw_progressbar(byte percent) {
   }
 }
 
+
+elapsedMillis display_refresh;
+
 void printInfos(){
+  if(display_refresh < 50) return;
   if(displayChange){
+    display_refresh = 0;
     displayChange = !displayChange;
 
     lcd.clear();

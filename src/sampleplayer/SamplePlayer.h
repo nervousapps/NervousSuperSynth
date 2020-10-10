@@ -32,12 +32,12 @@ volatile int ampVolnum = 0;
 volatile boolean selectingAmp = false;
 volatile boolean sampleVolCtrl = false;
 volatile float ampVol[7] = {
-  0.1,
-  0.1,
-  0.1,
-  0.1,
-  0.1,
-  0.1,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
   10
 };
 
@@ -146,6 +146,7 @@ void control_sampleplayer(){
       else if(sampleParamMsec >= 600){
         sampleVolCtrl = !sampleVolCtrl;
         selectingAmp = true;
+        knobRight2.write(bank_number*2);
       }
       sampleParamMsec = 0;
       displayChange = true;
@@ -154,25 +155,25 @@ void control_sampleplayer(){
 }
 
 void volumeControl(){
-  amp1.gain(((float)ampVol[0]/(float)20)+0.1);
-  amp2.gain(((float)ampVol[1]/(float)20)+0.1);
-  amp3.gain(((float)ampVol[2]/(float)20)+0.1);
-  amp4.gain(((float)ampVol[3]/(float)20)+0.1);
-  amp5.gain(((float)ampVol[4]/(float)20)+0.1);
-  amp6.gain(((float)ampVol[5]/(float)20)+0.1);
+  amp1.gain(((float)ampVol[0]/(float)20)+2);
+  amp2.gain(((float)ampVol[1]/(float)20)+2);
+  amp3.gain(((float)ampVol[2]/(float)20)+2);
+  amp4.gain(((float)ampVol[3]/(float)20)+2);
+  amp5.gain(((float)ampVol[4]/(float)20)+2);
+  amp6.gain(((float)ampVol[5]/(float)20)+2);
   amp7.gain(((float)ampVol[6]/(float)20)+10);
 }
 
 void init_banks(){
     // Set mixers gain
-    samplemix1.gain(0, 0.5);
+    samplemix1.gain(0, 0.25);
     samplemix1.gain(1, 0.25);
     samplemix1.gain(2, 0.25);
     samplemix2.gain(0, 0.25);
     samplemix2.gain(1, 0.25);
-    samplemix2.gain(2, 0.5);
-    samplemix3.gain(0, 0.5);
-    samplemix3.gain(1, 0.5);
+    samplemix2.gain(2, 0.25);
+    samplemix3.gain(0, 0.25);
+    samplemix3.gain(1, 0.25);
 
     amp1.gain(ampVol[0]);
     amp2.gain(ampVol[1]);

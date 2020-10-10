@@ -91,8 +91,6 @@ const int ENC_BUTTONS[ENC_BUTTONS_PINS] = {
 //******VARIABLES***********
 
 //************INITIALIZE LIBRARY OBJECTS**************
-// not sure if there is a better way... some way run a setup loop on global array??
-// use comment tags to comment out unused portions of array definitions
 
 // initialize the ReponsiveAnalogRead objects
 ResponsiveAnalogRead analog_controls[]{

@@ -115,13 +115,12 @@ void AudioMixer4::begin(void){
 
 void AudioMixer4::stop(void)
 {
-	__disable_irq();
 	if (run) {
+		__disable_irq();
 		run = false;
 		__enable_irq();
-	} else {
-		__enable_irq();
 	}
+	return;
 }
 
 void AudioMixer4::start(void)
@@ -169,13 +168,12 @@ void AudioAmplifier::begin(void){
 
 void AudioAmplifier::stop(void)
 {
-	__disable_irq();
 	if (run) {
+		__disable_irq();
 		run = false;
 		__enable_irq();
-	} else {
-		__enable_irq();
 	}
+	return;
 }
 
 void AudioAmplifier::start(void)

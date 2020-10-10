@@ -77,3 +77,4 @@ I made the panel here : https://www.john-steel.com/
 - display parameters when changing
 - review kelpie parameters for switches
 - clean code
+- update to ChordOrgan v0.6 (https://github.com/TomWhitwell/Chord-Organ/tree/v0.6.0/Chord-Organ)

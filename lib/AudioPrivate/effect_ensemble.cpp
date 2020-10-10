@@ -36,13 +36,12 @@ void AudioEffectEnsemble::begin(void){
 
 void AudioEffectEnsemble::stop(void)
 {
-	__disable_irq();
 	if (run) {
+		__disable_irq();
 		run = false;
 		__enable_irq();
-	} else {
-		__enable_irq();
 	}
+	return;
 }
 
 void AudioEffectEnsemble::start(void)

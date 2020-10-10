@@ -33,30 +33,28 @@ void AudioAnalyzePeak::begin(void){
 
 void AudioAnalyzePeak::stop(void)
 {
-	__disable_irq();
 	if (run) {
+		__disable_irq();
 		run = false;
 		__enable_irq();
-	} else {
-		__enable_irq();
 	}
+	return;
 }
 
 void AudioAnalyzePeak::start(void)
 {
-	__disable_irq();
 	if (!run) {
+		__disable_irq();
 		run = true;
 		__enable_irq();
-	} else {
-		__enable_irq();
 	}
+	return;
 }
 
 void AudioAnalyzePeak::update(void)
 {
 	if(!run) return;
-	
+
 	audio_block_t *block;
 	const int16_t *p, *end;
 	int32_t min, max;
