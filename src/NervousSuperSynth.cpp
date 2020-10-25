@@ -3,15 +3,17 @@
 #include <TimeLib.h>
 #include <TimeAlarms.h>
 #include <AudioPrivate.h>
-#include "hardware/pins.h"
 #include <MIDI.h>
 #include <SD.h>
 #include <SPI.h>
 #include <SerialFlash.h>
-#include "hardware/HardwareControls.h"
 #include <TeensyThreads.h>
+#include <NervousSuperMother.h>
 
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
+
+// Motherboard
+NervousSuperMother * device = NervousSuperMother::getInstance();
 
 AudioMixer4          mainMix;
 AudioAmplifier       mainAMP;
@@ -38,81 +40,79 @@ char synthName[synthNumber][16] = {"Kelpie", "ChordOrgan", "Tsynth", "Braids"};
 const int chipSelect = BUILTIN_SDCARD;
 
 #include "sampleplayer/SamplePlayer.h"
-#include "kelpie/kelpiemaster.h"
-#include "chordOrgan/ChordOrgan.h"
-#include "tsynth/TSynth.h"
-#include "braids/braids.h"
+// #include "kelpie/kelpiemaster.h"
+// #include "chordOrgan/ChordOrgan.h"
+// #include "tsynth/TSynth.h"
+// #include "braids/braids.h"
 
-#include "display/Display.h"
-
-void selectSynth(){
-  long newRight1;
-  if(firstSampleParam){
-    firstSampleParam = !firstSampleParam;
-    braids_off();
-    chordOrganOff();
-    Tsynth_off();
-    kelpieOff();
-  }
-  if(!synthParam){
-    // Get rotary encoder1 value
-    newRight1 = knobRight1.read()/2;
-    if (newRight1 != positionRight1) {
-      if (newRight1 >= synthNumber){
-        knobRight1.write(0);
-        newRight1 = 0;
-      }
-      if (newRight1 < 0){
-        newRight1 = synthNumber-1;
-        knobRight1.write(newRight1*2);
-      }
-      positionRight1 = newRight1;
-      displayChange = true;
-    }
-    if(digital_encsw[0].update()){
-      if(digital_encsw[0].fallingEdge()){
-        AudioNoInterrupts();
-        synthSelect = newRight1;
-        synthParam = !synthParam;
-        AudioInterrupts();
-        switch (synthSelect) {
-          case 0:
-          AudioNoInterrupts();
-          kelpieOn();
-          MIDI.setHandleNoteOff(KelpieOnNoteOff);
-          MIDI.setHandleNoteOn(KelpieOnNoteOn);
-          AudioInterrupts();
-          break;
-
-          case 1:
-          AudioNoInterrupts();
-          chordOrganOn();
-          MIDI.setHandleNoteOff(ChordOrganOnNoteOff);
-          MIDI.setHandleNoteOn(ChordOrganOnNoteOn);
-          AudioInterrupts();
-          chordOrganenvelope1.noteOn();
-          break;
-
-          case 2:
-          AudioNoInterrupts();
-          Tsynth_setup();
-          MIDI.setHandleNoteOff(TsynthNoteOff);
-          MIDI.setHandleNoteOn(TsynthNoteOn);
-          AudioInterrupts();
-          break;
-
-          case 3:
-          AudioNoInterrupts();
-          braids_on();
-          MIDI.setHandleNoteOn(braidsHandleNoteOn);
-          AudioInterrupts();
-          break;
-        }
-        displayChange = true;
-      }
-    }
-  }
-}
+// void selectSynth(){
+//   long newRight1;
+//   if(firstSampleParam){
+//     firstSampleParam = !firstSampleParam;
+//     braids_off();
+//     chordOrganOff();
+//     Tsynth_off();
+//     kelpieOff();
+//   }
+//   if(!synthParam){
+//     // Get rotary encoder1 value
+//     newRight1 = knobRight1.read()/2;
+//     if (newRight1 != positionRight1) {
+//       if (newRight1 >= synthNumber){
+//         knobRight1.write(0);
+//         newRight1 = 0;
+//       }
+//       if (newRight1 < 0){
+//         newRight1 = synthNumber-1;
+//         knobRight1.write(newRight1*2);
+//       }
+//       positionRight1 = newRight1;
+//       displayChange = true;
+//     }
+//     if(digital_encsw[0].update()){
+//       if(digital_encsw[0].fallingEdge()){
+//         AudioNoInterrupts();
+//         synthSelect = newRight1;
+//         synthParam = !synthParam;
+//         AudioInterrupts();
+//         switch (synthSelect) {
+//           case 0:
+//           AudioNoInterrupts();
+//           kelpieOn();
+//           MIDI.setHandleNoteOff(KelpieOnNoteOff);
+//           MIDI.setHandleNoteOn(KelpieOnNoteOn);
+//           AudioInterrupts();
+//           break;
+//
+//           case 1:
+//           AudioNoInterrupts();
+//           chordOrganOn();
+//           MIDI.setHandleNoteOff(ChordOrganOnNoteOff);
+//           MIDI.setHandleNoteOn(ChordOrganOnNoteOn);
+//           AudioInterrupts();
+//           chordOrganenvelope1.noteOn();
+//           break;
+//
+//           case 2:
+//           AudioNoInterrupts();
+//           Tsynth_setup();
+//           MIDI.setHandleNoteOff(TsynthNoteOff);
+//           MIDI.setHandleNoteOn(TsynthNoteOn);
+//           AudioInterrupts();
+//           break;
+//
+//           case 3:
+//           AudioNoInterrupts();
+//           braids_on();
+//           MIDI.setHandleNoteOn(braidsHandleNoteOn);
+//           AudioInterrupts();
+//           break;
+//         }
+//         displayChange = true;
+//       }
+//     }
+//   }
+// }
 
 boolean openSDCard() {
     int crashCountdown = 0;
@@ -130,14 +130,14 @@ boolean openSDCard() {
 
 void setup(){
   // Catch debug mode
-  if(digital_encsw[0].update()){
-    if(digital_encsw[0].fallingEdge()){
-      debug = true;
-      // Init serial
-      Serial.begin(9600);
-      Serial.print("Begin");
-    }
-  }
+  // if(digital_encsw[0].update()){
+  //   if(digital_encsw[0].fallingEdge()){
+  //     debug = true;
+  //     // Init serial
+  //     Serial.begin(9600);
+  //     Serial.print("Begin");
+  //   }
+  // }
   // debug = true;
   // Serial.begin(9600);
   // Serial.print("Begin");
@@ -166,42 +166,38 @@ void setup(){
     if(debug) Serial.println("initialization failed!");
   }
 
-  // Init LCD
-  setup_lcd();
-  setup_progressbar();
-  lcd.setCursor(0,0);
-
   // Init hardware controls
   setup_hardware_controls();
   if(debug) Serial.print(ANALOG_CONTROL_PINS);
 
-  // Init sampleplayer banks
-  init_banks();
-  // threads.addThread(runSamplePlayer);
-
   // Init MIDI
   MIDI.begin();
 
+  // Init device NervousSuperMother
+  byte controls[6] = {0,1,2,3,4,5};
+  device->init(controls);
+
+  // Set the handlers
+  initSamplePlayer(device);
+
   // Init Kelpie and power off
-  kelpie_setup();
-  kelpieOff();
+  // kelpie_setup();
+  // kelpieOff();
 
   // Init Tsynth and power off
-  Tsynth_setup();
-  Tsynth_off();
+  // Tsynth_setup();
+  // Tsynth_off();
 
   // Init chordOrgan and power off
-  setup_chordOrgan(hasSD);
-  chordOrganOff();
+  // setup_chordOrgan(hasSD);
+  // chordOrganOff();
 
   // Init Braids and power off
-  setup_braids();
-  braids_off();
-
-  // Init LCD
-  lcd.setCursor(0,0);
+  // setup_braids();
+  // braids_off();
 
   // Starting animation
+  lcd.setCursor(0,0);
   lcd.print("!    SuperSynth    !");
   for(int i=0; i<100; i++){
     draw_progressbar(i);
@@ -245,38 +241,29 @@ void CPUMonitor() {
   Serial.println(AudioMemoryUsageMax());
 }
 
-bool alternate = true;
-
 void loop(){
+  device->update();
   MIDI.read();
-  selectSynth();
-  if(alternate){
-    if(synthParam){
-      switch (synthSelect) {
-        case 0:
-        kelpie_run();
-        break;
+  // selectSynth();
+  if(synthParam){
+    switch (synthSelect) {
+      case 0:
+      // kelpie_run();
+      break;
 
-        case 1:
-        chordOrgan_run();
-        break;
+      case 1:
+      // chordOrgan_run();
+      break;
 
-        case 2:
-        Tsynth_run();
-        break;
+      case 2:
+      // Tsynth_run();
+      break;
 
-        case 3:
-        run_braids();
-        break;
-      }
+      case 3:
+      // run_braids();
+      break;
     }
-    alternate = !alternate;
-  }else{
-    runSamplePlayer();
-    alternate = !alternate;
   }
-
-  printInfos();
 
   if(debug){
     cpuLoadSleep();

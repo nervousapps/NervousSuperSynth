@@ -29,7 +29,7 @@ volatile Bank banks[30];
 const char* _filename = "banks.txt";
 
 volatile int ampVolnum = 0;
-volatile boolean selectingAmp = false;
+volatile boolean selectingAmp = true;
 volatile boolean sampleVolCtrl = false;
 volatile float ampVol[7] = {
   5,
@@ -57,103 +57,6 @@ String splitString(String data, char separator, int index)
     return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
 
-void sampleplay(){
-  for (int i=0;i<TRIGGER_PINS;i++){
-    digital_trig[i].update();
-    if (digital_trig[i].fallingEdge()) {
-      switch (i) {
-        case 0:
-          sampleplaySdWav1.play(banks[bank_number].sample1);
-          break;
-
-        case 1:
-          sampleplaySdWav2.play(banks[bank_number].sample2);
-          break;
-
-        case 2:
-          sampleplaySdWav3.play(banks[bank_number].sample3);
-          break;
-
-        case 3:
-          sampleplaySdWav4.play(banks[bank_number].sample4);
-          break;
-
-        case 4:
-          sampleplaySdWav5.play(banks[bank_number].sample5);
-          break;
-
-        case 5:
-          sampleplaySdWav6.play(banks[bank_number].sample6);
-          break;
-      }
-    }
-  }
-}
-
-void control_sampleplayer(){
-
-  // TODO : add editor mode !
-  long newRight2;
-  // Get rotary encoder2 value
-  newRight2 = knobRight2.read()/2;
-  if (newRight2 != positionRight2) {
-    if(sampleVolCtrl){
-      if(selectingAmp){
-        if (newRight2 > 6){
-          knobRight2.write(0);
-          newRight2 = 0;
-        }
-        if (newRight2 < 0){
-          newRight2 = 6;
-          knobRight2.write(newRight2*2);
-        }
-        ampVolnum = newRight2;
-      }else{
-        ampVol[ampVolnum] = abs(int(newRight2));
-      }
-    }else{
-      if (newRight2 > number_banks-1){
-        knobRight2.write(0);
-        newRight2 = 0;
-      }
-      if (newRight2 < 0){
-        newRight2 = number_banks-1;
-        knobRight2.write(newRight2*2);
-      }
-      bank_number = newRight2;
-    }
-    positionRight2 = newRight2;
-    displayChange = true;
-  }
-
-  // Switch to volume control mode
-  if(digital_encsw[1].update()){
-    if(digital_encsw[1].fallingEdge()){
-      sampleParamMsec = 0;
-    }
-
-    if(digital_encsw[1].risingEdge()){
-      if(sampleParamMsec < 300){
-        if(sampleVolCtrl){
-          if(selectingAmp){
-            knobRight2.write(ampVol[ampVolnum]*2);
-          }else{
-            knobRight2.write(ampVolnum*2);
-          }
-          selectingAmp = !selectingAmp;
-        }
-      }
-      else if(sampleParamMsec >= 600){
-        sampleVolCtrl = !sampleVolCtrl;
-        selectingAmp = true;
-        knobRight2.write(bank_number*2);
-      }
-      sampleParamMsec = 0;
-      displayChange = true;
-    }
-  }
-}
-
 void volumeControl(){
   amp1.gain(((float)ampVol[0]/(float)20)+2);
   amp2.gain(((float)ampVol[1]/(float)20)+2);
@@ -162,6 +65,109 @@ void volumeControl(){
   amp5.gain(((float)ampVol[4]/(float)20)+2);
   amp6.gain(((float)ampVol[5]/(float)20)+2);
   amp7.gain(((float)ampVol[6]/(float)20)+10);
+}
+
+void sampleplay(byte inputIndex){
+  switch (inputIndex) {
+    case 0:
+      sampleplaySdWav1.play(banks[bank_number].sample1);
+      break;
+
+    case 1:
+      sampleplaySdWav2.play(banks[bank_number].sample2);
+      break;
+
+    case 2:
+      sampleplaySdWav3.play(banks[bank_number].sample3);
+      break;
+
+    case 3:
+      sampleplaySdWav4.play(banks[bank_number].sample4);
+      break;
+
+    case 4:
+      sampleplaySdWav5.play(banks[bank_number].sample5);
+      break;
+
+    case 5:
+      sampleplaySdWav6.play(banks[bank_number].sample6);
+      break;
+  }
+}
+
+void printSamplePlayerLine(){
+  switch(ampVolnum){
+    case 0:
+    device->updateLine(2, splitString(splitString(banks[bank_number].sample1, '/', 1), '.', 0) + " : " + ampVol[ampVolnum]);
+    break;
+
+    case 1:
+    device->updateLine(2, splitString(splitString(banks[bank_number].sample2, '/', 1), '.', 0) + " : " + ampVol[ampVolnum]);
+    break;
+
+    case 2:
+    device->updateLine(2, splitString(splitString(banks[bank_number].sample3, '/', 1), '.', 0) + " : " + ampVol[ampVolnum]);
+    break;
+
+    case 3:
+    device->updateLine(2, splitString(splitString(banks[bank_number].sample4, '/', 1), '.', 0) + " : " + ampVol[ampVolnum]);
+    break;
+
+    case 4:
+    device->updateLine(2, splitString(splitString(banks[bank_number].sample5, '/', 1), '.', 0) + " : " + ampVol[ampVolnum]);
+    break;
+
+    case 5:
+    device->updateLine(2, splitString(splitString(banks[bank_number].sample6, '/', 1), '.', 0) + " : " + ampVol[ampVolnum]);
+    break;
+
+    case 6:
+    device->updateLine(2, "MAINAMP : " + String(ampVol[ampVolnum]));
+  }
+}
+
+void encoderHandler(byte inputIndex, long value){
+  if(sampleVolCtrl){
+    if(selectingAmp){
+      device->updateEncodeursMaxValue(1, 7);
+      ampVolnum = value;
+    }else{
+      device->updateEncodeursMaxValue(1, 300);
+      ampVol[ampVolnum] = abs(int(value));
+      volumeControl();
+    }
+    printSamplePlayerLine();
+  }else{
+    device->updateEncodeursMaxValue(1, number_banks-1);
+    bank_number = value;
+    device->updateLine(2, "BANK : " + String(banks[bank_number].name));
+  }
+}
+
+void simplePressHandler(byte inputIndex){
+  if(sampleVolCtrl){
+    if(selectingAmp){
+      device->updateEncodeursValue(1, ampVol[ampVolnum]);
+    }else{
+      device->updateEncodeursValue(1, ampVolnum);
+      volumeControl();
+    }
+    selectingAmp = !selectingAmp;
+  }else {
+    sampleVolCtrl = !sampleVolCtrl;
+  }
+  printSamplePlayerLine();
+}
+
+void doublePressHandler(byte inputIndex){
+  sampleVolCtrl = !sampleVolCtrl;
+  selectingAmp = true;
+  device->updateEncodeursValue(1, bank_number);
+  device->updateLine(2, "BANK : " + String(banks[bank_number].name));
+}
+
+void longPressHandler(byte inputIndex){
+
 }
 
 void init_banks(){
@@ -233,12 +239,19 @@ void init_banks(){
   return;
 }
 
-void runSamplePlayer(){
-  if(sampleVolCtrl){
-    volumeControl();
+void setSamplePlayerHandlers(NervousSuperMother *device){
+  for(byte i = 0; i < 6; i++){
+    device->setHandleTrigger(i, sampleplay);
   }
-  control_sampleplayer();
-  sampleplay();
+  device->setHandlePress(1, simplePressHandler);
+  device->setHandleDoublePress(1, doublePressHandler);
+  device->setHandleEncoderChange(1, encoderHandler);
+}
+
+void initSamplePlayer(NervousSuperMother *device){
+  init_banks();
+  setSamplePlayerHandlers(device);
+  volumeControl();
 }
 
 
