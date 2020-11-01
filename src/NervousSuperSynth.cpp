@@ -29,90 +29,69 @@ boolean sampleParam = false;
 boolean firstSampleParam = true;
 boolean hasSD = false;
 
-bool displayChange = true;
 bool debug = false;
 
 #define synthNumber 4
 
-int synthSelect = -9;
+int synthSelect = 0;
 char synthName[synthNumber][16] = {"Kelpie", "ChordOrgan", "Tsynth", "Braids"};
 
 const int chipSelect = BUILTIN_SDCARD;
 
 #include "sampleplayer/SamplePlayer.h"
-// #include "kelpie/kelpiemaster.h"
+#include "kelpie/kelpiemaster.h"
 // #include "chordOrgan/ChordOrgan.h"
 // #include "tsynth/TSynth.h"
 // #include "braids/braids.h"
 
-// void selectSynth(){
-//   long newRight1;
-//   if(firstSampleParam){
-//     firstSampleParam = !firstSampleParam;
-//     braids_off();
-//     chordOrganOff();
-//     Tsynth_off();
-//     kelpieOff();
-//   }
-//   if(!synthParam){
-//     // Get rotary encoder1 value
-//     newRight1 = knobRight1.read()/2;
-//     if (newRight1 != positionRight1) {
-//       if (newRight1 >= synthNumber){
-//         knobRight1.write(0);
-//         newRight1 = 0;
-//       }
-//       if (newRight1 < 0){
-//         newRight1 = synthNumber-1;
-//         knobRight1.write(newRight1*2);
-//       }
-//       positionRight1 = newRight1;
-//       displayChange = true;
-//     }
-//     if(digital_encsw[0].update()){
-//       if(digital_encsw[0].fallingEdge()){
-//         AudioNoInterrupts();
-//         synthSelect = newRight1;
-//         synthParam = !synthParam;
-//         AudioInterrupts();
-//         switch (synthSelect) {
-//           case 0:
-//           AudioNoInterrupts();
-//           kelpieOn();
-//           MIDI.setHandleNoteOff(KelpieOnNoteOff);
-//           MIDI.setHandleNoteOn(KelpieOnNoteOn);
-//           AudioInterrupts();
-//           break;
-//
-//           case 1:
-//           AudioNoInterrupts();
-//           chordOrganOn();
-//           MIDI.setHandleNoteOff(ChordOrganOnNoteOff);
-//           MIDI.setHandleNoteOn(ChordOrganOnNoteOn);
-//           AudioInterrupts();
-//           chordOrganenvelope1.noteOn();
-//           break;
-//
-//           case 2:
-//           AudioNoInterrupts();
-//           Tsynth_setup();
-//           MIDI.setHandleNoteOff(TsynthNoteOff);
-//           MIDI.setHandleNoteOn(TsynthNoteOn);
-//           AudioInterrupts();
-//           break;
-//
-//           case 3:
-//           AudioNoInterrupts();
-//           braids_on();
-//           MIDI.setHandleNoteOn(braidsHandleNoteOn);
-//           AudioInterrupts();
-//           break;
-//         }
-//         displayChange = true;
-//       }
-//     }
-//   }
-// }
+void selectSynth(byte inputIndex, long value){
+  Serial.println(value);
+  if(firstSampleParam){
+    firstSampleParam = !firstSampleParam;
+    // braids_off();
+    // chordOrganOff();
+    // Tsynth_off();
+    kelpieOff();
+    device->updateEncodeursValue(0, synthNumber-1);
+  }
+  if(!synthParam){
+    synthSelect = value;
+    device->updateEncodeursMaxValue(0, synthNumber-1);
+  }
+  device->updateLine(1, String(synthName[synthSelect]));
+}
+
+void confirmSynth(byte inputIndex){
+  AudioNoInterrupts();
+  synthParam = !synthParam;
+  switch (synthSelect) {
+    case 0:
+    kelpieOn(device);
+    MIDI.setHandleNoteOff(KelpieOnNoteOff);
+    MIDI.setHandleNoteOn(KelpieOnNoteOn);
+    break;
+
+    case 1:
+    // chordOrganOn();
+    // MIDI.setHandleNoteOff(ChordOrganOnNoteOff);
+    // MIDI.setHandleNoteOn(ChordOrganOnNoteOn);
+    // chordOrganenvelope1.noteOn();
+    break;
+
+    case 2:
+    // Tsynth_setup();
+    // MIDI.setHandleNoteOff(TsynthNoteOff);
+    // MIDI.setHandleNoteOn(TsynthNoteOn);
+    break;
+
+    case 3:
+    // braids_on();
+    // MIDI.setHandleNoteOn(braidsHandleNoteOn);
+    break;
+  }
+  AudioInterrupts();
+  device->updateLine(1, String(synthName[synthSelect]));
+}
 
 boolean openSDCard() {
     int crashCountdown = 0;
@@ -139,8 +118,8 @@ void setup(){
   //   }
   // }
   // debug = true;
-  // Serial.begin(9600);
-  // Serial.print("Begin");
+  Serial.begin(9600);
+  Serial.print("Begin");
 
   // Configure the ADCs
   analogReadResolution(7);
@@ -181,8 +160,8 @@ void setup(){
   initSamplePlayer(device);
 
   // Init Kelpie and power off
-  // kelpie_setup();
-  // kelpieOff();
+  kelpie_setup(device);
+  kelpieOff();
 
   // Init Tsynth and power off
   // Tsynth_setup();
@@ -195,6 +174,15 @@ void setup(){
   // Init Braids and power off
   // setup_braids();
   // braids_off();
+
+  // Set handlers
+  device->updateEncodeursValue(0, 0);
+  device->setHandleEncoderChange(0, selectSynth);
+  device->setHandlePress(0, confirmSynth);
+  device->updateEncodeursMaxValue(0, synthNumber-1);
+  for (int i=0;i<ANALOG_CONTROL_PINS;i++){
+    device->setHandlePotentiometerChange(i, nullptr);
+  }
 
   // Starting animation
   lcd.setCursor(0,0);
@@ -244,11 +232,10 @@ void CPUMonitor() {
 void loop(){
   device->update();
   MIDI.read();
-  // selectSynth();
   if(synthParam){
     switch (synthSelect) {
       case 0:
-      // kelpie_run();
+      kelpie_run();
       break;
 
       case 1:
@@ -263,6 +250,13 @@ void loop(){
       // run_braids();
       break;
     }
+  }else if(firstSampleParam && !synthParam){
+    device->setHandleEncoderChange(0, selectSynth);
+    device->setHandlePress(0, confirmSynth);
+    for (int i=0;i<ANALOG_CONTROL_PINS;i++){
+      device->setHandlePotentiometerChange(i, nullptr);
+    }
+    selectSynth(0, synthSelect);
   }
 
   if(debug){

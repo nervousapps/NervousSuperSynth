@@ -123,6 +123,7 @@ void printSamplePlayerLine(){
 
     case 6:
     device->updateLine(2, "MAINAMP : " + String(ampVol[ampVolnum]));
+    break;
   }
 }
 
@@ -153,21 +154,21 @@ void simplePressHandler(byte inputIndex){
       volumeControl();
     }
     selectingAmp = !selectingAmp;
-  }else {
-    sampleVolCtrl = !sampleVolCtrl;
+  }else{
+    sampleVolCtrl = true;
   }
   printSamplePlayerLine();
 }
 
 void doublePressHandler(byte inputIndex){
-  sampleVolCtrl = !sampleVolCtrl;
+  sampleVolCtrl = false;
   selectingAmp = true;
   device->updateEncodeursValue(1, bank_number);
   device->updateLine(2, "BANK : " + String(banks[bank_number].name));
 }
 
 void longPressHandler(byte inputIndex){
-
+  return;
 }
 
 void init_banks(){
