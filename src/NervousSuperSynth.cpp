@@ -17,6 +17,7 @@ NervousSuperMother * device = NervousSuperMother::getInstance();
 
 AudioMixer4          mainMix;
 AudioAmplifier       mainAMP;
+
 // AudioOutputAnalogStereo     DACS1;
 AudioOutputAnalog     DACS1;
 AudioOutputPT8211           pt8211_1;
@@ -29,6 +30,8 @@ boolean sampleParam = false;
 boolean firstSampleParam = true;
 boolean hasSD = false;
 
+elapsedMillis DisplayParamMsec = 0;
+
 bool debug = false;
 
 #define synthNumber 4
@@ -40,25 +43,23 @@ const int chipSelect = BUILTIN_SDCARD;
 
 #include "sampleplayer/SamplePlayer.h"
 #include "kelpie/kelpiemaster.h"
-// #include "chordOrgan/ChordOrgan.h"
-// #include "tsynth/TSynth.h"
-// #include "braids/braids.h"
+#include "chordOrgan/ChordOrgan.h"
+#include "tsynth/TSynth.h"
+#include "braids/braids.h"
 
 void selectSynth(byte inputIndex, long value){
-  Serial.println(value);
   if(firstSampleParam){
     firstSampleParam = !firstSampleParam;
-    // braids_off();
-    // chordOrganOff();
-    // Tsynth_off();
+    braids_off();
+    chordOrganOff();
+    Tsynth_off();
     kelpieOff();
-    device->updateEncodeursValue(0, synthNumber-1);
   }
   if(!synthParam){
     synthSelect = value;
     device->updateEncodeursMaxValue(0, synthNumber-1);
+    device->updateLine(1, String(synthName[synthSelect]));
   }
-  device->updateLine(1, String(synthName[synthSelect]));
 }
 
 void confirmSynth(byte inputIndex){
@@ -66,31 +67,37 @@ void confirmSynth(byte inputIndex){
   synthParam = !synthParam;
   switch (synthSelect) {
     case 0:
-    kelpieOn(device);
-    MIDI.setHandleNoteOff(KelpieOnNoteOff);
-    MIDI.setHandleNoteOn(KelpieOnNoteOn);
+    kelpie_setup();
+    kelpieOn();
     break;
 
     case 1:
-    // chordOrganOn();
-    // MIDI.setHandleNoteOff(ChordOrganOnNoteOff);
-    // MIDI.setHandleNoteOn(ChordOrganOnNoteOn);
-    // chordOrganenvelope1.noteOn();
+    setup_chordOrgan(hasSD);
+    chordOrganOn();
     break;
 
     case 2:
-    // Tsynth_setup();
-    // MIDI.setHandleNoteOff(TsynthNoteOff);
-    // MIDI.setHandleNoteOn(TsynthNoteOn);
+    Tsynth_setup();
     break;
 
     case 3:
-    // braids_on();
-    // MIDI.setHandleNoteOn(braidsHandleNoteOn);
+    braids_on();
     break;
   }
   AudioInterrupts();
-  device->updateLine(1, String(synthName[synthSelect]));
+}
+
+void returnToMenu(byte inputIndex){
+  device->updateEncodeursMaxValue(0, synthNumber-1);
+  device->setHandleEncoderChange(0, selectSynth);
+  device->setHandlePress(0, confirmSynth);
+  for (int i=0;i<ANALOG_CONTROL_PINS;i++){
+    device->setHandlePotentiometerChange(i, nullptr);
+  }
+  synthParam = false;
+  device->updateEncodeursValue(0, synthSelect);
+  firstSampleParam = true;
+  selectSynth(0, synthSelect);
 }
 
 boolean openSDCard() {
@@ -129,7 +136,7 @@ void setup(){
   // Configure the DACs
   analogWriteResolution(12);
   DACS1.analogReference(INTERNAL);
-  AudioMemory(400);
+  AudioMemory(500);
 
   // Set main mixer volume
   mainMix.gain(0, 0.25);
@@ -157,23 +164,10 @@ void setup(){
   device->init(controls);
 
   // Set the handlers
-  initSamplePlayer(device);
+  initSamplePlayer();
 
-  // Init Kelpie and power off
-  kelpie_setup(device);
-  kelpieOff();
-
-  // Init Tsynth and power off
-  // Tsynth_setup();
-  // Tsynth_off();
-
-  // Init chordOrgan and power off
-  // setup_chordOrgan(hasSD);
-  // chordOrganOff();
-
-  // Init Braids and power off
-  // setup_braids();
-  // braids_off();
+  // Power off all synths
+  selectSynth(0, synthSelect);
 
   // Set handlers
   device->updateEncodeursValue(0, 0);
@@ -183,6 +177,7 @@ void setup(){
   for (int i=0;i<ANALOG_CONTROL_PINS;i++){
     device->setHandlePotentiometerChange(i, nullptr);
   }
+  device->setHandleDoublePress(0, returnToMenu);
 
   // Starting animation
   lcd.setCursor(0,0);
@@ -239,24 +234,17 @@ void loop(){
       break;
 
       case 1:
-      // chordOrgan_run();
+      chordOrgan_run();
       break;
 
       case 2:
-      // Tsynth_run();
+      Tsynth_run();
       break;
 
       case 3:
-      // run_braids();
+      run_braids();
       break;
     }
-  }else if(firstSampleParam && !synthParam){
-    device->setHandleEncoderChange(0, selectSynth);
-    device->setHandlePress(0, confirmSynth);
-    for (int i=0;i<ANALOG_CONTROL_PINS;i++){
-      device->setHandlePotentiometerChange(i, nullptr);
-    }
-    selectSynth(0, synthSelect);
   }
 
   if(debug){

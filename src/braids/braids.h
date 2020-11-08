@@ -6,7 +6,6 @@
 #include "macro_oscillator.h"
 
 boolean first = true;
-boolean braidsOn = true;
 
 // initialize required values
 //  val -> used for set_parameters
@@ -37,6 +36,7 @@ static volatile int16_t pitch,pre_pitch;
 static volatile int16_t timbre;
 static volatile int16_t color;
 static volatile int16_t shape;
+static volatile int16_t encoder_shape;
 const char* const shape_values[] = {
     "CSAW",
     "^\x88\x8D_",
@@ -134,7 +134,87 @@ void putSample(void){
 
 }
 
+void main_braids(){
+  if(!wait){
+    wait = 1;
+    memset(sync_buffer, 0, sizeof(sync_buffer));
+
+    // If the pitch changes update it
+    if(pre_pitch!=pitch){
+        osc.set_pitch(pitch);
+        pre_pitch = pitch;
+    }
+    // Get the timbre and color parameters from the ui and set them
+    osc.set_parameters(timbre,color);
+
+    // Trims the shape to the valid values
+    shape = shape >= MACRO_OSC_SHAPE_LAST ? MACRO_OSC_SHAPE_LAST : shape<0 ? 0 : shape;
+
+    // Sets the shape
+    MacroOscillatorShape osc_shape = static_cast<MacroOscillatorShape>(shape);//
+    osc.set_shape(osc_shape);
+
+    if(buffer_sel){
+        osc.Render(sync_buffer, bufferA, kAudioBlockSize);
+    }
+    else{
+        osc.Render(sync_buffer, bufferB, kAudioBlockSize);
+    }
+  }
+  // Waits until the buffer is ready to render again
+  // wait = 1;
+  // while(wait);
+  // while(wait){
+  //   device->update();
+  // };
+}
+
+// thread to get parameters from the analog pins
+void braids_get_parameters(byte inputIndex, unsigned int valparam, int diffToPrevious){
+  if(wait){
+    if(valparam>0){
+      if(inputIndex == 1){
+        // synthBraids.set_braids_color(val<<6);
+        color = valparam << 8;
+        Serial.print("\ncolor : \n");
+        Serial.print(color);
+      }
+      if(inputIndex == 2){
+        // synthBraids.set_braids_timbre((val<<6));
+        timbre = valparam << 8;
+        Serial.print("\ntimbre : \n");
+        Serial.print(timbre);
+      }
+    }
+    device->updateLine(1, String(shape_values[encoder_shape]) + "  C:" + String(color) + "  T:" + String(timbre));
+  }
+}
+
+void braids_get_shape(byte inputIndex, long value){
+  encoder_shape = int16_t(value);
+  device->updateLine(1, String(shape_values[encoder_shape]) + String("  C:") + String(color) + String("  T:") + String(timbre));
+}
+
+void braidsPress(byte inputIndex){
+  shape = encoder_shape;
+}
+
+// sequencer
+void braidsHandleNoteOn(byte channel, byte note, byte velocity){
+  pitch = note << 7;
+  osc.Strike();
+}
+
 void init_braids(){
+  for (int i=0;i<ANALOG_CONTROL_PINS;i++){
+    device->setHandlePotentiometerChange(i, braids_get_parameters);
+  }
+  device->setHandlePress(0, braidsPress);
+  device->setHandleEncoderChange(0, braids_get_shape);
+  device->updateEncodeursMaxValue(0, 1-56);
+  device->updateEncodeursValue(0, 0);
+  MIDI.setHandleNoteOn(braidsHandleNoteOn);
+
   // Initalizes the buffers to zero
   memset(bufferA, 0, kAudioBlockSize);
   memset(bufferB, 0, kAudioBlockSize);
@@ -149,72 +229,13 @@ void init_braids(){
   myTimer.begin(putSample,1e6/96000.0);
 
   pitch = 32 << 7;
-}
 
-void main_braids(){
-  memset(sync_buffer, 0, sizeof(sync_buffer));
-
-  // If the pitch changes update it
-  if(pre_pitch!=pitch){
-      osc.set_pitch(pitch);
-      pre_pitch = pitch;
-  }
-  // Get the timbre and color parameters from the ui and set them
-  osc.set_parameters(timbre,color);
-
-  // Trims the shape to the valid values
-  shape = shape >= MACRO_OSC_SHAPE_LAST ? MACRO_OSC_SHAPE_LAST : shape<0 ? 0 : shape;
-
-  // Sets the shape
-  MacroOscillatorShape osc_shape = static_cast<MacroOscillatorShape>(shape);//
-  osc.set_shape(osc_shape);
-
-  if(buffer_sel){
-      osc.Render(sync_buffer, bufferA, kAudioBlockSize);
-  }
-  else{
-      osc.Render(sync_buffer, bufferB, kAudioBlockSize);
-  }
-
-  // Waits until the buffer is ready to render again
-  wait = 1;
-  while(wait);
-}
-
-// thread to get parameters from the analog pins
-void braids_get_parameters(){
-  if(!sampleParam){
-  // while(1){
-    for (int i=0;i<3;i++){
-      analog_slide[i].update();
-      if (analog_slide[i].hasChanged()) {
-        valparam = analog_slide[i].getValue();
-        if(valparam>0){
-          if(i == 1){
-            // synthBraids.set_braids_color(val<<6);
-            color = valparam << 8;
-            Serial.print("\ncolor : \n");
-            Serial.print(color);
-          }
-          if(i == 2){
-            // synthBraids.set_braids_timbre((val<<6));
-            timbre = valparam << 8;
-            Serial.print("\ntimbre : \n");
-            Serial.print(timbre);
-          }
-        }
-      }
-    }
-  //   threads.delay(100);
-  // }
-  }
+  device->updateLine(1, shape_values[encoder_shape]);
 }
 
 void braids_off(){
   AudioNoInterrupts();
-  MIDI.setHandleNoteOn(nothing);
   myTimer.end();
-  braidsOn = false;
   analogWrite(A22, (((uint16_t)(0+0x7FFF))>>4));
   AudioInterrupts();
 }
@@ -222,61 +243,15 @@ void braids_off(){
 void braids_on(){
   AudioNoInterrupts();
   init_braids();
-  braidsOn = true;
   AudioInterrupts();
-}
-
-void braids_get_shape(){
-  if(synthParam){
-    long newRight1;
-    // Get rotary encoder1 value
-    newRight1 = knobRight1.read()/2;
-    if (newRight1 != positionRight1) {
-      if (newRight1 > 56){
-        knobRight1.write(0);
-        newRight1 = 0;
-      }
-      if (newRight1 < 0){
-        newRight1 = 56;
-        knobRight1.write(newRight1*2);
-      }
-      positionRight1 = newRight1;
-      displayChange = true;
-    }
-    if(digital_encsw[0].update()){
-      if(digital_encsw[0].fallingEdge()){
-        if(kelpiesynthParamMsec <= 300){
-          synthParam = false;
-          knobRight1.write(synthSelect*2);
-          firstSampleParam = true;
-          displayChange = true;
-        }else{
-          if(newRight1 <= 56){
-            shape = newRight1;
-          }
-          kelpiesynthParamMsec = 0;
-        }
-      }
-    }
-  }
-}
-
-// sequencer
-void braidsHandleNoteOn(byte channel, byte note, byte velocity){
-  pitch = note << 7;
-  osc.Strike();
 }
 
 //************SETUP**************
 void setup_braids() {
   init_braids();
-
-  MIDI.setHandleNoteOn(braidsHandleNoteOn);
 }
 
 //************LOOP**************
 void run_braids() {
-  braids_get_shape();
-  braids_get_parameters();
   main_braids();
 }

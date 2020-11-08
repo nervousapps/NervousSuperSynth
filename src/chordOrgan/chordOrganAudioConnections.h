@@ -12,6 +12,7 @@ AudioMixer4              chordOrganmixer1;         //xy=424,117
 AudioMixer4              chordOrganmixer2;         //xy=424,181
 AudioMixer4              chordOrganmixer3;         //xy=571,84
 AudioEffectEnvelope      chordOrganenvelope1;      //xy=652,281
+AudioAmplifier           chordOrganAmp;
 // AudioOutputAnalog        dac1;           //xy=784,129
 AudioConnection          chordOrganpatchCord1(chordOrganwaveform1, 0, chordOrganmixer1, 0);
 AudioConnection          chordOrganpatchCord2(chordOrganwaveform2, 0, chordOrganmixer1, 1);
@@ -24,7 +25,9 @@ AudioConnection          chordOrganpatchCord6(chordOrganwaveform8, 0, chordOrgan
 AudioConnection          chordOrganpatchCord9(chordOrganmixer1, 0, chordOrganmixer3, 0);
 AudioConnection          chordOrganpatchCord10(chordOrganmixer2, 0, chordOrganmixer3, 1);
 AudioConnection          chordOrganpatchCord11(chordOrganmixer3, chordOrganenvelope1);
-AudioConnection          chordOrganpatchCord12(chordOrganenvelope1, 0, mainMix, 1);
+AudioConnection          chordOrganpatchCord12(chordOrganenvelope1, 0, chordOrganAmp, 0);
+AudioConnection          chordOrganpatchCord13(chordOrganAmp, 0, mainMix, 1);
+
 // GUItool: end automatically generated code
 
 void chordOrgan_AOstop(){
@@ -40,6 +43,7 @@ void chordOrgan_AOstop(){
   chordOrganmixer2.stop();
   chordOrganmixer3.stop();
   chordOrganenvelope1.stop();
+  chordOrganAmp.stop();
 }
 
 void chordOrgan_AOstart(){
@@ -55,4 +59,5 @@ void chordOrgan_AOstart(){
   chordOrganmixer2.start();
   chordOrganmixer3.start();
   chordOrganenvelope1.start();
+  chordOrganAmp.start();
 }

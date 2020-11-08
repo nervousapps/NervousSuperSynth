@@ -113,7 +113,7 @@ void kelpie_get_parameters(byte i, unsigned int value, int diffToPrevious){
       kelpiedata[i] = 0;
     }
     if (kelpiedata[i] != kelpiedataLag[i]){
-      kelpiesynthParamMsec = 0;
+      DisplayParamMsec = 0;
       kelpiedataLag[i] = kelpiedata[i];
       float normalizedKnobVal = (kelpiedataLag[i] * DIV127);
       switch (i)
@@ -122,7 +122,7 @@ void kelpie_get_parameters(byte i, unsigned int value, int diffToPrevious){
           // Serial.print("\nMASTER VOL : ");
           // Serial.print(normalizedKnobVal);
           globalState.MASTER_VOL = normalizedKnobVal * MAX_MASTER_GAIN;
-          MASTER_GAIN.gain(globalState.MASTER_VOL * globalState.POLY_GAIN_MULTIPLIER);
+          MASTER_GAIN.gain(kelpiedata[i]);//globalState.MASTER_VOL * globalState.POLY_GAIN_MULTIPLIER);
           line = "MASTER VOL : " + String(globalState.MASTER_VOL);
         break;
         case 1: // OSC BALANCE
@@ -309,12 +309,6 @@ void kelpie_get_parameters(byte i, unsigned int value, int diffToPrevious){
   }
 }
 
-void kelpieDoublePress(byte inputIndex){
-  synthParam = false;
-  device->updateEncodeursValue(0, synthSelect);
-  firstSampleParam = true;
-}
-
 void kelpiePress(byte inputIndex){
   switch(kelpieParam){
     case 0:
@@ -379,13 +373,48 @@ void kelpie_get_encoders_parameters(byte inputIndex, long value){
   }
 }
 
-void kelpieOn(NervousSuperMother *device){
+void KelpieOnNoteOn(byte channel, byte note, byte velocity) {
+  // Serial.print("Note ON");
+  if (note > 23 && note < 108)
+  {
+    LFO.phase(0); // retrigger LFO on keypress
+    float noteGain = pow(float(velocity) * DIV127, VELOCITY_CURVE);
+
+    if (globalState.IS_POLY == true) // depending on mode send to buffer
+    {
+      keyBuffPoly(note, noteGain, true);
+    }
+    else
+    {
+      keyBuffMono(note, noteGain, true);
+    }
+  }
+}
+
+void KelpieOnNoteOff(byte channel, byte note, byte velocity) {
+  // Serial.print("Note OFF");
+  if (note > 23 && note < 108)
+  {
+    if (globalState.IS_POLY == true) // depending on mode send to buffer
+    {
+      keyBuffPoly(note, velocity, false);
+    }
+    else
+    {
+      keyBuffMono(note, velocity, false);
+    }
+  }
+}
+
+void kelpieOn(){
   kelpie_AOstart();
-  device->setHandleDoublePress(0, kelpieDoublePress);
   device->setHandlePress(0, kelpiePress);
   device->setHandleEncoderChange(0, kelpie_get_encoders_parameters);
-  device->updateEncodeursMaxValue(0, 3-1);
+  device->updateEncodeursMaxValue(0, 1-3);
   device->updateEncodeursValue(0, kelpieParam-1);
+
+  MIDI.setHandleNoteOff(KelpieOnNoteOff);
+  MIDI.setHandleNoteOn(KelpieOnNoteOn);
 
   kelpieUpdateLine();
 
@@ -565,42 +594,9 @@ void kelpieOn(NervousSuperMother *device){
   }
 }
 
-void KelpieOnNoteOn(byte channel, byte note, byte velocity) {
-  // Serial.print("Note ON");
-  if (note > 23 && note < 108)
-  {
-    LFO.phase(0); // retrigger LFO on keypress
-    float noteGain = pow(float(velocity) * DIV127, VELOCITY_CURVE);
-
-    if (globalState.IS_POLY == true) // depending on mode send to buffer
-    {
-      keyBuffPoly(note, noteGain, true);
-    }
-    else
-    {
-      keyBuffMono(note, noteGain, true);
-    }
-  }
-}
-
-void KelpieOnNoteOff(byte channel, byte note, byte velocity) {
-  // Serial.print("Note OFF");
-  if (note > 23 && note < 108)
-  {
-    if (globalState.IS_POLY == true) // depending on mode send to buffer
-    {
-      keyBuffPoly(note, velocity, false);
-    }
-    else
-    {
-      keyBuffMono(note, velocity, false);
-    }
-  }
-}
-
-void kelpie_setup(NervousSuperMother *device){
+void kelpie_setup(){
   AudioNoInterrupts();
-  kelpieOn(device);
+  kelpieOn();
   for (byte i = 0; i < numPolyVoices; i++)
   {
     polyVoices[i].waveformA.begin(globalState.WAVEFORM1);
@@ -654,7 +650,7 @@ void kelpie_setup(NervousSuperMother *device){
 }
 
 void kelpie_run(){
-  if(kelpiesynthParamMsec > 400 && kelpiesynthParamMsec < 500){
+  if(DisplayParamMsec > 400 && DisplayParamMsec < 500){
     kelpieUpdateLine();
   }
   if (fps > 24)

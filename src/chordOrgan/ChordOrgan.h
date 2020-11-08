@@ -351,44 +351,48 @@ void ledWrite(int n){
     // digitalWrite(LED0, HIGH && (n==3));
 }
 
-void checkInterface(){
-    if(!sampleParam){
-      // Read pots + CVs
-      for (int i=0;i<SLIDERS_PINS;i++){
-        analog_slide[i].update();
-        if (analog_slide[i].hasChanged()) {
-          int value = analog_slide[i].getValue();
-          switch(i){
-            case 0:
-            chordPot = value*64;
-            break;
+void checkInterface(byte inputIndex, unsigned int value, int diffToPrevious){
+    DisplayParamMsec = 0;
+    switch(inputIndex){
+      case 0:
+      chordPot = value*64;
+      device->updateLine(1, "chordPot : " + String(chordPot));
+      break;
 
-            case 1:
-            rootPot = value*64;
-            break;
+      case 1:
+      rootPot = value*64;
+      device->updateLine(1, "rootPot : " + String(rootPot));
+      break;
 
-            case 2:
-            rootCV = value*64;
-            break;
+      case 2:
+      rootCV = value*64;
+      device->updateLine(1, "rootCV : " + String(rootCV));
+      break;
 
-            case 3:
-            chordOrganenvelope1.attack(value*10);
-            break;
+      case 3:
+      chordOrganenvelope1.attack(value);
+      device->updateLine(1, "attack : " + String(value));
+      break;
 
-            case 4:
-            chordOrganenvelope1.decay(value*10);
-            break;
+      case 4:
+      chordOrganenvelope1.decay(value);
+      device->updateLine(1, "decay : " + String(value));
+      break;
 
-            case 5:
-            chordOrganenvelope1.sustain(value*10);
-            break;
+      case 5:
+      chordOrganenvelope1.sustain(value);
+      device->updateLine(1, "sustain : " + String(value));
+      break;
 
-            case 6:
-            chordOrganenvelope1.release(value*10);
-            break;
-          }
-        }
-      }
+      case 6:
+      chordOrganenvelope1.release(value);
+      device->updateLine(1, "release : " + String(value));
+      break;
+
+      case 7:
+      chordOrganAmp.gain(value);
+      device->updateLine(1, "amp : " + String(value));
+      break;
     }
     // int chordCV = analogRead(CHORD_CV_PIN);
 
@@ -467,41 +471,18 @@ void checkInterface(){
     }
 }
 
-void chordOrganOff(){
-  chordOrganenvelope1.noteOff();
-  chordOrgan_AOstop();
+void COonButtonPress(byte inputIndex) {
+  shortPress = true;
 }
 
-void chordOrganOn(){
-  chordOrgan_AOstart();
+void COonButtonLongPress(byte inputIndex) {
+  longPress = true;
+  lockOut = 0;
 }
 
-void chord_get_encoders_parameters(){
-  if(synthParam){
-    if(digital_encsw[0].update()){
-      if(digital_encsw[0].fallingEdge()){
-        if(ChordsynthParamMsec <= 300){
-          synthParam = false;
-          knobRight1.write(synthSelect*2);
-          firstSampleParam = true;
-          displayChange = true;
-        }else{
-          buttonTimer = 0;
-        }
-      }
-      if(digital_encsw[0].risingEdge()){
-        if (buttonTimer > SHORT_PRESS_DURATION && lockOut > 999 ){
-            shortPress = true;
-        }
-        if (buttonTimer > LONG_PRESS_DURATION){
-            longPress = true;
-            lockOut = 0;
-            buttonTimer = 0;
-        }
-      }
-      ChordsynthParamMsec = 0;
-    }
-  }
+void COonButtonDoublePress(byte inputIndex) {
+  Serial.print("Button double press ");
+  Serial.println(inputIndex);
 }
 
 void reBoot(int delayTime){
@@ -684,6 +665,8 @@ void setup_chordOrgan(bool hasSD){
     // Now map the rest of the range linearly across the input range
     rootMapCoeff = (float)noteRange / (ADC_MAX_VAL - rootClampLow);
 
+    chordOrganAmp.gain(10);
+
 #ifdef DEBUG_STARTUP
     Serial.print("Root Clamp Low ");
     Serial.println(rootClampLow);
@@ -692,12 +675,29 @@ void setup_chordOrgan(bool hasSD){
 #endif
 }
 
+void chordOrganOff(){
+  chordOrganenvelope1.noteOff();
+  chordOrgan_AOstop();
+}
+
+void chordOrganOn(){
+  device->setHandlePress(0, COonButtonPress);
+  device->setHandleLongPress(0, COonButtonLongPress);
+  for (int i=0;i<ANALOG_CONTROL_PINS;i++){
+    device->setHandlePotentiometerChange(i, checkInterface);
+  }
+  device->setHandleEncoderChange(0, nullptr);
+  MIDI.setHandleNoteOff(ChordOrganOnNoteOff);
+  MIDI.setHandleNoteOn(ChordOrganOnNoteOn);
+  chordOrgan_AOstart();
+  chordOrganenvelope1.noteOn();
+  device->updateLine(1, "WAVEFORM : " + String(waveform));
+}
 
 void chordOrgan_run(){
-
-    checkInterface();
-    chord_get_encoders_parameters();
-
+    if(DisplayParamMsec > 400 && DisplayParamMsec < 500){
+      device->updateLine(1, "WAVEFORM : " + String(waveform));
+    }
     if (changed) {
         // Serial.println("Changed");
         updateAmpAndFreq();
@@ -723,7 +723,7 @@ void chordOrgan_run(){
         selectWaveform(waveform);
         changed = true;
         shortPress = false;
-        displayChange = true;
+        device->updateLine(1, "WAVEFORM : " + String(waveform));
     }
 
     if (changed)  {

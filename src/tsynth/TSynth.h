@@ -1794,127 +1794,141 @@ int cc_id[] = {
 
 int patch_num = 0;
 
-void checkMux()
+void TsynthCheckPotard(byte i, unsigned int value, int diffToPrevious)
 {
-  for (int i=0;i<ANALOG_CONTROL_PINS;i++){
-    // update the ResponsiveAnalogRead object every loop
-    analog_controls[i].update();
-    if (analog_controls[i].hasChanged()) {
-      // Maybe store previous value analog_controls[i].getValue();
-      int value = analog_controls[i].getValue();
-      switch (i)
-      {
-        // case 0: //MUX1_noiseLevel
-        //   TsynthControlChange(midiChannel, CCnoiseLevel, value);
-        //   break;
-        // case 1: //MUX1_pitchLfoRate
-        //   TsynthControlChange(midiChannel, CCoscLfoRate, value);
-        //   break;
-        // case 2: //MUX1_pitchLfoWaveform
-        //   TsynthControlChange(midiChannel, CCoscLfoWaveform, value);
-        //   break;
-        // case 3: //MUX1_pitchLfoAmount:
-        //   TsynthControlChange(midiChannel, CCosclfoamt, value);
-        //   break;
-        // case 4: //MUX1_detune:
-        //   TsynthControlChange(midiChannel, CCdetune, value);
-        //   break;
-        // case 5: //MUX1_oscMix:
-        //   TsynthControlChange(midiChannel, CCoscLevelA, OSCMIXA[value]);
-        //   TsynthControlChange(midiChannel, CCoscLevelB, OSCMIXB[value]);
-        //   break;
-        case 0: //MUX1_filterAttack:
-          TsynthControlChange(midiChannel, CCfilterattack, value);
-          break;
-        case 1: //MUX1_filterDecay:
-          TsynthControlChange(midiChannel, CCfilterdecay, value);
-          break;
-        // case 8: //MUX1_pwmAmountA:
-        //   TsynthControlChange(midiChannel, CCpwA, value);
-        //   break;
-        // case 9: //MUX1_waveformA:
-        //   TsynthControlChange(midiChannel, CCoscwaveformA, value);
-        //   break;
-        // case 10: //MUX1_pitchA:
-        //   TsynthControlChange(midiChannel, CCpitchA, value);
-        //   break;
-        // case 11: //MUX1_pwmAmountB:
-        //   TsynthControlChange(midiChannel, CCpwB, value);
-        //   break;
-        // case 12: //MUX1_waveformB:
-        //   TsynthControlChange(midiChannel, CCoscwaveformB, value);
-        //   break;
-        // case 13: //MUX1_pitchB:
-        //   TsynthControlChange(midiChannel, CCpitchB, value);
-        //   break;
-        // case 14: //MUX1_pwmRate:
-        //   TsynthControlChange(midiChannel, CCpwmRate, value);
-        //   break;
-        // case 15: //MUX1_pitchEnv:
-        //   TsynthControlChange(midiChannel, CCpitchenv, value);
-        //   break;
-        // case 16: //MUX2_attack:
-        //   TsynthControlChange(midiChannel, CCampattack, value);
-        //   break;
-        // case 17: //MUX2_decay:
-        //   TsynthControlChange(midiChannel, CCampdecay, value);
-        //   break;
-        // case 18: //MUX2_sustain:
-        //   TsynthControlChange(midiChannel, CCampsustain, value);
-        //   break;
-        // case 19: //MUX2_release:
-        //   TsynthControlChange(midiChannel, CCamprelease, value);
-        //   break;
-        // case 20: //MUX2_filterLFOAmount:
-        //   TsynthControlChange(midiChannel, CCfilterlfoamt, value);
-        //   break;
-        // case 21: //MUX2_FXMix:
-        //   TsynthControlChange(midiChannel, CCfxmix, value);
-        //   break;
-        // case 22: //MUX2_FXAmount:
-        //   TsynthControlChange(midiChannel, CCfxamt, value);
-        //   break;
-        case 2: //MUX2_glide:
-          TsynthControlChange(midiChannel, CCglide, value);
-          break;
-        case 3: //MUX2_filterEnv:
-          TsynthControlChange(midiChannel, CCfilterenv, value);
-          break;
-        case 4: //MUX2_filterRelease:
-          TsynthControlChange(midiChannel, CCfilterrelease, value);
-          break;
-        case 5: //MUX2_filterSustain:
-          TsynthControlChange(midiChannel, CCfiltersustain, value);
-          break;
-        case 6: //MUX2_filterType:
-          TsynthControlChange(midiChannel, CCfiltermixer, value);
-          break;
-        case 7: //MUX2_resonance:
-          TsynthControlChange(midiChannel, CCfilterres, value);
-          break;
-        case 8: //MUX2_cutoff:
-          TsynthControlChange(midiChannel, CCfilterfreq, value);
-          break;
-        // case 30: //MUX2_filterLFORate:
-        //   TsynthControlChange(midiChannel, CCfilterlforate, value);
-        //   break;
-        // case 31: //MUX2_filterLFOWaveform:
-        //   TsynthControlChange(midiChannel, CCfilterlfowaveform, value);
-        //   break;
-        // case 32: //MUX2_filterLFOWaveform:
-        //   volumePrevious = value;
-        //   TsynthControlChange(midiChannel, CCvolume, value);
-        //   break;
-          case 15:
-            if(value == 0){ tsynth_control = true;}
-            else{ tsynth_control = false;}
-        }
+  String line = "";
+  DisplayParamMsec = 0;
+  if(tsynth_control){
+    switch (i)
+    {
+      // case 0: //MUX1_noiseLevel
+      //   TsynthControlChange(midiChannel, CCnoiseLevel, value);
+      //   break;
+      // case 1: //MUX1_pitchLfoRate
+      //   TsynthControlChange(midiChannel, CCoscLfoRate, value);
+      //   break;
+      // case 2: //MUX1_pitchLfoWaveform
+      //   TsynthControlChange(midiChannel, CCoscLfoWaveform, value);
+      //   break;
+      // case 3: //MUX1_pitchLfoAmount:
+      //   TsynthControlChange(midiChannel, CCosclfoamt, value);
+      //   break;
+      // case 4: //MUX1_detune:
+      //   TsynthControlChange(midiChannel, CCdetune, value);
+      //   break;
+      // case 5: //MUX1_oscMix:
+      //   TsynthControlChange(midiChannel, CCoscLevelA, OSCMIXA[value]);
+      //   TsynthControlChange(midiChannel, CCoscLevelB, OSCMIXB[value]);
+      //   break;
+      case 0: //MUX1_filterAttack:
+        TsynthControlChange(midiChannel, CCfilterattack, value);
+        line = "CCfilterattack : " + String(value);
+        break;
+      case 1: //MUX1_filterDecay:
+        TsynthControlChange(midiChannel, CCfilterdecay, value);
+        line = "CCfilterdecay : " + String(value);
+        break;
+      // case 8: //MUX1_pwmAmountA:
+      //   TsynthControlChange(midiChannel, CCpwA, value);
+      //   break;
+      // case 9: //MUX1_waveformA:
+      //   TsynthControlChange(midiChannel, CCoscwaveformA, value);
+      //   break;
+      // case 10: //MUX1_pitchA:
+      //   TsynthControlChange(midiChannel, CCpitchA, value);
+      //   break;
+      // case 11: //MUX1_pwmAmountB:
+      //   TsynthControlChange(midiChannel, CCpwB, value);
+      //   break;
+      // case 12: //MUX1_waveformB:
+      //   TsynthControlChange(midiChannel, CCoscwaveformB, value);
+      //   break;
+      // case 13: //MUX1_pitchB:
+      //   TsynthControlChange(midiChannel, CCpitchB, value);
+      //   break;
+      // case 14: //MUX1_pwmRate:
+      //   TsynthControlChange(midiChannel, CCpwmRate, value);
+      //   break;
+      // case 15: //MUX1_pitchEnv:
+      //   TsynthControlChange(midiChannel, CCpitchenv, value);
+      //   break;
+      // case 16: //MUX2_attack:
+      //   TsynthControlChange(midiChannel, CCampattack, value);
+      //   break;
+      // case 17: //MUX2_decay:
+      //   TsynthControlChange(midiChannel, CCampdecay, value);
+      //   break;
+      // case 18: //MUX2_sustain:
+      //   TsynthControlChange(midiChannel, CCampsustain, value);
+      //   break;
+      // case 19: //MUX2_release:
+      //   TsynthControlChange(midiChannel, CCamprelease, value);
+      //   break;
+      // case 20: //MUX2_filterLFOAmount:
+      //   TsynthControlChange(midiChannel, CCfilterlfoamt, value);
+      //   break;
+      // case 21: //MUX2_FXMix:
+      //   TsynthControlChange(midiChannel, CCfxmix, value);
+      //   break;
+      // case 22: //MUX2_FXAmount:
+      //   TsynthControlChange(midiChannel, CCfxamt, value);
+      //   break;
+      case 2: //MUX2_glide:
+        TsynthControlChange(midiChannel, CCglide, value);
+        line = "CCglide : " + String(value);
+        break;
+      case 3: //MUX2_filterEnv:
+        TsynthControlChange(midiChannel, CCfilterenv, value);
+        line = "CCfilterenv : " + String(value);
+        break;
+      case 4: //MUX2_filterRelease:
+        TsynthControlChange(midiChannel, CCfilterrelease, value);
+        line = "CCfilterrelease : " + String(value);
+        break;
+      case 5: //MUX2_filterSustain:
+        TsynthControlChange(midiChannel, CCfiltersustain, value);
+        line = "CCfiltersustain : " + String(value);
+        break;
+      case 6: //MUX2_filterType:
+        TsynthControlChange(midiChannel, CCfiltermixer, value);
+        line = "CCfiltermixer : " + String(value);
+        break;
+      case 7: //MUX2_resonance:
+        TsynthControlChange(midiChannel, CCfilterres, value);
+        line = "CCfilterres : " + String(value);
+        break;
+      case 8: //MUX2_cutoff:
+        TsynthControlChange(midiChannel, CCfilterfreq, value);
+        line = "CCfilterfreq : " + String(value);
+        break;
+      // case 30: //MUX2_filterLFORate:
+      //   TsynthControlChange(midiChannel, CCfilterlforate, value);
+      //   break;
+      // case 31: //MUX2_filterLFOWaveform:
+      //   TsynthControlChange(midiChannel, CCfilterlfowaveform, value);
+      //   break;
+      // case 32: //MUX2_filterLFOWaveform:
+      //   volumePrevious = value;
+      //   TsynthControlChange(midiChannel, CCvolume, value);
+      //   break;
+      }
+      device->updateLine(1, line);
+    }
+    if(i == 15){
+      if(value == 0){
+        tsynth_control = true;
+        line = "Parameters : ON";
+      }
+      else{
+        tsynth_control = false;
+        line = "Parameters : OFF";
+      }
+      device->updateLine(1, line);
     }
     if (!firstPatchLoaded) {
       recallPatch(patchNo); //Load first patch after all controls read
       firstPatchLoaded = true;
     }
-  }
 }
 
 // void checkSwitches()
@@ -2213,41 +2227,16 @@ void reinitialiseToPanel()
   // showPatchPage("Initial", "Panel Settings");
 }
 
-void checkEncoder()
+void TsynthcheckEncoder(byte inputIndex, long value)
 {
-  long newRight1;
-  if(synthParam){
-    // Get rotary encoder1 value
-    newRight1 = knobRight1.read()/2;
-    if (newRight1 != positionRight1) {
-      if (newRight1 >= 45){
-        knobRight1.write(0);
-        newRight1 = 0;
-      }
-      if (newRight1 < 0){
-        newRight1 = 45-1;
-        knobRight1.write(newRight1*2);
-      }
-      positionRight1 = newRight1;
-      displayChange = true;
-      patchNo = newRight1 + 1;
-    }
-    if(digital_encsw[0].update()){
-      if(digital_encsw[0].fallingEdge()){
-        if(TsynthParamMsec <= 300){
-          synthParam = false;
-          knobRight1.write(synthSelect*2);
-          firstSampleParam = true;
-          displayChange = true;
-        }else{
-          TsynthProgramChange(0,newRight1);
-        }
-      }
-      TsynthParamMsec = 0;
-      displayChange = true;
-    }
-  }
+    patchNo = value + 1;
+    device->updateLine(1, "Patch : " + String(patches[patchNo-1].patchName));
 }
+
+void TsynthButtonPress(byte inputIndex){
+    TsynthProgramChange(0, patchNo);
+}
+
 //   //Encoder works with relative inc and dec values
 //   //Detent encoder goes up in 4 steps, hence +/-3
 //
@@ -2632,6 +2621,13 @@ void Tsynth_setup()
 
   Tsynth_AOstart();
 
+  device->setHandleEncoderChange(0, TsynthcheckEncoder);
+  device->setHandlePress(0, TsynthButtonPress);
+  device->updateEncodeursMaxValue(0, patches.size()-1);
+  for (int i=0;i<ANALOG_CONTROL_PINS;i++){
+    device->setHandlePotentiometerChange(i, TsynthCheckPotard);
+  }
+
   // //MIDI 5 Pin DIN
   // MIDI.begin();
   MIDI.setHandleNoteOn(TsynthNoteOn);
@@ -2795,12 +2791,17 @@ void Tsynth_setup()
   // encCW = getEncoderDir();
 
   // setCurrentPatchData(solid);
+
+  device->updateLine(1, "Patch : " + String(patches[patchNo-1].patchName));
 }
 
 // elapsedMillis patching;
 
 void Tsynth_run()
 {
+  if(DisplayParamMsec > 400 && DisplayParamMsec < 500){
+    device->updateLine(1, "Patch : " + String(patches[patchNo-1].patchName));
+  }
   // myusb.Task();
   // midi1.read(midiChannel);   //USB HOST MIDI Class Compliant
   // usbMIDI.read(midiChannel); //USB Client MIDI
@@ -2814,8 +2815,8 @@ void Tsynth_run()
   //   patching = 0;
   // }
 
-  if(tsynth_control) checkMux();
+  // if(tsynth_control) checkMux();
   // checkSwitches();
-  checkEncoder();
+  // checkEncoder();
   // CPUMonitor();
 }

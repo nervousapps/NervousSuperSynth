@@ -240,7 +240,7 @@ void init_banks(){
   return;
 }
 
-void setSamplePlayerHandlers(NervousSuperMother *device){
+void setSamplePlayerHandlers(){
   for(byte i = 0; i < 6; i++){
     device->setHandleTrigger(i, sampleplay);
   }
@@ -249,9 +249,9 @@ void setSamplePlayerHandlers(NervousSuperMother *device){
   device->setHandleEncoderChange(1, encoderHandler);
 }
 
-void initSamplePlayer(NervousSuperMother *device){
+void initSamplePlayer(){
   init_banks();
-  setSamplePlayerHandlers(device);
+  setSamplePlayerHandlers();
   volumeControl();
 }
 
