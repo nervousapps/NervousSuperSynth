@@ -1,5 +1,5 @@
 # NervousSuperSynth
-Synthesizer and sampler built around Teensy 3.5/3.6
+Synthesizer and sampler built around Teensy 3.5/3.6.
 
 It is mainly a development platform using almost all the ports on Teensy.
 
@@ -39,11 +39,11 @@ of audio objects in order to save CPU load.
 - PROGRAM
 
 # Firmware
-The firmware is an aggregation of several synths ported to Teensy 3.5:
+The firmware is an aggregation of several synths ported for this motherboard:
 - Kelpie (https://github.com/friedpies/kelpie-pocket-synth)
 - Braids (https://github.com/pichenettes/eurorack and https://github.com/modlfo/teensy-braids)
 - ChordOrgan (https://github.com/TomWhitwell/Chord-Organ)
-- Tsynth (https://github.com/ElectroTechnique/TSynth/) (works only with Teensy 3.6, testing ...)
+- Tsynth (https://github.com/ElectroTechnique/TSynth/)
 - SamplePlayer
 
 # Compilation
@@ -74,7 +74,6 @@ I made the panel here : https://www.john-steel.com/
     - https://github.com/kbob/drum-machine
     - https://github.com/RyoKosaka/HelloDrum-arduino-Library (https://gist.github.com/RyoKosaka/2046d4af9e4f12aaba618d9c9036d89e)
     - https://forum.pjrc.com/threads/32167-My-Teensy-3-1-Commodore-SID-Emulation-Player
-- display parameters when changing
 - review kelpie parameters for switches
 - clean code
 - update to ChordOrgan v0.6 (https://github.com/TomWhitwell/Chord-Organ/tree/v0.6.0/Chord-Organ)
