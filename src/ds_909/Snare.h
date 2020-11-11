@@ -1,0 +1,201 @@
+#ifndef Snare_h
+#define Snare_h
+
+#include "AudioPlayPitchedMemory.h"
+#include <Arduino.h>
+#include <AudioPrivate.h>
+
+/*
+// GUItool: begin automatically generated code
+AudioSynthNoiseWhite     white;          //xy=58,111
+AudioFilterStateVariable filter;         //xy=181,122
+AudioEffectEnvelope      snareEnvelope;  //xy=331,125
+AudioSynthSimpleDrum     snareDrum2;     //xy=342,172
+AudioSynthSimpleDrum     snareDrum;      //xy=345,82
+AudioMixer4              snareMixer;     //xy=499,116
+AudioFilterStateVariable filterAll;        //xy=637,122
+AudioOutputI2S           i2s1;           //xy=655,235
+AudioOutputUSB           usb1;           //xy=657,284
+AudioOutputI2S           i2s2; //xy=989,453
+AudioOutputUSB           usb2; //xy=990,495
+AudioOutputI2S           is24; //xy=1002,491
+AudioOutputUSB           usb4; //xy=1003,533
+AudioOutputI2S           is26; //xy=1007,446
+AudioOutputUSB           usb6; //xy=1008,488
+AudioOutputI2S           is23;           //xy=1063,522
+AudioOutputUSB           usb3;           //xy=1064,564
+AudioOutputI2S           is25;           //xy=1076,560
+AudioOutputUSB           usb5;           //xy=1077,602
+AudioOutputI2S           is27; //xy=1081,515
+AudioOutputUSB           usb7; //xy=1082,557
+AudioConnection          patchCord1(white, 0, filter, 0);
+AudioConnection          patchCord2(filter, 1, snareEnvelope, 0);
+AudioConnection          patchCord3(snareEnvelope, 0, snareMixer, 1);
+AudioConnection          patchCord4(snareDrum2, 0, snareMixer, 2);
+AudioConnection          patchCord5(snareDrum, 0, snareMixer, 0);
+AudioConnection          patchCord6(snareMixer, 0, filterAll, 0);
+AudioConnection          patchCord7(filterAll, 1, i2s1, 0);
+AudioConnection          patchCord8(filterAll, 1, i2s1, 1);
+AudioConnection          patchCord9(filterAll, 1, usb1, 0);
+AudioConnection          patchCord10(filterAll, 1, usb1, 1);
+// GUItool: end automatically generated code
+*/
+
+/*
+ * Snare
+ */
+class Snare{
+  private:
+    AudioSynthNoiseWhite     *white;
+    AudioSynthSimpleDrum     *snareDrum;
+    AudioSynthSimpleDrum     *snareDrum2;
+    AudioEffectEnvelope      *snareEnvelope;
+    AudioMixer4              *snareMixer;
+    AudioFilterStateVariable *filter;
+    AudioFilterStateVariable *filterAll;
+    AudioConnection* patchCords[22];
+    AudioMixer4 *output;
+
+
+  public:
+    Snare();
+
+    AudioMixer4 * getOutput();
+    void noteOn(byte velocity);
+    void setPitch(byte pitch);
+    void setTone(byte tone);
+    void setDecay(byte decay);
+
+    void stop();
+    void start();
+};
+
+
+/**
+ * Constructor
+ */
+inline Snare::Snare(){
+  this->white = new AudioSynthNoiseWhite();
+  this->white->amplitude(1);
+
+  this->snareDrum = new AudioSynthSimpleDrum();
+  this->snareDrum->pitchMod(0.5);
+  this->snareDrum->frequency(180);
+  this->snareDrum->length(150);
+  this->snareDrum->secondMix(0.7);
+
+  this->snareDrum2 = new AudioSynthSimpleDrum();
+  this->snareDrum2->pitchMod(0.9);
+  this->snareDrum2->frequency(50);
+  this->snareDrum2->length(45);
+  this->snareDrum2->secondMix(0);
+
+  this->snareEnvelope = new AudioEffectEnvelope();
+  this->snareEnvelope->attack(4);
+  this->snareEnvelope->sustain(0);
+  this->snareEnvelope->release(1);
+  this->snareEnvelope->decay(300);
+
+  this->snareMixer = new AudioMixer4();
+  this->snareMixer->gain(0, 1);
+  this->snareMixer->gain(1, 0.3);
+  this->snareMixer->gain(2, 2);
+
+  this->filter = new AudioFilterStateVariable();
+  this->filter->frequency(2000);
+  this->filter->resonance(2);
+  this->filter->octaveControl(3);
+
+  this->output = new AudioMixer4();
+  this->output->gain(0, 0.5);
+
+  this->filterAll = new AudioFilterStateVariable();
+  this->filterAll->frequency(350);
+
+
+  this->patchCords[0] = new AudioConnection(*this->white, 0, *this->filter, 0);
+  this->patchCords[1] = new AudioConnection(*this->filter, 1, *this->snareEnvelope, 0);
+  this->patchCords[2] = new AudioConnection(*this->snareDrum, 0, *this->snareMixer, 0);
+  this->patchCords[3] = new AudioConnection(*this->snareEnvelope, 0, *this->snareMixer, 1);
+  this->patchCords[4] = new AudioConnection(*this->snareDrum2, 0, *this->snareMixer, 2);
+  this->patchCords[5] = new AudioConnection(*this->snareMixer, 0, *this->filterAll, 0);
+  this->patchCords[6] = new AudioConnection(*this->filterAll, 2, *this->output, 0);
+}
+
+/**
+ * Return the audio output
+ */
+inline AudioMixer4 * Snare::getOutput(){
+  return this->output;
+}
+
+/**
+ * Note on
+ */
+inline void Snare::noteOn(byte velocity) {
+  this->output->gain(0, map((float)velocity, 0, 255, 0, 1));
+  this->snareDrum->noteOn();
+  this->snareDrum2->noteOn();
+  this->snareEnvelope->noteOn();
+}
+
+
+/**
+ * Set the pitch
+ *
+ * @param pitch The pitch
+ */
+inline void Snare::setPitch(byte pitch){
+  unsigned int mappedFrequency = map(pitch, 0, 255, 150, 300);
+  unsigned int mappedFrequency2 = map(pitch, 0, 255, 70, 100);
+  this->snareDrum->frequency(mappedFrequency);
+  this->snareDrum2->frequency(mappedFrequency2);
+}
+
+/**
+ * Set the decay
+ *
+ * @param decay The decay
+ */
+inline void Snare::setDecay(byte decay){
+  unsigned int mappedSnareDecay = map(decay, 0, 255, 50, 120);
+  unsigned int mappedSnareNoiseDecay = map(decay, 0, 255, 200, 500);
+
+  this->snareDrum->length(mappedSnareDecay);
+  this->snareEnvelope->decay(mappedSnareNoiseDecay);
+}
+
+/**
+ * Set the tone
+ *
+ * @param tone The tone
+ */
+inline void Snare::setTone(byte tone){
+  unsigned int mappedFilter = map(tone, 0, 255, 2000, 2500);
+  this->filter->frequency(mappedFilter);
+}
+
+inline void Snare::stop(){
+  this->white->stop();
+  this->snareDrum->stop();
+  this->snareDrum2->stop();
+  this->snareEnvelope->stop();
+  this->snareMixer->stop();
+  this->filter->stop();
+  this->output->stop();
+  this->filterAll->stop();
+}
+
+inline void Snare::start(){
+  this->white->start();
+  this->snareDrum->start();
+  this->snareDrum2->start();
+  this->snareEnvelope->start();
+  this->snareMixer->start();
+  this->filter->start();
+  this->output->start();
+  this->filterAll->start();
+}
+
+
+#endif

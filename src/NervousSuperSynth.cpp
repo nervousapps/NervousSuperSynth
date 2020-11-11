@@ -66,7 +66,7 @@ boolean openSDCard() {
 #include "tsynth/TSynth.h"
 #include "braids/braids.h"
 #include "psyc03/Psyc03Main.h"
-// #include "ds909/DS909/DS909MAIN.h"
+#include "ds909/DS909MAIN.h"
 
 void selectSynth(byte inputIndex, long value){
   if(firstSampleParam){
@@ -76,7 +76,7 @@ void selectSynth(byte inputIndex, long value){
     Tsynth_off();
     kelpieOff();
     stopPsyc03();
-    // stopDS909();
+    stopDS909();
   }
   if(!synthParam){
     synthSelect = value;
@@ -111,7 +111,7 @@ void confirmSynth(byte inputIndex){
     break;
 
     case 5:
-    // setupDS909();
+    setupDS909();
     break;
   }
   AudioInterrupts();
@@ -276,7 +276,7 @@ void loop(){
       break;
 
       case 5:
-      // runDS909();
+      runDS909();
       break;
     }
   }
