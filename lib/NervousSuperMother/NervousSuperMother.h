@@ -1,12 +1,13 @@
 #ifndef NervousSuperMother_h
 #define NervousSuperMother_h
 
+#include <AudioPrivate.h>
 #include "hardware/HardwareControls.h"
 #include "display/Display.h"
 
 /*
 * NervousSuperMother
-* v0.0.1 beta
+* v0.1.0 beta
 */
 class NervousSuperMother{
 
@@ -19,7 +20,7 @@ private:
   byte ioNumber = 6;
   byte currentInput = 0;
 
-  byte analogResolution = 10;
+  byte analogResolution = 7;
 
   // Potentiometers
   unsigned int *potentiometers;
@@ -70,7 +71,7 @@ private:
 
   // Main clock
   elapsedMicros clockMain;
-  const unsigned int intervalClockMain = 5000;
+  const unsigned int intervalClockMain = 4000;
 
   // Inputs clock
   const unsigned int intervalInputs = 100;
@@ -112,13 +113,13 @@ inline NervousSuperMother::NervousSuperMother(){
 
   // Potentiometers
   this->potardIndex = 0;
-  this->potentiometers = new unsigned int[POTARDS_PINS];
-  this->potentiometersPrevious = new unsigned int[POTARDS_PINS];
-  this->potentiometersTemp = new unsigned int[POTARDS_PINS];
-  this->potentiometersReadings = new byte[POTARDS_PINS];
-  this->inputsPotentiometerChangeCallback = new PotentiometerChangeCallback[POTARDS_PINS];
+  this->potentiometers = new unsigned int[ANALOG_CONTROL_PINS];
+  this->potentiometersPrevious = new unsigned int[ANALOG_CONTROL_PINS];
+  this->potentiometersTemp = new unsigned int[ANALOG_CONTROL_PINS];
+  this->potentiometersReadings = new byte[ANALOG_CONTROL_PINS];
+  this->inputsPotentiometerChangeCallback = new PotentiometerChangeCallback[ANALOG_CONTROL_PINS];
 
-  for(byte i = 0; i < POTARDS_PINS; i++){
+  for(byte i = 0; i < ANALOG_CONTROL_PINS; i++){
     this->potentiometers[i] = 0;
     this->potentiometersPrevious[i] = 0;
     this->potentiometersTemp[i] = 0;
@@ -203,6 +204,7 @@ inline void NervousSuperMother::update(){
   if (this->clockMain > this->intervalClockMain / 2) {
     return;
   }else{
+    AudioNoInterrupts();
     // Inputs
     // At the end of the clock we iterate to next input
     if (this->clockInputs >= this->intervalInputs) {
@@ -212,6 +214,7 @@ inline void NervousSuperMother::update(){
       // Reading the current input
       this->readCurrentInput();
     }
+    AudioInterrupts();
   }
 }
 
@@ -234,7 +237,7 @@ inline void NervousSuperMother::readCurrentInput(){
     break;
 
     case 1:
-    if(this->potardIndex < POTARDS_PINS) {
+    if(this->potardIndex < ANALOG_CONTROL_PINS) {
       this->readPotentiometer(this->potardIndex);
       this->potardIndex ++;
     } else {

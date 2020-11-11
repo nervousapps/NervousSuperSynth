@@ -88,7 +88,7 @@ private:
 	int32_t state_lowpass;
 	int32_t state_bandpass;
 	audio_block_t *inputQueueArray[2];
-	volatile bool run ;
+	volatile bool run;
 };
 
 #endif

@@ -247,11 +247,11 @@ void braids_on(){
 }
 
 //************SETUP**************
-void setup_braids() {
+void setupBraids() {
   init_braids();
 }
 
 //************LOOP**************
-void run_braids() {
+void runBraids() {
   main_braids();
 }

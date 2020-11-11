@@ -2562,7 +2562,7 @@ void TsynthNoteOff(byte channel, byte note, byte velocity)
   }
 }
 
-void Tsynth_setup()
+void setupTsynth()
 {
   // setupDisplay();
   setUpSettings();
@@ -2797,7 +2797,7 @@ void Tsynth_setup()
 
 // elapsedMillis patching;
 
-void Tsynth_run()
+void runTsynth()
 {
   if(DisplayParamMsec > 400 && DisplayParamMsec < 500){
     device->updateLine(1, "Patch : " + String(patches[patchNo-1].patchName));

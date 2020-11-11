@@ -15,14 +15,18 @@ MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
 // Motherboard
 NervousSuperMother * device = NervousSuperMother::getInstance();
 
-AudioMixer4          mainMix;
-AudioAmplifier       mainAMP;
+AudioMixer4                 mainMix;
+AudioMixer4                 mainMix2;
+AudioMixer4                 mainMix3;
+AudioAmplifier              mainAMP;
 
 // AudioOutputAnalogStereo     DACS1;
-AudioOutputAnalog     DACS1;
+AudioOutputAnalog           DACS1;
 AudioOutputPT8211           pt8211_1;
-AudioConnection             mainpatchcord0(mainMix, 0, mainAMP, 0);
-AudioConnection             mainpatchcord2(mainAMP, 0, DACS1, 0);
+AudioConnection             mainpatchcord0(mainMix, 0, mainMix2, 0);
+AudioConnection             mainpatchcord1(mainMix2, 0, mainMix3, 0);
+AudioConnection             mainpatchcord2(mainMix3, 0, mainAMP, 0);
+AudioConnection             mainpatchcord3(mainAMP, 0, DACS1, 0);
 // AudioConnection             mainpatchcord3(mainAMP, 0, DACS1, 1);
 
 boolean synthParam = false;
@@ -31,74 +35,16 @@ boolean firstSampleParam = true;
 boolean hasSD = false;
 
 elapsedMillis DisplayParamMsec = 0;
+// elapsedMillis DisplayDebug = 0;
 
 bool debug = false;
 
-#define synthNumber 4
+#define synthNumber 6
 
 int synthSelect = 0;
-char synthName[synthNumber][16] = {"Kelpie", "ChordOrgan", "Tsynth", "Braids"};
+char synthName[synthNumber][16] = {"Kelpie", "ChordOrgan", "Tsynth", "Braids", "Psych03", "DS909"};
 
 const int chipSelect = BUILTIN_SDCARD;
-
-#include "sampleplayer/SamplePlayer.h"
-#include "kelpie/kelpiemaster.h"
-#include "chordOrgan/ChordOrgan.h"
-#include "tsynth/TSynth.h"
-#include "braids/braids.h"
-
-void selectSynth(byte inputIndex, long value){
-  if(firstSampleParam){
-    firstSampleParam = !firstSampleParam;
-    braids_off();
-    chordOrganOff();
-    Tsynth_off();
-    kelpieOff();
-  }
-  if(!synthParam){
-    synthSelect = value;
-    device->updateEncodeursMaxValue(0, synthNumber-1);
-    device->updateLine(1, String(synthName[synthSelect]));
-  }
-}
-
-void confirmSynth(byte inputIndex){
-  AudioNoInterrupts();
-  synthParam = !synthParam;
-  switch (synthSelect) {
-    case 0:
-    kelpie_setup();
-    kelpieOn();
-    break;
-
-    case 1:
-    setup_chordOrgan(hasSD);
-    chordOrganOn();
-    break;
-
-    case 2:
-    Tsynth_setup();
-    break;
-
-    case 3:
-    braids_on();
-    break;
-  }
-  AudioInterrupts();
-}
-
-void returnToMenu(byte inputIndex){
-  device->updateEncodeursMaxValue(0, synthNumber-1);
-  device->setHandleEncoderChange(0, selectSynth);
-  device->setHandlePress(0, confirmSynth);
-  for (int i=0;i<ANALOG_CONTROL_PINS;i++){
-    device->setHandlePotentiometerChange(i, nullptr);
-  }
-  synthParam = false;
-  device->updateEncodeursValue(0, synthSelect);
-  firstSampleParam = true;
-  selectSynth(0, synthSelect);
-}
 
 boolean openSDCard() {
     int crashCountdown = 0;
@@ -114,6 +60,86 @@ boolean openSDCard() {
     return true;
 }
 
+#include "sampleplayer/SamplePlayer.h"
+#include "kelpie/kelpiemaster.h"
+#include "chordOrgan/ChordOrgan.h"
+#include "tsynth/TSynth.h"
+#include "braids/braids.h"
+#include "psyc03/Psyc03Main.h"
+// #include "ds909/DS909/DS909MAIN.h"
+
+void selectSynth(byte inputIndex, long value){
+  if(firstSampleParam){
+    firstSampleParam = !firstSampleParam;
+    braids_off();
+    stopchordOrgan();
+    Tsynth_off();
+    kelpieOff();
+    stopPsyc03();
+    // stopDS909();
+  }
+  if(!synthParam){
+    synthSelect = value;
+    device->updateEncodeursMaxValue(0, synthNumber-1);
+    device->updateLine(1, String(synthName[synthSelect]));
+  }
+}
+
+void confirmSynth(byte inputIndex){
+  AudioNoInterrupts();
+  synthParam = !synthParam;
+  switch (synthSelect) {
+    case 0:
+    setupKelpie();
+    kelpieOn();
+    break;
+
+    case 1:
+    setupChordOrgan();
+    break;
+
+    case 2:
+    setupTsynth();
+    break;
+
+    case 3:
+    braids_on();
+    break;
+
+    case 4:
+    setupPsyc03();
+    break;
+
+    case 5:
+    // setupDS909();
+    break;
+  }
+  AudioInterrupts();
+}
+
+void NothingnoteOn(byte channel, byte note, byte velocity){
+  return;
+}
+
+void NothingnoteOff(byte channel, byte note, byte velocity){
+  return;
+}
+
+void returnToMenu(byte inputIndex){
+  MIDI.setHandleNoteOn(NothingnoteOn);
+  MIDI.setHandleNoteOff(NothingnoteOff);
+  device->updateEncodeursMaxValue(0, synthNumber-1);
+  device->setHandleEncoderChange(0, selectSynth);
+  device->setHandlePress(0, confirmSynth);
+  for (int i=0;i<ANALOG_CONTROL_PINS;i++){
+    device->setHandlePotentiometerChange(i, nullptr);
+  }
+  synthParam = false;
+  device->updateEncodeursValue(0, synthSelect);
+  firstSampleParam = true;
+  selectSynth(0, synthSelect);
+}
+
 void setup(){
   // Catch debug mode
   // if(digital_encsw[0].update()){
@@ -125,12 +151,12 @@ void setup(){
   //   }
   // }
   // debug = true;
-  Serial.begin(9600);
-  Serial.print("Begin");
+  // Serial.begin(9600);
+  // Serial.print("!    SuperSynth    !");
 
   // Configure the ADCs
   analogReadResolution(7);
-  analogReadAveraging(4);
+  analogReadAveraging(16);
   analogReference(EXTERNAL);
 
   // Configure the DACs
@@ -230,28 +256,37 @@ void loop(){
   if(synthParam){
     switch (synthSelect) {
       case 0:
-      kelpie_run();
+      runKelpie();
       break;
 
       case 1:
-      chordOrgan_run();
+      runChordOrgan();
       break;
 
       case 2:
-      Tsynth_run();
+      runTsynth();
       break;
 
       case 3:
-      run_braids();
+      runBraids();
+      break;
+
+      case 4:
+      runPsyc03();
+      break;
+
+      case 5:
+      // runDS909();
       break;
     }
   }
 
-  if(debug){
+  if(debug){  //&& DisplayDebug > 1000){
     cpuLoadSleep();
     if(has_result){
       Serial.println(cpu_load);
     }
     CPUMonitor();
+    // DisplayDebug = 0;
   }
 }

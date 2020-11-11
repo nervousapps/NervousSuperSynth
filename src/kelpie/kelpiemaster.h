@@ -594,7 +594,7 @@ void kelpieOn(){
   }
 }
 
-void kelpie_setup(){
+void setupKelpie(){
   AudioNoInterrupts();
   kelpieOn();
   for (byte i = 0; i < numPolyVoices; i++)
@@ -649,7 +649,7 @@ void kelpie_setup(){
   MIDI.setHandleNoteOn(KelpieOnNoteOn);
 }
 
-void kelpie_run(){
+void runKelpie(){
   if(DisplayParamMsec > 400 && DisplayParamMsec < 500){
     kelpieUpdateLine();
   }

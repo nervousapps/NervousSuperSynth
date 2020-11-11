@@ -68,6 +68,7 @@
 #include "synth_sine.h"
 #include "synth_whitenoise.h"
 #include "synth_pinknoise.h"
+#include "synth_simple_drum.h"
 #include "effect_multiply.h"
 #include "play_sd_wav.h"
 #include "analyze_peak.h"
