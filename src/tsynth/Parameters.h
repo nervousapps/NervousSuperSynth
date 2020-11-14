@@ -1,7 +1,8 @@
 //Values below are just for initialising and will be changed when synth is initialised to current panel controls & EEPROM settings
-// byte midiChannel = MIDI_CHANNEL_OMNI;//(EEPROM)
+byte midiChannel = MIDI_CHANNEL_OMNI;//(EEPROM)
+byte midiOutCh = 0;//(EEPROM)
 String patchName = INITPATCHNAME;
-boolean encCW = true;//This is to set the encoder to increment when turned CW - Settings Option
+boolean encCW = false;//This is to set the encoder to increment when turned CW - Settings Option
 float oscALevel = 1;
 float oscBLevel = 1;
 float noiseLevel = 0;
@@ -13,7 +14,8 @@ float midiClkTimeInterval = 0.0;
 float lfoTempoValue = 1.0;
 int pitchBendRange = 12;
 float modWheelDepth = 0.2f;
-float keytrackingAmount = 0.5;//MIDI CC & settings option (EEPROM)
+float modWhAmt = 0.0f;
+float keytrackingAmount = 0.5;//MIDI CC & settings option
 float glideSpeed = 0;
 int oscPitchA = 0;
 int oscPitchB = 12;
@@ -59,6 +61,22 @@ float ampRelease = 300;
 float fxAmt = 1;
 float fxMix = 0;
 
-//For T4.1, T3.6 isn't fast enough to read MUX
-//boolean pickUp = true;
-//int filterfreqPrevValue = 63;
+int velocitySens = 0;//Default off - settings option
+
+boolean vuMeter = false;
+
+//Pick-up - Experimental feature
+//Control will only start changing when the Knob/MIDI control reaches the current parameter value
+//Prevents jumps in value when the patch parameter and control are different values
+volatile boolean pickUp = false;//settings option (EEPROM)
+volatile boolean pickUpActive = false;
+#define TOLERANCE 2 //Gives a window of when pick-up occurs, this is due to the speed of control changing and Mux reading
+uint32_t filterfreqPrevValue = 0;//Need to set these when patch loaded
+float filterMixPrevValue = 0.0f;//Need to set these when patch loaded
+float resonancePrevValue = 0.0f;//Need to set these when patch loaded
+float oscLfoAmtPrevValue = 0.0f;//Need to set these when patch loaded
+float oscLfoRatePrevValue = 0.0f;//Need to set these when patch loaded
+float filterLfoRatePrevValue = 0.0f;//Need to set these when patch loaded
+float filterLfoAmtPrevValue = 0.0f;//Need to set these when patch loaded
+float fxAmtPrevValue = 0.0f;//Need to set these when patch loaded
+float fxMixPrevValue = 0.0f;//Need to set these when patch loaded

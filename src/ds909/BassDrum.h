@@ -1,7 +1,6 @@
 #ifndef BassDrum_h
 #define BassDrum_h
 
-#include <Arduino.h>
 #include <AudioPrivate.h>
 
 /*
@@ -41,9 +40,6 @@ class BassDrum{
     byte getPitch();
     byte getTone();
     byte getDecay();
-
-    void stop();
-    void start();
 };
 
 /**
@@ -115,17 +111,5 @@ inline void BassDrum::setTone(byte tone){
 
   this->click->pitchMod(mappedTone);
   this->click->frequency(this->clickFrequency + this->clickExtraFrequency);
-}
-
-inline void BassDrum::stop(){
-  this->click->stop();
-  this->bassDrum->stop();
-  this->output->stop();
-}
-
-inline void BassDrum::start(){
-  this->click->start();
-  this->bassDrum->start();
-  this->output->start();
 }
 #endif

@@ -41,20 +41,16 @@ public:
         //scales a value of 0.0 - 1024.0 to 0.125 - 4.0
         tone_incr = (t_freq) * (4.0 - 0.125) / (1024.0) + 0.125;
     }
-
-    void start(void);
-
     virtual void update(void);
 private:
-
+    
     uint16_t * sampleBuffer;
     uint16_t length;
-
+    
     float tone_incr;
     float sampleIndex;
-
+        
     volatile bool playing;
-    volatile bool run;
 };
 
 #endif /* defined(AudioPlayPitchedMemory_h) */

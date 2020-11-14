@@ -10,6 +10,8 @@
 #include <TeensyThreads.h>
 #include <NervousSuperMother.h>
 
+#define DEBUG false
+
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
 
 // Motherboard
@@ -35,14 +37,16 @@ boolean firstSampleParam = true;
 boolean hasSD = false;
 
 elapsedMillis DisplayParamMsec = 0;
-// elapsedMillis DisplayDebug = 0;
+#if DEBUG
+elapsedMillis DisplayDebug = 0;
+#endif
 
 bool debug = false;
 
-#define synthNumber 6
+#define synthNumber 7
 
 int synthSelect = 0;
-char synthName[synthNumber][16] = {"Kelpie", "ChordOrgan", "Tsynth", "Braids", "Psych03", "DS909"};
+String synthName[synthNumber] = {"Kelpie", "ChordOrgan", "Tsynth", "Braids", "Psych03", "DS909 notIMPLEMENTED", "FMSynth"};
 
 const int chipSelect = BUILTIN_SDCARD;
 
@@ -66,22 +70,24 @@ boolean openSDCard() {
 #include "tsynth/TSynth.h"
 #include "braids/braids.h"
 #include "psyc03/Psyc03Main.h"
-#include "ds909/DS909MAIN.h"
+// #include "ds909/DS909MAIN.h"
+#include "fmsynth/SynthMain.h"
+
 
 void selectSynth(byte inputIndex, long value){
   if(firstSampleParam){
     firstSampleParam = !firstSampleParam;
     braids_off();
     stopchordOrgan();
-    Tsynth_off();
+    stopTsynth();
     kelpieOff();
     stopPsyc03();
-    stopDS909();
+    // stopDS909();
+    stopFMSynth();
   }
   if(!synthParam){
     synthSelect = value;
-    device->updateEncodeursMaxValue(0, synthNumber-1);
-    device->updateLine(1, String(synthName[synthSelect]));
+    device->updateLine(1, synthName[synthSelect]);
   }
 }
 
@@ -111,7 +117,11 @@ void confirmSynth(byte inputIndex){
     break;
 
     case 5:
-    setupDS909();
+    // setupDS909();
+    break;
+
+    case 6:
+    setupFMSynth();
     break;
   }
   AudioInterrupts();
@@ -131,6 +141,7 @@ void returnToMenu(byte inputIndex){
   device->updateEncodeursMaxValue(0, synthNumber-1);
   device->setHandleEncoderChange(0, selectSynth);
   device->setHandlePress(0, confirmSynth);
+  device->setHandleDoublePress(0, nullptr);
   for (int i=0;i<ANALOG_CONTROL_PINS;i++){
     device->setHandlePotentiometerChange(i, nullptr);
   }
@@ -141,18 +152,13 @@ void returnToMenu(byte inputIndex){
 }
 
 void setup(){
-  // Catch debug mode
-  // if(digital_encsw[0].update()){
-  //   if(digital_encsw[0].fallingEdge()){
-  //     debug = true;
-  //     // Init serial
-  //     Serial.begin(9600);
-  //     Serial.print("Begin");
-  //   }
-  // }
-  // debug = true;
-  // Serial.begin(9600);
-  // Serial.print("!    SuperSynth    !");
+  // Power off all synths
+  selectSynth(0, synthSelect);
+
+#if DEBUG
+  Serial.begin(9600);
+  Serial.print("!    SuperSynth    !");
+#endif
 
   // Configure the ADCs
   analogReadResolution(7);
@@ -162,7 +168,7 @@ void setup(){
   // Configure the DACs
   analogWriteResolution(12);
   DACS1.analogReference(INTERNAL);
-  AudioMemory(500);
+  AudioMemory(150);
 
   // Set main mixer volume
   mainMix.gain(0, 0.25);
@@ -172,15 +178,15 @@ void setup(){
   mainAMP.gain(10);
 
   // Init SD card
-  if(debug) Serial.println("Initializing SD card...");
+  if(DEBUG) Serial.println("Initializing SD card...");
   hasSD = openSDCard();
   if (!hasSD) {
-    if(debug) Serial.println("initialization failed!");
+    if(DEBUG) Serial.println("initialization failed!");
   }
 
   // Init hardware controls
   setup_hardware_controls();
-  if(debug) Serial.print(ANALOG_CONTROL_PINS);
+  if(DEBUG) Serial.print(ANALOG_CONTROL_PINS);
 
   // Init MIDI
   MIDI.begin();
@@ -189,21 +195,19 @@ void setup(){
   byte controls[6] = {0,1,2,3,4,5};
   device->init(controls);
 
-  // Set the handlers
+  // Init sampleplayer
   initSamplePlayer();
-
-  // Power off all synths
-  selectSynth(0, synthSelect);
 
   // Set handlers
   device->updateEncodeursValue(0, 0);
   device->setHandleEncoderChange(0, selectSynth);
   device->setHandlePress(0, confirmSynth);
+  device->setHandleDoublePress(0, nullptr);
   device->updateEncodeursMaxValue(0, synthNumber-1);
   for (int i=0;i<ANALOG_CONTROL_PINS;i++){
     device->setHandlePotentiometerChange(i, nullptr);
   }
-  device->setHandleDoublePress(0, returnToMenu);
+  device->setHandleLongPress(0, returnToMenu);
 
   // Starting animation
   lcd.setCursor(0,0);
@@ -276,17 +280,23 @@ void loop(){
       break;
 
       case 5:
-      runDS909();
+      // runDS909();
+      break;
+
+      case 6:
+      runFMSynth();
       break;
     }
   }
 
-  if(debug){  //&& DisplayDebug > 1000){
+#if DEBUG
+  if(DEBUG && DisplayDebug > 1000){
     cpuLoadSleep();
     if(has_result){
       Serial.println(cpu_load);
     }
     CPUMonitor();
-    // DisplayDebug = 0;
+    DisplayDebug = 0;
   }
+#endif
 }

@@ -12,30 +12,27 @@ https://github.com/ghostintranslation
 https://www.ghostintranslation.com
 */
 
-#include <Arduino.h>
 #include <AudioPrivate.h>
-
 #include "DS909.h"
 
 // Instanciation of DS9
 DS909 * ds909 = DS909::getInstance();
 
 // Connecting DS9 to general audio output
-AudioConnection ds909patchCord1(*ds909->getOutput(), 0, mainMix2, 2);
+AudioAmplifier  AMP;
+AudioConnection patchCord1(*ds909->getOutput(), 0, AMP, 0);
+AudioConnection patchCord2(AMP, 0, mainMix2, 2);
+
+void setAMPGAIN(byte inputIndex, unsigned int value, int diffToPrevious) {
+  AMP.gain(value);
+}
 
 void setupDS909() {
-  ds909->init(device);
-
-  // while (!Serial && millis() < 2500); // wait for serial monitor
-  //
-  // // Starting sequence
-  // Serial.println("Ready!");
+  ds909->init();
+  AMP.gain(10);
+  device->setHandlePotentiometerChange(9, setAMPGAIN);
 }
 
-void runDS909() {
+void loopDS909() {
   ds909->update();
-}
-
-void stopDS909(){
-  ds909->stop();
 }

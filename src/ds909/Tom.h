@@ -1,7 +1,6 @@
 #ifndef Tom_h
 #define Tom_h
 
-#include <Arduino.h>
 #include <AudioPrivate.h>
 
 /*
@@ -20,9 +19,6 @@ class Tom{
     void setDecay(byte decay);
     AudioMixer4 * getOutput();
     void noteOn();
-
-    void stop();
-    void start();
 };
 
 /**
@@ -72,16 +68,6 @@ inline void Tom::setPitch(byte pitch){
 inline void Tom::setDecay(byte decay){
   unsigned int mappedDecay = map(decay, 0, 255, 300, 1500);
   this->tom->length(mappedDecay);
-}
-
-inline void Tom::stop(){
-  this->tom->stop();
-  this->output->stop();
-}
-
-inline void Tom::start(){
-  this->tom->start();
-  this->output->start();
 }
 
 #endif

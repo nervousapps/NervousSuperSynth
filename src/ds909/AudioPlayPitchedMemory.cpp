@@ -23,22 +23,11 @@
 // Source https://github.com/zueblin/Polaron
 
 #include "AudioPlayPitchedMemory.h"
-// #include "spi_interrupt.h"
+#include "spi_interrupt.h"
 
-void AudioPlayPitchedMemory::start(void)
-{
-	__disable_irq();
-	if (!run) {
-		run = true;
-		__enable_irq();
-	} else {
-		__enable_irq();
-	}
-}
 
 void AudioPlayPitchedMemory::begin(void)
 {
-    run = true;
     playing = false;
     tone_incr = 1.0;
 }
@@ -56,9 +45,6 @@ bool AudioPlayPitchedMemory::play(uint16_t * sample, uint16_t slength)
 void AudioPlayPitchedMemory::stop(void)
 {
     __disable_irq();
-    if (run) {
-  		run = false;
-  	}
     if (playing) {
         playing = false;
         __enable_irq();
@@ -72,34 +58,31 @@ void AudioPlayPitchedMemory::stop(void)
 
 void AudioPlayPitchedMemory::update(void)
 {
-    if(run){
-      unsigned int i, indexInt;
-      audio_block_t *block;
-      int16_t *out;
+    unsigned int i, indexInt;
+    audio_block_t *block;
+    int16_t *out;
+    
+    // only update if we're playing
+    if (!playing) return;
+    
+    // allocate the audio blocks to transmit
+    block = allocate();
+    if (block == NULL) return;
+    
+    out = block->data;
 
-      // only update if we're playing
-      if (!playing) return;
-
-      // allocate the audio blocks to transmit
-      block = allocate();
-      if (block == NULL) return;
-
-      out = block->data;
-
-      for (i = 0; i < AUDIO_BLOCK_SAMPLES;i+=2) {
-          indexInt = (int)sampleIndex;
-          if (indexInt < length) {
-              *out++ = sampleBuffer[indexInt];
-              *out++ = sampleBuffer[indexInt+1];
-          } else {
-              *out++ = 0;
-              *out++ = 0;
-              playing = false;
-          }
-          sampleIndex += tone_incr;
-      }
-      transmit(block);
-      release(block);
+    for (i = 0; i < AUDIO_BLOCK_SAMPLES;i+=2) {
+        indexInt = (int)sampleIndex;
+        if (indexInt < length) {
+            *out++ = sampleBuffer[indexInt];
+            *out++ = sampleBuffer[indexInt+1];
+        } else {
+            *out++ = 0;
+            *out++ = 0;
+            playing = false;
+        }
+        sampleIndex += tone_incr;
     }
-    return;
+    transmit(block);
+    release(block);
 }

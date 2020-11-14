@@ -45,3 +45,51 @@
 #define   CCpwmSource 106//LFO/Filter Env
 #define   CCallnotesoff 123//Panic button
 #define   CCunison  126//Off/On
+
+int CCarray[] = {
+  CCmodwheel,    //pitch LFO amount - less from mod wheel
+  CCosclfoamt,    //pitch LFO amount - panel control
+  CCglide,
+  CCvolume,
+  CCoscwaveformA,
+  CCoscwaveformB,
+  CCfilterenv,
+  CCfiltermixer,
+  CCoscLevelA,
+  CCoscLevelB,
+  CCnoiseLevel,
+  CCringmod,   //Off/On
+  CCpitchA,
+  CCpitchB,
+  CCpitchenv,
+  CCosclforetrig,   //Off/On
+  CCfilterlforetrig,   //Off/On
+  CCfilterres,
+  CCamprelease,
+  CCampattack,
+  CCfilterfreq,
+  CCampdecay,
+  CCfilterlforate,
+  CCfilterlfoamt,
+  CCampsustain,
+  CCfilterattack,
+  CCfilterdecay,
+  CCfiltersustain,
+  CCfilterrelease,
+  CCpwA,
+  CCpwB,
+  CCpwmRate,
+  CCpwmAmt,   //MIDI Only
+  CCkeytracking,
+  CCfilterlfowaveform,
+  CCfxamt,
+  CCfxmix,
+  CCdetune,
+  CCoscLfoRate,
+  CCoscLfoWaveform,
+  CCfilterLFOMidiClkSync,   //Off/On
+  CCoscLFOMidiClkSync,   //Off/On - MIDI Only
+  CCpwmSource,   //LFO/Filter Env
+  CCallnotesoff,   //Panic button
+  CCunison,   //Off/On
+};

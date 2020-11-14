@@ -1,9 +1,8 @@
 #ifndef Rimshot_h
 #define Rimshot_h
 
-#include "AudioPlayPitchedMemory.h"
-#include <Arduino.h>
 #include <AudioPrivate.h>
+#include "AudioPlayPitchedMemory.h"
 
 
 /*
@@ -55,9 +54,6 @@ class Rimshot{
     void noteOn(byte velocity);
     void setPitch(byte pitch);
     void setTone(byte tone);
-
-    void stop();
-    void start();
 };
 
 /**
@@ -134,23 +130,5 @@ inline void Rimshot::setPitch(byte pitch) {
 inline void Rimshot::setTone(byte tone) {
   float mappedTone = map((float)tone, 0, 255, 0, 0.2);
   this->mixer->gain(1, mappedTone);
-}
-
-inline void Rimshot::stop(){
-  this->white->stop();
-  this->rim->stop();
-  this->clickEnvelope->stop();
-  this->mixer->stop();
-  this->filter->stop();
-  this->output->stop();
-}
-
-inline void Rimshot::start(){
-  this->white->start();
-  this->rim->start();
-  this->clickEnvelope->start();
-  this->mixer->start();
-  this->filter->start();
-  this->output->start();
 }
 #endif

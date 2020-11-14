@@ -197,7 +197,7 @@ void ChordOrganhandlePress(byte inputIndex){
   interface.buttonState = BUTTON_SHORT_PRESS;
 }
 
-void ChordOrganhandleLongPress(byte inputIndex){
+void ChordOrganhandleDoublePress(byte inputIndex){
   interface.buttonState = BUTTON_LONG_PRESS;
 }
 
@@ -249,7 +249,7 @@ void setupChordOrgan(){
   device->setHandlePotentiometerChange(15, ChordOrganhandleGlide);
   device->setHandlePotentiometerChange(16, ChordOrganhandleStacked);
   device->setHandlePress(0, ChordOrganhandlePress);
-  device->setHandleLongPress(0, ChordOrganhandleLongPress);
+  device->setHandleDoublePress(0, ChordOrganhandleDoublePress);
   MIDI.setHandleNoteOn(ChordOrgannoteOn);
   MIDI.setHandleNoteOff(ChordOrgannoteOff);
 

@@ -2,6 +2,12 @@
 #define Tsynth_Audio_Connections_h
 
 // GUItool: begin automatically generated code
+// waveformMixer1 --> filterMixer --> voiceMixer --> voiceMixerM --> volumeMixer --> EffectsMixer
+// oscLevel                            velocity
+
+#include <Arduino.h>
+#include <AudioPrivate.h>
+
 AudioSynthWaveformDc     constant1Dc;    //xy=69.5,437
 AudioSynthNoisePink      pink;           //xy=268,349
 AudioSynthNoiseWhite     white;           //xy=268,359
@@ -9,6 +15,7 @@ AudioMixer4              noiseMixer;       //xy=288,369
 AudioSynthWaveformTS       pwmLfo;         //xy=92,208
 AudioSynthWaveformDc     pwa;            //xy=107,256
 AudioSynthWaveformDc     pwb;            //xy=110,301
+AudioAnalyzePeak peak;
 AudioEffectEnvelope      filterEnvelope6;   //xy=629,1107
 AudioEffectEnvelope      filterEnvelope5;   //xy=638,300
 AudioEffectEnvelope      filterEnvelope4;   //xy=617,1107
@@ -55,7 +62,6 @@ AudioMixer4              oscModMixer5a;         //xy=550,245
 AudioMixer4              oscModMixer5b;         //xy=550,265
 AudioMixer4              oscModMixer6a;         //xy=550,285
 AudioMixer4              oscModMixer6b;         //xy=550,305
-// AudioSynthWaveformModulatedTS waveformMod1b;  //xy=503,170
 AudioSynthWaveformModulatedTS waveformMod1b;  //xy=503,170
 AudioSynthWaveformModulatedTS waveformMod1a;  //xy=507,114
 AudioSynthWaveformModulatedTS waveformMod2b;  //xy=513,550
@@ -108,9 +114,13 @@ AudioMixer4              voiceMixer1;     //xy=1524,570
 AudioMixer4              voiceMixer2;     //xy=1524,570
 AudioMixer4              voiceMixerM;     //xy=1544,580
 AudioFilterStateVariable dcOffsetFilter;     //xy=1564,580
+AudioMixer4              volumeMixer;     //xy=1544,580
 AudioEffectEnsemble       ensemble;  //xy=1800,600
+// Oscilloscope              scope;
 AudioMixer4              effectMixerR;         //xy=1848,625
 AudioMixer4              effectMixerL;         //xy=1857,539
+// AudioOutputI2S           i2s;            //xy=2364,547
+// AudioOutputUSB           usbAudio;       //xy=2356,593
 AudioConnection          TsynthpatchCord1(constant1Dc, filterEnvelope2);
 AudioConnection          TsynthpatchCord2(constant1Dc, filterEnvelope3);
 AudioConnection          TsynthpatchCord3(constant1Dc, filterEnvelope4);
@@ -195,7 +205,7 @@ AudioConnection          TsynthpatchCord82(oscFX4, 0, waveformMixer4, 3);
 AudioConnection          TsynthpatchCord83(oscFX3, 0, waveformMixer3, 3);
 AudioConnection          TsynthpatchCord84(waveformMixer1, 0, filter1, 0);
 AudioConnection          TsynthpatchCord85(waveformMixer2, 0, filter2, 0);
-AudioConnection          TsynthpatchCord86(filterModMixer1, 0, filter1, 1);
+AudioConnection          patchCord86(filterModMixer1, 0, filter1, 1);
 AudioConnection          TsynthpatchCord87(waveformMixer3, 0, filter3, 0);
 AudioConnection          TsynthpatchCord88(filterModMixer2, 0, filter2, 1);
 AudioConnection          TsynthpatchCord89(filterModMixer3, 0, filter3, 1);
@@ -231,15 +241,20 @@ AudioConnection          TsynthpatchCord110(ampEnvelope4, 0, voiceMixer2, 0);
 AudioConnection          TsynthpatchCord111(ampEnvelope1, 0, voiceMixer1, 0);
 AudioConnection          TsynthpatchCord195(ampEnvelope5, 0, voiceMixer2, 1);
 AudioConnection          TsynthpatchCord196(ampEnvelope6, 0, voiceMixer2, 2);
-AudioConnection          TsynthpatchCord112(dcOffsetFilter, 2, ensemble, 0);
+// AudioConnection       Tsynth   patchCord215(dcOffsetFilter, 2, scope, 0);
+AudioConnection          TsynthpatchCord112(volumeMixer, 0, ensemble, 0);
 AudioConnection          TsynthpatchCord113(ensemble, 0, effectMixerL, 1);
 AudioConnection          TsynthpatchCord114(ensemble, 1, effectMixerR, 1);
-AudioConnection          TsynthpatchCord115(dcOffsetFilter, 2, effectMixerL, 0);
-AudioConnection          TsynthpatchCord116(dcOffsetFilter, 2, effectMixerR, 0);
-// AudioConnection          TsynthpatchCord117(effectMixerR, 0, usbAudio, 1);
+AudioConnection          TsynthpatchCord115(volumeMixer, 0, effectMixerL, 0);
+AudioConnection          TsynthpatchCord116(volumeMixer, 0, effectMixerR, 0);
+
+// AudioConnection          patchCord117(effectMixerR, 0, usbAudio, 1);
+// AudioConnection          patchCord118(effectMixerR, 0, i2s, 1);
+// AudioConnection          patchCord119(effectMixerL, 0, i2s, 0);
+// AudioConnection          patchCord120(effectMixerL, 0, usbAudio, 0);
 AudioConnection          TsynthpatchCord118(effectMixerR, 0, mainMix, 2);
 AudioConnection          TsynthpatchCord119(effectMixerL, 0, mainMix, 3);
-// AudioConnection          TsynthpatchCord120(effectMixerL, 0, usbAudio, 0);
+
 AudioConnection          TsynthpatchCord121(oscModMixer1a, 0, waveformMod1a, 0);
 AudioConnection          TsynthpatchCord122(oscModMixer1b, 0, waveformMod1b, 0);
 AudioConnection          TsynthpatchCord123(oscModMixer2a, 0, waveformMod2a, 0);
@@ -325,7 +340,8 @@ AudioConnection          TsynthpatchCord198(voiceMixer2, 0, voiceMixerM, 1);
 AudioConnection          TsynthpatchCord199(constant1Dc, filterEnvelope5);
 AudioConnection          TsynthpatchCord200(constant1Dc, filterEnvelope6);
 AudioConnection          TsynthpatchCord203(voiceMixerM, 0, dcOffsetFilter, 0);
-// AudioControlSGTL5000     sgtl5000_1;     //xy=2353,505
+AudioConnection          TsynthpatchCord217(dcOffsetFilter, 2, volumeMixer, 0);
+AudioConnection          TsynthpatchCord216(dcOffsetFilter, 2, peak, 0);
 // GUItool: end automatically generated code
 
 void Tsynth_AOstop(){

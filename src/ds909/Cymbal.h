@@ -1,9 +1,8 @@
 #ifndef Cymbal_h
 #define Cymbal_h
 
-#include "AudioPlayPitchedMemory.h"
-#include <Arduino.h>
 #include <AudioPrivate.h>
+#include "AudioPlayPitchedMemory.h"
 
 /*
  * Cymbal
@@ -4787,9 +4786,6 @@ class Cymbal{
     AudioMixer4 * getOutput();
     void noteOn(bool crash);
     void setPitch(float pitch);
-
-    void stop();
-    void start();
 };
 
 /**
@@ -4830,16 +4826,6 @@ inline void Cymbal::noteOn(bool crash) {
  */
 inline void Cymbal::setPitch(float pitch) {
   this->player->frequency(constrain(pitch, 0, 1023));
-}
-
-inline void Cymbal::stop(){
-  this->player->stop();
-  this->output->stop();
-}
-
-inline void Cymbal::start(){
-  this->player->start();
-  this->output->start();
 }
 
 #endif

@@ -1,10 +1,11 @@
 #ifndef DS909_h
 #define DS909_h
 
-#include <Arduino.h>
 #include <AudioPrivate.h>
-#include <NervousSuperMother.h>
+// #include <MIDI.h>
+// MIDI_CREATE_DEFAULT_INSTANCE(); // MIDI library init
 
+#include "NervousSuperMother.h"
 #include "BassDrum.h"
 #include "Snare.h"
 #include "Clap.h"
@@ -20,9 +21,6 @@ class DS909{
   private:
     static DS909 *instance;
     DS909();
-
-    // Motherboard
-    NervousSuperMother *device;
 
     // Bass Drum
     BassDrum *bassDrum;
@@ -56,9 +54,10 @@ class DS909{
 
 
   public:
+    // Motherboard
+    NervousSuperMother *device;
     static DS909 *getInstance();
     void init(NervousSuperMother *device);
-    void stop();
     void update();
     static void noteOn(byte channel, byte note, byte velocity);
     AudioMixer4 * getOutput();
@@ -156,35 +155,12 @@ inline void DS909::init(NervousSuperMother *device){
   this->device->setHandlePotentiometerChange(6, onRMChange);
   this->device->setHandlePotentiometerChange(7, onHHChange);
   this->device->setHandlePotentiometerChange(8, onCYChange);
-
-  this->bassDrum->start();
-  this->snare->start();
-  this->clap->start();
-  this->hiTom->start();
-  this->midTom->start();
-  this->lowTom->start();
-  this->rimshot->start();
-  this->hihat->start();
-  this->cymbal->start();
-}
-
-inline void DS909::stop(){
-  this->bassDrum->stop();
-  this->snare->stop();
-  this->clap->stop();
-  this->hiTom->stop();
-  this->midTom->stop();
-  this->lowTom->stop();
-  this->rimshot->stop();
-  this->hihat->stop();
-  this->cymbal->stop();
 }
 
 /**
  * Update
  */
 inline void DS909::update(){
-  // this->device->update();
   return;
 }
 
@@ -200,46 +176,57 @@ inline void DS909::noteOn(byte channel, byte note, byte velocity){
     // Bass Drum
     case 36:
       getInstance()->bassDrum->noteOn();
+      // getInstance()->device->setLED(0, 4);
     break;
     // Snare
     case 40:
       getInstance()->snare->noteOn(velocity);
+      // getInstance()->device->setLED(1, 4);
     break;
     // Clap
     case 39:
       getInstance()->clap->noteOn();
+      // getInstance()->device->setLED(2, 4);
     break;
     // low Tom
     case 45:
       getInstance()->lowTom->noteOn();
+      // getInstance()->device->setLED(3, 4);
     break;
     // Mid Tom
     case 48:
       getInstance()->midTom->noteOn();
+      // getInstance()->device->setLED(4, 4);
     break;
     // High Tom
     case 50:
       getInstance()->hiTom->noteOn();
+      // getInstance()->device->setLED(5, 4);
     break;
     // Rimshot
     case 37:
       getInstance()->rimshot->noteOn(velocity);
+      // getInstance()->device->setLED(6, 4);
     break;
     // Closed High Hat
     case 42:
       getInstance()->hihat->noteOn(false);
+      // getInstance()->device->setLED(7, 4);
     break;
     // Open High Hat
     case 46:
       getInstance()->hihat->noteOn(true);
+      // getInstance()->device->setLED(7, 4);
     break;
     // Cymbal
     case 51:
       getInstance()->cymbal->noteOn(false);
+      // getInstance()->device->setLED(8, 4);
     break;
     // Crash
     case 49:
       getInstance()->cymbal->noteOn(true);
+      // getInstance()->device->setLED(8, 4);
     break;
 
     default:

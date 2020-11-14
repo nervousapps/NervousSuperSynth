@@ -41,7 +41,6 @@ class Psyc03{
   private:
     static Psyc03 *instance;
     Psyc03();
-    ~Psyc03(){};
 
     AudioSynthWaveformDc        *dc1;
     AudioSynthWaveformSine      *sine1;
@@ -214,6 +213,17 @@ inline void Psyc03::init(NervousSuperMother *device){
 
   this->peak1 = new AudioAnalyzePeak();
 
+  this->patchCords[0]->connect();
+  this->patchCords[1]->connect();
+  this->patchCords[2]->connect();
+  this->patchCords[3]->connect();
+  this->patchCords[4]->connect();
+  this->patchCords[5]->connect();
+  this->patchCords[6]->connect();
+  this->patchCords[7]->connect();
+  this->patchCords[8]->connect();
+  this->patchCords[9]->connect();
+
   this->lfo->start();
   this->sine1->start();
   this->sine_fm->start();
@@ -239,6 +249,17 @@ inline void Psyc03::stop(){
   this->filter->stop();
   this->mixer1->stop();
   this->output->stop();
+
+  this->patchCords[0]->disconnect();
+  this->patchCords[1]->disconnect();
+  this->patchCords[2]->disconnect();
+  this->patchCords[3]->disconnect();
+  this->patchCords[4]->disconnect();
+  this->patchCords[5]->disconnect();
+  this->patchCords[6]->disconnect();
+  this->patchCords[7]->disconnect();
+  this->patchCords[8]->disconnect();
+  this->patchCords[9]->disconnect();
   // delete instance; //= nullptr;
 }
 

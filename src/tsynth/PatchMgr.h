@@ -77,12 +77,13 @@ void recallPatchData(File patchFile, String data[])
     else
     {
       // At eof, too long, or read error.  Too long is error.
+
       Serial.print(patchFile.available() ? F("error: ") : F("eof:   "));
     }
     // Print the field.
-    //    Serial.print(i);
-    //    Serial.print(" - ");
-    //    Serial.println(str);
+//        Serial.print(i);
+//        Serial.print(" - ");
+//        Serial.println(str);
     data[i++] = String(str);
   }
 }
@@ -112,7 +113,7 @@ void sortPatches()
 
 void loadPatches()
 {
-  File file = SD.open("/TSPATCH");
+  File file = SD.open("TSPATCH/");
   patches.clear();
   while (true)
   {
@@ -149,9 +150,9 @@ void savePatch(const char *patchNo, String patchData)
   File patchFile = SD.open(patchNo, FILE_WRITE);
   if (patchFile)
   {
-       Serial.print("Writing Patch No:");
-       Serial.println(patchNo);
-    Serial.println(patchData);
+    //    Serial.print("Writing Patch No:");
+    //    Serial.println(patchNo);
+    //Serial.println(patchData);
     patchFile.println(patchData);
     patchFile.close();
   }

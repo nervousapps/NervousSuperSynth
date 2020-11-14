@@ -1,9 +1,8 @@
 #ifndef Hihat_h
 #define Hihat_h
 
-#include "AudioPlayPitchedMemory.h"
-#include <Arduino.h>
 #include <AudioPrivate.h>
+#include "AudioPlayPitchedMemory.h"
 
 /*
  * Hihat
@@ -1799,9 +1798,6 @@ class Hihat{
     AudioMixer4 * getOutput();
     void noteOn(bool open);
     void setPitch(float pitch);
-
-    void stop();
-    void start();
 };
 
 /**
@@ -1843,15 +1839,5 @@ inline void Hihat::noteOn(bool open) {
  */
 inline void Hihat::setPitch(float pitch) {
   this->player->frequency(constrain(pitch, 0, 1023));
-}
-
-inline void Hihat::stop(){
-  this->player->stop();
-  this->output->stop();
-}
-
-inline void Hihat::start(){
-  this->player->start();
-  this->output->start();
 }
 #endif

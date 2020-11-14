@@ -1,17 +1,22 @@
 // This optional setting causes Encoder to use more optimized code,
 // It must be defined before Encoder.h is included.
-#define ENCODER_OPTIMIZE_INTERRUPTS
-#include <Encoder.h>
-#include <Bounce.h>
+#include <Arduino.h>
+// #define ENCODER_OPTIMIZE_INTERRUPTS
+// #include <Encoder.h>
+// #include <Bounce.h>
+// #include <ADC.h>
+// #include <ADC_util.h>
+//
+// ADC *adc = new ADC();
 
-// //Teensy 3.6 - Mux Pins
+//Teensy 3.6 - Mux Pins
 // #define MUX_0 28
 // #define MUX_1 27
 // #define MUX_2 26
 // #define MUX_3 25
 // #define MUX1_S 38
 // #define MUX2_S A22
-// //Mux 1 Connections
+//Mux 1 Connections
 // #define MUX1_noiseLevel 0
 // #define MUX1_pitchLfoRate 1
 // #define MUX1_pitchLfoWaveform 2
@@ -66,19 +71,19 @@
 // #define OSC_FX_LED 14
 //
 #define MUXCHANNELS 16
-// #define QUANTISE_FACTOR 7
+// #define QUANTISE_FACTOR 15//Window of noise before change detected in controls. 15 is 4 bits
 //
 // #define DEBOUNCE 30
 
-static byte muxInput = 0;
-static int mux1ValuesPrev[MUXCHANNELS] = {};
-static int mux2ValuesPrev[MUXCHANNELS] = {};
-
+// static byte muxInput = 0;
+// static int mux1ValuesPrev[MUXCHANNELS] = {};
+// static int mux2ValuesPrev[MUXCHANNELS] = {};
+//
 // static int mux1Read = 0;
 // static int mux2Read = 0;
-// static int volumeRead = 0;
+static int volumeRead = 0;
 static int volumePrevious = 0;
-// static long encPrevious = 0;
+static long encPrevious = 0;
 
 //These are pushbuttons and require debouncing
 // Bounce oscFXSwitch = Bounce(OSC_FX_SW, DEBOUNCE);
@@ -98,6 +103,18 @@ boolean panic = true; //Hack for back button
 
 void setupHardware()
 {
+  // //Volume Pot is on ADC0
+  // adc->adc0->setAveraging(16); // set number of averages 0, 4, 8, 16 or 32.
+  // adc->adc0->setResolution(12); // set bits of resolution  8, 10, 12 or 16 bits.
+  // adc->adc0->setConversionSpeed(ADC_CONVERSION_SPEED::VERY_LOW_SPEED); // change the conversion speed
+  // adc->adc0->setSamplingSpeed(ADC_SAMPLING_SPEED::MED_SPEED); // change the sampling speed
+  //
+  // //MUXs on ADC1
+  // adc->adc1->setAveraging(16); // set number of averages 0, 4, 8, 16 or 32.
+  // adc->adc1->setResolution(12); // set bits of resolution  8, 10, 12 or 16 bits.
+  // adc->adc1->setConversionSpeed(ADC_CONVERSION_SPEED::VERY_LOW_SPEED); // change the conversion speed
+  // adc->adc1->setSamplingSpeed(ADC_SAMPLING_SPEED::MED_SPEED); // change the sampling speed
+  //
   // //Mux address pins
   // pinMode(MUX_0, OUTPUT);
   // pinMode(MUX_1, OUTPUT);

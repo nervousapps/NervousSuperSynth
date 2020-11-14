@@ -30,6 +30,18 @@ void AudioEngine::init(Settings* settings, float* tuning, int waveform) {
 
     setWaveform(waveform);
 
+    patchCord1.connect();
+  	patchCord2.connect();
+  	patchCord3.connect();
+  	patchCord4.connect();
+  	patchCord5.connect();
+  	patchCord6.connect();
+  	patchCord7.connect();
+  	patchCord8.connect();
+  	patchCord9.connect();
+  	patchCord10.connect();
+  	patchCord11.connect();
+
     waveform1.start();
   	waveform2.start();
   	waveform3.start();
@@ -55,6 +67,17 @@ void AudioEngine::stop(){
   mixer1.stop();
   mixer2.stop();
   mixer3.stop();
+  patchCord1.disconnect();
+	patchCord2.disconnect();
+	patchCord3.disconnect();
+	patchCord4.disconnect();
+	patchCord5.disconnect();
+	patchCord6.disconnect();
+	patchCord7.disconnect();
+	patchCord8.disconnect();
+	patchCord9.disconnect();
+	patchCord10.disconnect();
+	patchCord11.disconnect();
 }
 
 void AudioEngine::updateNotes(int16_t* noteOffsets, float transpose) {

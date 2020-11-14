@@ -1,9 +1,8 @@
 #ifndef Snare_h
 #define Snare_h
 
-#include "AudioPlayPitchedMemory.h"
-#include <Arduino.h>
 #include <AudioPrivate.h>
+#include "AudioPlayPitchedMemory.h"
 
 /*
 // GUItool: begin automatically generated code
@@ -65,9 +64,6 @@ class Snare{
     void setPitch(byte pitch);
     void setTone(byte tone);
     void setDecay(byte decay);
-
-    void stop();
-    void start();
 };
 
 
@@ -173,28 +169,6 @@ inline void Snare::setDecay(byte decay){
 inline void Snare::setTone(byte tone){
   unsigned int mappedFilter = map(tone, 0, 255, 2000, 2500);
   this->filter->frequency(mappedFilter);
-}
-
-inline void Snare::stop(){
-  this->white->stop();
-  this->snareDrum->stop();
-  this->snareDrum2->stop();
-  this->snareEnvelope->stop();
-  this->snareMixer->stop();
-  this->filter->stop();
-  this->output->stop();
-  this->filterAll->stop();
-}
-
-inline void Snare::start(){
-  this->white->start();
-  this->snareDrum->start();
-  this->snareDrum2->start();
-  this->snareEnvelope->start();
-  this->snareMixer->start();
-  this->filter->start();
-  this->output->start();
-  this->filterAll->start();
 }
 
 

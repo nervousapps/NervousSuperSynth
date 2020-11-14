@@ -1,7 +1,6 @@
 #ifndef Clap_h
 #define Clap_h
 
-#include <Arduino.h>
 #include <AudioPrivate.h>
 
 /*
@@ -79,9 +78,6 @@ class Clap{
     void noteOn();
     void setTone(byte tone);
     void setDecay(byte decay);
-
-    void stop();
-    void start();
 };
 
 /**
@@ -212,37 +208,5 @@ inline void Clap::setTone(byte tone){
 
   unsigned int mappedFilter = map(tone, 0, 255, 300, 2000);
   this->filter->frequency(mappedFilter);
-}
-
-inline void Clap::stop(){
-  this->white->stop();
-  // Clap
-  this->clapEnvelope->stop();
-  this->clapEnvelope2->stop();
-  this->clapEnvelope3->stop();
-  this->clapEnvelope4->stop();
-  this->clapEnvelope5->stop();
-  this->clapFilter->stop();
-  this->clapMixer->stop();
-  this->clapMixer2->stop();
-  this->mixer->stop();
-  this->filter->stop();
-  this->output->stop();
-}
-
-inline void Clap::start(){
-  this->white->start();
-  // Clap
-  this->clapEnvelope->start();
-  this->clapEnvelope2->start();
-  this->clapEnvelope3->start();
-  this->clapEnvelope4->start();
-  this->clapEnvelope5->start();
-  this->clapFilter->start();
-  this->clapMixer->start();
-  this->clapMixer2->start();
-  this->mixer->start();
-  this->filter->start();
-  this->output->start();
 }
 #endif

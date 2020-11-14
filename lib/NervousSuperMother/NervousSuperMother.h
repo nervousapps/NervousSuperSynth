@@ -92,8 +92,8 @@ public:
 
   // Callbacks
   void setHandlePress(byte inputIndex, PressCallback fptr);
-  void setHandleDoublePress(byte inputIndex, LongPressCallback fptr);
-  void setHandleLongPress(byte inputIndex, DoublePressCallback fptr);
+  void setHandleLongPress(byte inputIndex, LongPressCallback fptr);
+  void setHandleDoublePress(byte inputIndex, DoublePressCallback fptr);
   void setHandlePotentiometerChange(byte inputIndex, PotentiometerChangeCallback fptr);
   void setHandleEncoderChange(byte inputIndex, EncoderChangeCallback fptr);
   void setHandleTrigger(byte inputIndex, TriggerCallback fptr);
@@ -357,19 +357,25 @@ inline void NervousSuperMother::readButton(byte buttonIndex) {
         if(digital_button[buttonIndex].fallingEdge()){
           this->pushed[buttonIndex] = true;
           if(this->inputsPressTime[buttonIndex] <= 400 && this->pushed[buttonIndex]){
-            this->inputsDoublePressCallback[buttonIndex](buttonIndex);
+            if(this->inputsDoublePressCallback[buttonIndex] != nullptr){
+              this->inputsDoublePressCallback[buttonIndex](buttonIndex);
+            }
           }
           this->inputsPressTime[buttonIndex] = 0;
         }
 
         if(digital_button[buttonIndex].risingEdge()){
           if(this->inputsPressTime[buttonIndex] > 150 && this->inputsPressTime[buttonIndex] < 500){
-            this->inputsPressCallback[buttonIndex](buttonIndex);
+            if(this->inputsPressCallback[buttonIndex] != nullptr){
+              this->inputsPressCallback[buttonIndex](buttonIndex);
+            }
           }
           this->pushed[buttonIndex] = false;
         }
       }else if(this->inputsPressTime[buttonIndex] >= 800 && this->pushed[buttonIndex]){
-        this->inputsLongPressCallback[buttonIndex](buttonIndex);
+        if(this->inputsLongPressCallback[buttonIndex] != nullptr){
+          this->inputsLongPressCallback[buttonIndex](buttonIndex);
+        }
         this->pushed[buttonIndex] = false;
       }
     }
