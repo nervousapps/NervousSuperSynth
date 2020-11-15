@@ -22,11 +22,11 @@ https://github.com/ghostintranslation
 // Instanciation of DS9
 Synth * synth = Synth::getInstance();;
 
-AudioConnection FmSynthpatchCord1(*synth->getOutput(), 0, mainMix3, 1);
+AudioConnection FmSynthpatchCord1(*synth->getOutput(), 0, mainMix1, 2);
 
 void setupFMSynth() {
-  // synth = Synth::getInstance();
   synth->init(device);
+  FmSynthpatchCord1.connect();
 }
 
 void runFMSynth() {
@@ -35,10 +35,6 @@ void runFMSynth() {
 }
 
 void stopFMSynth() {
-  // Synth stop
-  // if(synth != nullptr){
-    synth->stop();
-  //   delete synth;
-  //   synth = nullptr;
-  // }
+  synth->stop();
+  FmSynthpatchCord1.disconnect();
 }

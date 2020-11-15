@@ -154,7 +154,7 @@ void AudioEngine::changeWave() {
     	setupCustomWaveform();
     } else {
     	setWaveformType(standardWaveTypes[currentWaveform]);
-      line = "Waveform : " + String(standardWaveTypes[currentWaveform]);
+      line = "Waveform : " + String(currentWaveform);
     }
 }
 
@@ -167,7 +167,7 @@ void AudioEngine::setupCustomWaveform() {
     }
 
     setWaveformType(WAVEFORM_ARBITRARY);
-    line = "Waveform : wave" + String(waveIndex);
+    line = "Waveform : " + String(waveIndex);
 }
 
 void AudioEngine::setWaveformType(short waveformType) {

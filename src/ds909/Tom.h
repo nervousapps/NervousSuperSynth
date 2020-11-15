@@ -15,6 +15,9 @@ class Tom{
   public:
     Tom();
 
+    void start();
+    void stop();
+
     void setPitch(byte pitch);
     void setDecay(byte decay);
     AudioMixer4 * getOutput();
@@ -40,6 +43,14 @@ inline Tom::Tom(){
  */
 inline AudioMixer4 * Tom::getOutput(){
   return this->output;
+}
+
+inline void Tom::start(){
+  this->patchCords[1]->connect();
+}
+
+inline void Tom::stop(){
+  this->patchCords[1]->disconnect();
 }
 
 /**

@@ -32,6 +32,8 @@ class BassDrum{
   public:
     BassDrum();
 
+    void start();
+    void stop();
     AudioMixer4 * getOutput();
     void noteOn();
     void setPitch(byte pitch);
@@ -64,6 +66,16 @@ inline BassDrum::BassDrum(){
  */
 inline AudioMixer4 * BassDrum::getOutput(){
   return this->output;
+}
+
+inline void BassDrum::start(){
+  this->patchCords[0]->connect();
+  this->patchCords[1]->connect();
+}
+
+inline void BassDrum::stop(){
+  this->patchCords[0]->disconnect();
+  this->patchCords[1]->disconnect();
 }
 
 /**

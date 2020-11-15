@@ -59,6 +59,9 @@ class Snare{
   public:
     Snare();
 
+    void start();
+    void stop();
+
     AudioMixer4 * getOutput();
     void noteOn(byte velocity);
     void setPitch(byte pitch);
@@ -123,6 +126,26 @@ inline Snare::Snare(){
  */
 inline AudioMixer4 * Snare::getOutput(){
   return this->output;
+}
+
+inline void Snare::start(){
+  this->patchCords[0]->connect();
+  this->patchCords[1]->connect();
+  this->patchCords[2]->connect();
+  this->patchCords[3]->connect();
+  this->patchCords[4]->connect();
+  this->patchCords[5]->connect();
+  this->patchCords[6]->connect();
+}
+
+inline void Snare::stop(){
+  this->patchCords[0]->disconnect();
+  this->patchCords[1]->disconnect();
+  this->patchCords[2]->disconnect();
+  this->patchCords[3]->disconnect();
+  this->patchCords[4]->disconnect();
+  this->patchCords[5]->disconnect();
+  this->patchCords[6]->disconnect();
 }
 
 /**

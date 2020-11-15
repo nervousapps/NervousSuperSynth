@@ -131,8 +131,18 @@ inline void Synth::init(NervousSuperMother *device){
   this->device->setHandlePotentiometerChange(4, onAttackChange);
   this->device->setHandlePotentiometerChange(5, onReleaseChange);
 
+  this->device->setHandlePress(0, nullptr);
+
   for (int i = 0; i < voiceCount; i++) {
     this->voices[i]->start();
+  }
+
+  for (int i = 0; i < voiceCount/4; i++) {
+    this->patchCords[i]->connect();;
+  }
+
+  for (int i = 0; i < voiceCount; i++) {
+    this->patchCords[i]->connect();
   }
 }
 
@@ -228,6 +238,10 @@ inline void Synth::noteOff(byte channel, byte note, byte velocity){
 inline void Synth::stop(){
   for (int i = 0; i < voiceCount; i++) {
     getInstance()->voices[i]->stop();
+  }
+
+  for (int i = 0; i < voiceCount; i++) {
+    getInstance()->patchCords[i]->disconnect();
   }
 }
 
@@ -329,6 +343,8 @@ inline void Synth::onModeChange(byte inputIndex, unsigned int value, int diffToP
     getInstance()->output->gain(2, 1 );
     getInstance()->output->gain(3, 1 );
   }
+
+  getInstance()->device->updateLine(1, "Mode : " + String(getInstance()->mode));
 }
 
 
@@ -379,6 +395,7 @@ inline void Synth::onParamChange(byte inputIndex, unsigned int value, int diffTo
       }
     break;
   }
+  getInstance()->device->updateLine(1, "Param : " + String(getInstance()->parameter));
 }
 
 
@@ -399,6 +416,8 @@ inline void Synth::onShapeChange(byte inputIndex, unsigned int value, int diffTo
   for (int i = 0; i < voiceCount ; i++) {
     getInstance()->voices[i]->setShape(shape);
   }
+
+  getInstance()->device->updateLine(1, "Shape : " + String(shape));
 }
 
 
@@ -440,6 +459,8 @@ inline void Synth::onFmChange(byte inputIndex, unsigned int value, int diffToPre
       getInstance()->voices[i]->setModulatorAmplitude(0);
     }
   }
+
+  getInstance()->device->updateLine(1, "FM : " + String(value));
 }
 
 /**
@@ -459,6 +480,8 @@ inline void Synth::onAttackChange(byte inputIndex, unsigned int value, int diffT
   for (int i = 0; i < voiceCount ; i++) {
     getInstance()->voices[i]->setAttack(attack);
   }
+
+  getInstance()->device->updateLine(1, "Attack : " + String(getInstance()->attack));
 }
 
 /**
@@ -478,6 +501,8 @@ inline void Synth::onReleaseChange(byte inputIndex, unsigned int value, int diff
   for (int i = 0; i < voiceCount ; i++) {
     getInstance()->voices[i]->setRelease(release);
   }
+
+  getInstance()->device->updateLine(1, "Release : " + String(getInstance()->release));
 }
 
 #endif

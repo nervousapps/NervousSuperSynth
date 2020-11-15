@@ -1795,6 +1795,9 @@ class Hihat{
   public:
     Hihat();
 
+    void start();
+    void stop();
+
     AudioMixer4 * getOutput();
     void noteOn(bool open);
     void setPitch(float pitch);
@@ -1817,6 +1820,14 @@ inline Hihat::Hihat(){
  */
 inline AudioMixer4 * Hihat::getOutput(){
   return this->output;
+}
+
+inline void Hihat::start(){
+  this->patchCords[0]->connect();
+}
+
+inline void Hihat::stop(){
+  this->patchCords[0]->disconnect();
 }
 
 /**

@@ -47,10 +47,10 @@
 #define   CCunison  126//Off/On
 
 int CCarray[] = {
-  CCmodwheel,    //pitch LFO amount - less from mod wheel
+  // CCmodwheel,    //pitch LFO amount - less from mod wheel
+  CCvolume,
   CCosclfoamt,    //pitch LFO amount - panel control
   CCglide,
-  CCvolume,
   CCoscwaveformA,
   CCoscwaveformB,
   CCfilterenv,
@@ -69,8 +69,8 @@ int CCarray[] = {
   CCampattack,
   CCfilterfreq,
   CCampdecay,
-  CCfilterlforate,
-  CCfilterlfoamt,
+  // CCfilterlforate,
+  // CCfilterlfoamt,
   CCampsustain,
   CCfilterattack,
   CCfilterdecay,
@@ -80,15 +80,15 @@ int CCarray[] = {
   CCpwB,
   CCpwmRate,
   CCpwmAmt,   //MIDI Only
-  CCkeytracking,
+  // CCkeytracking,
   CCfilterlfowaveform,
   CCfxamt,
   CCfxmix,
   CCdetune,
   CCoscLfoRate,
   CCoscLfoWaveform,
-  CCfilterLFOMidiClkSync,   //Off/On
-  CCoscLFOMidiClkSync,   //Off/On - MIDI Only
+  // CCfilterLFOMidiClkSync,   //Off/On
+  // CCoscLFOMidiClkSync,   //Off/On - MIDI Only
   CCpwmSource,   //LFO/Filter Env
   CCallnotesoff,   //Panic button
   CCunison,   //Off/On

@@ -57,6 +57,9 @@ class DS909{
     // Motherboard
     NervousSuperMother *device;
     static DS909 *getInstance();
+
+    void stop();
+
     void init(NervousSuperMother *device);
     void update();
     static void noteOn(byte channel, byte note, byte velocity);
@@ -143,7 +146,6 @@ inline void DS909::init(NervousSuperMother *device){
   this->device = device;
 
   MIDI.setHandleNoteOn(noteOn);
-  MIDI.begin(MIDI_CHANNEL_OMNI);
 
   // Device callbacks
   this->device->setHandlePotentiometerChange(0, onBDChange);
@@ -155,6 +157,33 @@ inline void DS909::init(NervousSuperMother *device){
   this->device->setHandlePotentiometerChange(6, onRMChange);
   this->device->setHandlePotentiometerChange(7, onHHChange);
   this->device->setHandlePotentiometerChange(8, onCYChange);
+
+  this->bassDrum->start();
+  this->snare->start();
+  this->clap->start();
+  this->hiTom->start();
+  this->midTom->start();
+  this->lowTom->start();
+  this->rimshot->start();
+  this->hihat->start();
+  this->cymbal->start();
+
+  this->patchCords[0]->connect();
+  this->patchCords[1]->connect();
+}
+
+inline void DS909::stop(){
+  this->patchCords[0]->disconnect();
+  this->patchCords[1]->disconnect();
+  this->bassDrum->stop();
+  this->snare->stop();
+  this->clap->stop();
+  this->hiTom->stop();
+  this->midTom->stop();
+  this->lowTom->stop();
+  this->rimshot->stop();
+  this->hihat->stop();
+  this->cymbal->stop();
 }
 
 /**

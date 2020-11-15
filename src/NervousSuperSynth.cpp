@@ -17,7 +17,18 @@ MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
 // Motherboard
 NervousSuperMother * device = NervousSuperMother::getInstance();
 
-AudioMixer4                 mainMix;
+// ChordOrgan -> mainMix1 -> 0
+// DS909 -> mainMix1 -> 1
+// FMSynth -> mainMix1 -> 2
+// Kelpie -> mainMix1 -> 3
+// Psych03 -> mainMix2 -> 0
+// Tsynth -> mainMix2 -> 1
+// * -> mainMix2 -> 2
+// * -> mainMix2 -> 3
+// mainMix1 -> mainMix3 -> 0
+// mainMix2 -> mainMix3 -> 1
+
+AudioMixer4                 mainMix1;
 AudioMixer4                 mainMix2;
 AudioMixer4                 mainMix3;
 AudioAmplifier              mainAMP;
@@ -25,10 +36,11 @@ AudioAmplifier              mainAMP;
 // AudioOutputAnalogStereo     DACS1;
 AudioOutputAnalog           DACS1;
 AudioOutputPT8211           pt8211_1;
-AudioConnection             mainpatchcord0(mainMix, 0, mainMix2, 0);
-AudioConnection             mainpatchcord1(mainMix2, 0, mainMix3, 0);
-AudioConnection             mainpatchcord2(mainMix3, 0, mainAMP, 0);
-AudioConnection             mainpatchcord3(mainAMP, 0, DACS1, 0);
+AudioConnection             mainpatchcord0(mainMix1, 0, mainMix3, 0);
+AudioConnection             mainpatchcord1(mainMix2, 0, mainMix3, 1);
+AudioConnection             mainpatchcord3(mainMix3, 0, DACS1, 0);
+// AudioConnection             mainpatchcord2(mainMix3, 0, mainAMP, 0);
+// AudioConnection             mainpatchcord3(mainAMP, 0, DACS1, 0);
 // AudioConnection             mainpatchcord3(mainAMP, 0, DACS1, 1);
 
 boolean synthParam = false;
@@ -138,7 +150,7 @@ void NothingnoteOff(byte channel, byte note, byte velocity){
 void returnToMenu(byte inputIndex){
   MIDI.setHandleNoteOn(NothingnoteOn);
   MIDI.setHandleNoteOff(NothingnoteOff);
-  device->updateEncodeursMaxValue(0, synthNumber-1);
+  device->updateEncodeursMaxValue(0, 1-synthNumber);
   device->setHandleEncoderChange(0, selectSynth);
   device->setHandlePress(0, confirmSynth);
   device->setHandleDoublePress(0, nullptr);
@@ -170,11 +182,8 @@ void setup(){
   DACS1.analogReference(INTERNAL);
   AudioMemory(150);
 
-  // Set main mixer volume
-  mainMix.gain(0, 0.25);
-  mainMix.gain(1, 0.25);
-  mainMix.gain(2, 0.25);
-  mainMix.gain(3, 0.25);
+  // Set main amplificator volume
+
   mainAMP.gain(10);
 
   // Init SD card
@@ -203,7 +212,7 @@ void setup(){
   device->setHandleEncoderChange(0, selectSynth);
   device->setHandlePress(0, confirmSynth);
   device->setHandleDoublePress(0, nullptr);
-  device->updateEncodeursMaxValue(0, synthNumber-1);
+  device->updateEncodeursMaxValue(0, 1-synthNumber);
   for (int i=0;i<ANALOG_CONTROL_PINS;i++){
     device->setHandlePotentiometerChange(i, nullptr);
   }

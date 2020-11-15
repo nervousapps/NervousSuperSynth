@@ -15,14 +15,12 @@ https://github.com/ghostintranslation
 // Instanciation of Psyc03
 Psyc03 * psyc03 = Psyc03::getInstance();
 
-AudioConnection Psyc03patchCord1(*psyc03->getOutput(), 0, mainMix2, 1);
+AudioConnection Psyc03patchCord1(*psyc03->getOutput(), 0, mainMix2, 0);
 boolean psyc03Running = false;
 
 void setupPsyc03() {
-  // psyc03 = Psyc03::getInstance();
   psyc03->init(device);
-  // Psyc03patchCord1 = new AudioConnection(*psyc03->envelope1, 0, mainMix2, 1);
-  psyc03Running = true;
+  Psyc03patchCord1.connect();
 }
 
 void runPsyc03() {
@@ -30,9 +28,6 @@ void runPsyc03() {
 }
 
 void stopPsyc03() {
-  if(psyc03Running){
-    psyc03->stop();
-    // delete Psyc03patchCord1;
-    psyc03Running = false;
-  }
+  psyc03->stop();
+  Psyc03patchCord1.disconnect();
 }

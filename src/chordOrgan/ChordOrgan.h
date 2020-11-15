@@ -41,14 +41,14 @@ Tuning tuning("TUNING.SCL");
 Interface interface;
 // Trig trig;
 
-AudioConnection ChordOrganpatchCord1(audioEngine.envelope1, 0, mainMix, 1);
+AudioConnection ChordOrganpatchCord1(audioEngine.envelope1, 0, mainMix1, 0);
 
 void selectWaveform(int waveform) {
   waveformPage = waveform >> 2;
 }
 
 void nextWaveform() {
-  waveform++;
+  // waveform++;
   waveform = waveform % (4 * waveformPages);
   selectWaveform(waveform);
   audioEngine.update(waveform, interface.rootNotePot);
@@ -194,11 +194,18 @@ void ChordOrganhandleStacked(byte inputIndex, unsigned int value, int diffToPrev
 }
 
 void ChordOrganhandlePress(byte inputIndex){
-  interface.buttonState = BUTTON_SHORT_PRESS;
+  // interface.buttonState = BUTTON_SHORT_PRESS;
+  nextWaveform();
 }
 
 void ChordOrganhandleDoublePress(byte inputIndex){
   interface.buttonState = BUTTON_LONG_PRESS;
+}
+
+void ChordOrgancheckEncoder(byte inputIndex, long value)
+{
+  waveform = value;
+  device->updateLine(1, "Waveform : " + String(waveform));
 }
 
 void setupChordOrgan(){
@@ -250,24 +257,18 @@ void setupChordOrgan(){
   device->setHandlePotentiometerChange(16, ChordOrganhandleStacked);
   device->setHandlePress(0, ChordOrganhandlePress);
   device->setHandleDoublePress(0, ChordOrganhandleDoublePress);
+  device->setHandleEncoderChange(0, ChordOrgancheckEncoder);
+  device->updateEncodeursMaxValue(0, -11);
   MIDI.setHandleNoteOn(ChordOrgannoteOn);
   MIDI.setHandleNoteOff(ChordOrgannoteOff);
 
-  // ledControl.single(waveform % 4);
-
-  // if(waveformPage > 0) {
-  //   ledControl.flash();
-  // }
+  ChordOrganpatchCord1.connect();
   device->updateLine(1, "Waveform : " + String(waveform));
 }
 
 void stopchordOrgan(){
   audioEngine.stop();
-  // delete settings;
-  // delete tuning;
-  // delete interface;
-  // delete audioEngine;
-  // delete ChordOrganpatchCord1;
+  ChordOrganpatchCord1.disconnect();
 }
 
 void runChordOrgan(){

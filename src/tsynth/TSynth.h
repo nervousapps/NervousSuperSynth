@@ -71,7 +71,7 @@
 #define PATCH 9 // Show current patch bypassing PARAMETER
 
 String TsynthFirstParamName[7] = {
-  "PARAMETER", //The main page for displaying the current patch and control (parameter) changes
+  "PATCHES", //The main page for displaying the current patch and control (parameter) changes
   // "RECALL", //Patches list
   "SAVE", //Save patch page
   "REINITIALISE", // Reinitialise message
@@ -2322,7 +2322,7 @@ void TsynthcheckDoublePress(byte inputIndex){
   DisplayParamMsec = 0;
   if(!TsynthFirstParameter)
     TsynthFirstParameter = !TsynthFirstParameter;
-    device->updateEncodeursMaxValue(0, 6-1);
+    device->updateEncodeursMaxValue(0, 1-6);
     line = TsynthFirstParamName[state];
     device->updateLine(1, line);
 }
@@ -2331,7 +2331,7 @@ void TsynthcheckPress(byte inputIndex){
   DisplayParamMsec = 0;
   if(TsynthFirstParameter){
     TsynthFirstParameter = !TsynthFirstParameter;
-    device->updateEncodeursMaxValue(0, 100);
+    device->updateEncodeursMaxValue(0, -100);
     switch (state)
     {
       case PARAMETER:
@@ -2368,7 +2368,7 @@ void TsynthcheckPress(byte inputIndex){
     {
       case PARAMETER:
         state = RECALL;//show patch list
-        line = "RECALL";
+        line = "Patch : " + String(patches.first().patchName);
         break;
       case RECALL:
         state = PATCH;
@@ -2376,7 +2376,7 @@ void TsynthcheckPress(byte inputIndex){
         patchNo = patches.first().patchNo;
         recallPatch(patchNo);
         line = "Patch : " + String(patches.first().patchName);
-        state = PARAMETER;
+        state = RECALL;
         break;
       case SAVE:
         line = patches.last().patchName;
@@ -2557,7 +2557,7 @@ void setupTsynth()
   device->setHandleEncoderChange(0, TsynthcheckEncoder);
   device->setHandlePress(0, TsynthcheckPress);
   device->setHandleDoublePress(0, TsynthcheckDoublePress);
-  device->updateEncodeursMaxValue(0, 6-1);
+  device->updateEncodeursMaxValue(0, 1-6);
   for (int i=0;i<ANALOG_CONTROL_PINS;i++){
     device->setHandlePotentiometerChange(i, TsynthHandlePotards);
   }

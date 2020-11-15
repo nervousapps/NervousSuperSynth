@@ -74,6 +74,9 @@ class Clap{
   public:
     Clap();
 
+    void start();
+    void stop();
+
     AudioMixer4 * getOutput();
     void noteOn();
     void setTone(byte tone);
@@ -173,6 +176,44 @@ inline Clap::Clap(){
  */
 inline AudioMixer4 * Clap::getOutput(){
   return this->output;
+}
+
+inline void Clap::start(){
+  this->patchCords[0]->connect();
+  this->patchCords[1]->connect();
+  this->patchCords[2]->connect();
+  this->patchCords[3]->connect();
+  this->patchCords[4]->connect();
+  this->patchCords[5]->connect();
+  this->patchCords[6]->connect();
+  this->patchCords[7]->connect();
+  this->patchCords[8]->connect();
+  this->patchCords[9]->connect();
+  this->patchCords[10]->connect();
+  this->patchCords[12]->connect();
+
+  this->patchCords[18]->connect();
+  this->patchCords[19]->connect();
+  this->patchCords[21]->connect();
+}
+
+inline void Clap::stop(){
+  this->patchCords[0]->disconnect();
+  this->patchCords[1]->disconnect();
+  this->patchCords[2]->disconnect();
+  this->patchCords[3]->disconnect();
+  this->patchCords[4]->disconnect();
+  this->patchCords[5]->disconnect();
+  this->patchCords[6]->disconnect();
+  this->patchCords[7]->disconnect();
+  this->patchCords[8]->disconnect();
+  this->patchCords[9]->disconnect();
+  this->patchCords[10]->disconnect();
+  this->patchCords[12]->disconnect();
+
+  this->patchCords[18]->disconnect();
+  this->patchCords[19]->disconnect();
+  this->patchCords[21]->disconnect();
 }
 
 /**

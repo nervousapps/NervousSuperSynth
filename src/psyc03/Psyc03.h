@@ -211,6 +211,8 @@ inline void Psyc03::init(NervousSuperMother *device){
   this->device->setHandlePotentiometerChange(7, onSpeedChange);
   this->device->setHandlePotentiometerChange(8, onDepth);
 
+  this->device->setHandlePress(0, nullptr);
+
   this->peak1 = new AudioAnalyzePeak();
 
   this->patchCords[0]->connect();
@@ -238,28 +240,28 @@ inline void Psyc03::init(NervousSuperMother *device){
 }
 
 inline void Psyc03::stop(){
-  this->lfo->stop();
-  this->sine1->stop();
-  this->sine_fm->stop();
-  this->dc1->stop();
-  this->envelope1->stop();
-  this->envelope2->stop();
-  this->envelope3->stop();
-  this->dc2->stop();
-  this->filter->stop();
-  this->mixer1->stop();
-  this->output->stop();
+  getInstance()->lfo->stop();
+  getInstance()->sine1->stop();
+  getInstance()->sine_fm->stop();
+  getInstance()->dc1->stop();
+  getInstance()->envelope1->stop();
+  getInstance()->envelope2->stop();
+  getInstance()->envelope3->stop();
+  getInstance()->dc2->stop();
+  getInstance()->filter->stop();
+  getInstance()->mixer1->stop();
+  getInstance()->output->stop();
 
-  this->patchCords[0]->disconnect();
-  this->patchCords[1]->disconnect();
-  this->patchCords[2]->disconnect();
-  this->patchCords[3]->disconnect();
-  this->patchCords[4]->disconnect();
-  this->patchCords[5]->disconnect();
-  this->patchCords[6]->disconnect();
-  this->patchCords[7]->disconnect();
-  this->patchCords[8]->disconnect();
-  this->patchCords[9]->disconnect();
+  getInstance()->patchCords[0]->disconnect();
+  getInstance()->patchCords[1]->disconnect();
+  getInstance()->patchCords[2]->disconnect();
+  getInstance()->patchCords[3]->disconnect();
+  getInstance()->patchCords[4]->disconnect();
+  getInstance()->patchCords[5]->disconnect();
+  getInstance()->patchCords[6]->disconnect();
+  getInstance()->patchCords[7]->disconnect();
+  getInstance()->patchCords[8]->disconnect();
+  getInstance()->patchCords[9]->disconnect();
   // delete instance; //= nullptr;
 }
 

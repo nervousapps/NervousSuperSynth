@@ -188,7 +188,7 @@ AudioConnection          kelpiepatchCord94(V58_MIX, 0, ALL_VOICE_MIX, 1);
 AudioConnection          kelpiepatchCord95(ALL_VOICE_MIX, 0, LFO_AMP, 1);
 AudioConnection          kelpiepatchCord96(LFO_MIXER_AMP, 0, LFO_AMP, 0);
 AudioConnection          kelpiepatchCord97(LFO_AMP, MASTER_GAIN);
-AudioConnection          kelpiepatchCord98(MASTER_GAIN, 0, mainMix, 0);
+AudioConnection          kelpiepatchCord98(MASTER_GAIN, 0, mainMix1, 3);
 // AudioConnection          patchCord98(MASTER_GAIN, 0, i2s1, 0);
 // AudioConnection          patchCord99(MASTER_GAIN, 0, i2s1, 1);
 AudioConnection          kelpiepatchCord100(MASTER_GAIN, PEAK);

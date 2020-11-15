@@ -4783,6 +4783,9 @@ class Cymbal{
   public:
     Cymbal();
 
+    void start();
+    void stop();
+
     AudioMixer4 * getOutput();
     void noteOn(bool crash);
     void setPitch(float pitch);
@@ -4804,6 +4807,14 @@ inline Cymbal::Cymbal(){
  */
 inline AudioMixer4 * Cymbal::getOutput(){
   return this->output;
+}
+
+inline void Cymbal::start(){
+  this->patchCords[0]->connect();
+}
+
+inline void Cymbal::stop(){
+  this->patchCords[0]->disconnect();
 }
 
 /**

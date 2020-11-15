@@ -50,6 +50,9 @@ class Rimshot{
   public:
     Rimshot();
 
+    void start();
+    void stop();
+
     AudioMixer4 * getOutput();
     void noteOn(byte velocity);
     void setPitch(byte pitch);
@@ -99,6 +102,22 @@ inline Rimshot::Rimshot(){
  */
 inline AudioMixer4 * Rimshot::getOutput(){
   return this->output;
+}
+
+inline void Rimshot::start(){
+  this->patchCords[0]->connect();
+  this->patchCords[1]->connect();
+  this->patchCords[2]->connect();
+  this->patchCords[3]->connect();
+  this->patchCords[4]->connect();
+}
+
+inline void Rimshot::stop(){
+  this->patchCords[0]->disconnect();
+  this->patchCords[1]->disconnect();
+  this->patchCords[2]->disconnect();
+  this->patchCords[3]->disconnect();
+  this->patchCords[4]->disconnect();
 }
 
 /**

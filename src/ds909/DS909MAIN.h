@@ -21,18 +21,25 @@ DS909 * ds909 = DS909::getInstance();
 // Connecting DS9 to general audio output
 AudioAmplifier  AMP;
 AudioConnection patchCord1(*ds909->getOutput(), 0, AMP, 0);
-AudioConnection patchCord2(AMP, 0, mainMix2, 2);
+AudioConnection patchCord2(AMP, 0, mainMix1, 1);
 
 void setAMPGAIN(byte inputIndex, unsigned int value, int diffToPrevious) {
   AMP.gain(value);
 }
 
 void setupDS909() {
-  ds909->init();
+  ds909->init(device);
+  patchCord1.connect();
+  patchCord2.connect();
   AMP.gain(10);
   device->setHandlePotentiometerChange(9, setAMPGAIN);
 }
 
-void loopDS909() {
+void runDS909() {
   ds909->update();
+}
+
+void stopDS909(){
+  patchCord1.disconnect();
+  patchCord2.disconnect();
 }
