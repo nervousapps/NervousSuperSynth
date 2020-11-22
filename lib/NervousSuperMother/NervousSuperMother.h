@@ -1,7 +1,6 @@
 #ifndef NervousSuperMother_h
 #define NervousSuperMother_h
 
-#include <AudioPrivate.h>
 #include "hardware/HardwareControls.h"
 #include "display/Display.h"
 

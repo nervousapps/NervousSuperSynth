@@ -106,6 +106,7 @@ void selectSynth(byte inputIndex, long value){
 void confirmSynth(byte inputIndex){
   AudioNoInterrupts();
   synthParam = !synthParam;
+  lcd.cursor();
   switch (synthSelect) {
     case 0:
     setupKelpie();
@@ -180,11 +181,11 @@ void setup(){
   // Configure the DACs
   analogWriteResolution(12);
   DACS1.analogReference(INTERNAL);
-  AudioMemory(150);
+  AudioMemory(200);
 
   // Set main amplificator volume
 
-  mainAMP.gain(10);
+  mainAMP.gain(8);
 
   // Init SD card
   if(DEBUG) Serial.println("Initializing SD card...");

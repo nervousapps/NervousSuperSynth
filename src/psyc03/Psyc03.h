@@ -198,6 +198,8 @@ inline Psyc03 *Psyc03::getInstance()    {
 inline void Psyc03::init(NervousSuperMother *device){
   this->device = device;
 
+  getInstance()->device->updateLine(1, "xxxx   Psyc03   xxxx");
+
   MIDI.setHandleNoteOn(noteOn);
   MIDI.setHandleNoteOff(noteOff);
 

@@ -143,12 +143,12 @@ inline void Voice::start(){
   this->patchCords[5]->connect();
   this->patchCords[6]->connect();
 
-  // this->sineFM->start();
-  // this->sawtoothFM->start();
-  // this->mixer->start();
-  // this->sineModulator->start();
-  // this->envelope->start();
-  // this->output->start();
+  this->sineFM->start();
+  this->sawtoothFM->start();
+  this->mixer->start();
+  this->sineModulator->start();
+  this->envelope->start();
+  this->output->start();
 }
 
 inline void Voice::stop(){
@@ -160,12 +160,12 @@ inline void Voice::stop(){
   this->patchCords[5]->disconnect();
   this->patchCords[6]->disconnect();
 
-  // this->sineFM->stop();
-  // this->sawtoothFM->stop();
-  // this->mixer->stop();
-  // this->sineModulator->stop();
-  // this->envelope->stop();
-  // this->output->stop();
+  this->sineFM->stop();
+  this->sawtoothFM->stop();
+  this->mixer->stop();
+  this->sineModulator->stop();
+  this->envelope->stop();
+  this->output->stop();
 }
 
 /**

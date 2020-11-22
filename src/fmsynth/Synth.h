@@ -120,6 +120,8 @@ inline Synth *Synth::getInstance()    {
 inline void Synth::init(NervousSuperMother *device){
   this->device = device;
 
+  getInstance()->device->updateLine(1, "xxx   FMSynth   xxx");
+
   MIDI.setHandleNoteOn(noteOn);
   MIDI.setHandleNoteOff(noteOff);
 
