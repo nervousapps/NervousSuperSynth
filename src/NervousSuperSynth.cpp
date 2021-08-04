@@ -1,223 +1,172 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include <TimeLib.h>
-#include <TimeAlarms.h>
 #include <AudioPrivate.h>
 #include <MIDI.h>
 #include <SD.h>
 #include <SPI.h>
-#include <SerialFlash.h>
-#include <TeensyThreads.h>
 #include <NervousSuperMother.h>
+#include "main_settings.h"
+#include "main_utils.h"
 
-#define DEBUG false
+#if DEBUG
+elapsedMillis DisplayDebug = 0;
+#endif
 
+// Create a default midi instance => MIDI
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
 
 // Motherboard
 NervousSuperMother * device = NervousSuperMother::getInstance();
 
+
+AudioControlSGTL5000        sgtl5000_1;
+AudioOutputI2S              output_i2s;
+AudioInputI2S               input_i2s;
+AudioOutputPT8211_2         pt8211_1;
+
+// Routes for mono outs
 // ChordOrgan -> mainMix1 -> 0
 // DS909 -> mainMix1 -> 1
 // FMSynth -> mainMix1 -> 2
 // Kelpie -> mainMix1 -> 3
 // Psych03 -> mainMix2 -> 0
 // Tsynth -> mainMix2 -> 1
-// * -> mainMix2 -> 2
-// * -> mainMix2 -> 3
-// mainMix1 -> mainMix3 -> 0
-// mainMix2 -> mainMix3 -> 1
+// AudioBraids -> mainMix2 -> 2
 
-AudioMixer4                 mainMix1;
-AudioMixer4                 mainMix2;
+// mainMix 1 -> mainMix3 -> 0
+// mainMix 2 -> mainMix3 -> 1
+
 AudioMixer4                 mainMix3;
-AudioAmplifier              mainAMP;
 
-// AudioOutputAnalogStereo     DACS1;
-AudioOutputAnalog           DACS1;
-AudioOutputPT8211           pt8211_1;
-AudioConnection             mainpatchcord0(mainMix1, 0, mainMix3, 0);
-AudioConnection             mainpatchcord1(mainMix2, 0, mainMix3, 1);
-AudioConnection             mainpatchcord3(mainMix3, 0, DACS1, 0);
-// AudioConnection             mainpatchcord2(mainMix3, 0, mainAMP, 0);
-// AudioConnection             mainpatchcord3(mainAMP, 0, DACS1, 0);
-// AudioConnection             mainpatchcord3(mainAMP, 0, DACS1, 1);
+AudioMixer4                 mainMixI2s_L;
+AudioMixer4                 mainMixI2s_R;
+AudioMixer4                 mainMix8211_L;
+AudioMixer4                 mainMix8211_R;
+AudioAmplifier              mainAmpI2s_L;
+AudioAmplifier              mainAmpI2s_R;
+AudioAmplifier              mainAmp8211_L;
+AudioAmplifier              mainAmp8211_R;
 
-boolean synthParam = false;
-boolean sampleParam = false;
-boolean firstSampleParam = true;
-boolean hasSD = false;
+AudioConnection             mainpatchcord0(mainMix3, 0, mainMixI2s_L, 0);
+AudioConnection             mainpatchcord1(mainMix3, 0, mainMixI2s_R, 0);
+AudioConnection             mainpatchcord2(mainMixI2s_L, 0, mainAmpI2s_L, 0);
+AudioConnection             mainpatchcord3(mainMixI2s_R, 0, mainAmpI2s_R, 0);
+AudioConnection             mainpatchcord4(mainAmpI2s_L, 0, output_i2s, 0);
+AudioConnection             mainpatchcord5(mainAmpI2s_R, 0, output_i2s, 1);
 
-elapsedMillis DisplayParamMsec = 0;
-#if DEBUG
-elapsedMillis DisplayDebug = 0;
+AudioConnection             mainpatchcord00(mainMix3, 0, mainMix8211_L, 0);
+AudioConnection             mainpatchcord11(mainMix3, 0, mainMix8211_R, 0);
+AudioConnection             mainpatchcord22(mainMix8211_L, 0, mainAmp8211_L, 0);
+AudioConnection             mainpatchcord33(mainMix8211_R, 0, mainAmp8211_R, 0);
+AudioConnection             mainpatchCord44(mainAmp8211_L, 0, pt8211_1, 0);
+AudioConnection             mainpatchCord55(mainAmp8211_R, 0, pt8211_1, 1);
+
+#ifdef SYNTHS
+#include "synths/synths.h"
 #endif
 
-bool debug = false;
-
-#define synthNumber 7
-
-int synthSelect = 0;
-String synthName[synthNumber] = {"Kelpie", "ChordOrgan", "Tsynth", "Braids", "Psych03", "DS909 notIMPLEMENTED", "FMSynth"};
-
-const int chipSelect = BUILTIN_SDCARD;
-
-boolean openSDCard() {
-    int crashCountdown = 0;
-    if (!(SD.begin(chipSelect))) {
-        while (!(SD.begin(chipSelect))) {
-            delay(20);
-            crashCountdown++;
-            if (crashCountdown > 4) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
+#ifdef SAMPLEPLAYER
 #include "sampleplayer/SamplePlayer.h"
-#include "kelpie/kelpiemaster.h"
-#include "chordOrgan/ChordOrgan.h"
-#include "tsynth/TSynth.h"
-#include "braids/braids.h"
-#include "psyc03/Psyc03Main.h"
-// #include "ds909/DS909MAIN.h"
-#include "fmsynth/SynthMain.h"
+#endif
+
+#ifdef EFFECTSPROCESSOR
+#include "effectsprocessor/EffectsProcessor.h"
+#endif
 
 
-void selectSynth(byte inputIndex, long value){
-  if(firstSampleParam){
-    firstSampleParam = !firstSampleParam;
-    braids_off();
-    stopchordOrgan();
-    stopTsynth();
-    kelpieOff();
-    stopPsyc03();
-    // stopDS909();
-    stopFMSynth();
-  }
-  if(!synthParam){
-    synthSelect = value;
-    device->updateLine(1, synthName[synthSelect]);
-  }
-}
+void setVol(float value){
+  float rate = (value / 64.0);
 
-void confirmSynth(byte inputIndex){
-  AudioNoInterrupts();
-  synthParam = !synthParam;
-  lcd.cursor();
-  switch (synthSelect) {
-    case 0:
-    setupKelpie();
-    kelpieOn();
-    break;
+  mainAmp8211_L.gain(rate/6.0);
+  mainAmp8211_R.gain(rate/6.0);
 
-    case 1:
-    setupChordOrgan();
-    break;
-
-    case 2:
-    setupTsynth();
-    break;
-
-    case 3:
-    braids_on();
-    break;
-
-    case 4:
-    setupPsyc03();
-    break;
-
-    case 5:
-    // setupDS909();
-    break;
-
-    case 6:
-    setupFMSynth();
-    break;
-  }
-  AudioInterrupts();
-}
-
-void NothingnoteOn(byte channel, byte note, byte velocity){
-  return;
-}
-
-void NothingnoteOff(byte channel, byte note, byte velocity){
-  return;
-}
-
-void returnToMenu(byte inputIndex){
-  MIDI.setHandleNoteOn(NothingnoteOn);
-  MIDI.setHandleNoteOff(NothingnoteOff);
-  device->updateEncodeursMaxValue(0, 1-synthNumber);
-  device->setHandleEncoderChange(0, selectSynth);
-  device->setHandlePress(0, confirmSynth);
-  device->setHandleDoublePress(0, nullptr);
-  for (int i=0;i<ANALOG_CONTROL_PINS;i++){
-    device->setHandlePotentiometerChange(i, nullptr);
-  }
-  synthParam = false;
-  device->updateEncodeursValue(0, synthSelect);
-  firstSampleParam = true;
-  selectSynth(0, synthSelect);
+  mainAmpI2s_L.gain(rate);
+  mainAmpI2s_R.gain(rate);
+  device->updateLine(2, "Vol : " + String(rate));
+  // draw_progressbar(value/10);
 }
 
 void setup(){
-  // Power off all synths
-  selectSynth(0, synthSelect);
-
 #if DEBUG
   Serial.begin(9600);
   Serial.print("!    SuperSynth    !");
 #endif
 
+  // Set TX of Serial1 to 53 instead of 1 as encoder 1 uses that pin.
+  Serial1.setTX(53);
+
+  AudioNoInterrupts();
   // Configure the ADCs
-  analogReadResolution(7);
+  analogReadResolution(10);
   analogReadAveraging(16);
-  analogReference(EXTERNAL);
+  analogReference(0);
 
   // Configure the DACs
-  analogWriteResolution(12);
-  DACS1.analogReference(INTERNAL);
-  AudioMemory(200);
+  // analogWriteResolution(12);
 
-  // Set main amplificator volume
+  // Init audio
+  AudioMemory(1500);
 
-  mainAMP.gain(8);
+  sgtl5000_1.enable();
+  sgtl5000_1.volume(0.8);
+  sgtl5000_1.lineOutLevel(0.8);
+  sgtl5000_1.dacVolume(1.0);
+  sgtl5000_1.muteHeadphone();
+  sgtl5000_1.inputSelect(AUDIO_INPUT_LINEIN);
+  sgtl5000_1.audioPreProcessorEnable();
+  sgtl5000_1.audioPostProcessorEnable();
+  sgtl5000_1.surroundSoundEnable();
+  sgtl5000_1.enhanceBassEnable();
+
+  // Set main mixers/amplificator volume
+  // Little trick here as I did not succeed to get separate outputs for the two DACs
+  // But working with the same mixer out.
+  mainMixI2s_L.gain(0,0.5);  // Synths
+  mainMixI2s_R.gain(0,0.5);
+  mainMixI2s_L.gain(1,0);  // EffectProcessor
+  mainMixI2s_R.gain(1,0);
+  mainMixI2s_L.gain(2,0.5);  // SamplePlayer
+  mainMixI2s_R.gain(2,0.5);
+  mainMixI2s_L.gain(3,0);  // None
+  mainMixI2s_R.gain(3,0);
+
+  mainMix8211_L.gain(0,0);  // Synths
+  mainMix8211_R.gain(0,0);
+  mainMix8211_L.gain(1,0.5);  // EffectProcessor
+  mainMix8211_R.gain(1,0.5);
+  mainMix8211_L.gain(2,0.5);  // SamplePlayer
+  mainMix8211_R.gain(2,0.5);
+  mainMix8211_L.gain(3,0);  // None
+  mainMix8211_R.gain(3,0);
+
+  mainAmpI2s_L.gain(2);
+  mainAmpI2s_R.gain(2);
+  mainAmp8211_L.gain(0.2);
+  mainAmp8211_R.gain(0.2);
 
   // Init SD card
-  if(DEBUG) Serial.println("Initializing SD card...");
-  hasSD = openSDCard();
-  if (!hasSD) {
-    if(DEBUG) Serial.println("initialization failed!");
-  }
-
-  // Init hardware controls
-  setup_hardware_controls();
-  if(DEBUG) Serial.print(ANALOG_CONTROL_PINS);
+  init_sd_card();
 
   // Init MIDI
-  MIDI.begin();
+  MIDI.begin(MIDI_CHANNEL);
 
   // Init device NervousSuperMother
-  byte controls[6] = {0,1,2,3,4,5};
+  byte controls[7] = {0,1,2,3,4,5,6};
   device->init(controls);
 
-  // Init sampleplayer
-  initSamplePlayer();
+  device->setHandleVolChange(setVol);
 
-  // Set handlers
-  device->updateEncodeursValue(0, 0);
-  device->setHandleEncoderChange(0, selectSynth);
-  device->setHandlePress(0, confirmSynth);
-  device->setHandleDoublePress(0, nullptr);
-  device->updateEncodeursMaxValue(0, 1-synthNumber);
-  for (int i=0;i<ANALOG_CONTROL_PINS;i++){
-    device->setHandlePotentiometerChange(i, nullptr);
-  }
-  device->setHandleLongPress(0, returnToMenu);
+#ifdef SYNTHS
+  setup_synths();
+#endif
+
+#ifdef SAMPLEPLAYER
+  setup_sampleplayer();
+#endif
+
+#ifdef EFFECTSPROCESSOR
+  setup_effect_processor();
+#endif
 
   // Starting animation
   lcd.setCursor(0,0);
@@ -226,78 +175,25 @@ void setup(){
     draw_progressbar(i);
     delay(2);
   }
-}
 
-volatile uint32_t cpu_load = 0;
-volatile bool has_result = false;
-
-void cpuLoadSleep()
-{
-    uint32_t st;
-    static uint32_t wt = 0;
-    static uint32_t busy_time = 0;
-    static uint32_t sleep_time = 0;
-
-    busy_time += ARM_DWT_CYCCNT - wt;
-    st = ARM_DWT_CYCCNT;
-    __disable_irq();
-    __asm volatile ("wfi \n");
-    sleep_time += ARM_DWT_CYCCNT - st;
-    wt = ARM_DWT_CYCCNT;
-    __enable_irq();
-    if ((busy_time + sleep_time) > F_CPU) {
-        cpu_load = busy_time / ((busy_time + sleep_time) / 1000);
-        busy_time = 0;
-        sleep_time = 0;
-        has_result = true;
-    }
-}
-
-void CPUMonitor() {
-  Serial.print("CPU:");
-  Serial.print(AudioProcessorUsage());
-  Serial.print("  MEM:");
-  Serial.println(AudioMemoryUsage());
-  Serial.print("CPU MAX:");
-  Serial.print(AudioProcessorUsageMax());
-  Serial.print("  MEM MAX:");
-  Serial.println(AudioMemoryUsageMax());
+  AudioInterrupts();
 }
 
 void loop(){
-  device->update();
   MIDI.read();
-  if(synthParam){
-    switch (synthSelect) {
-      case 0:
-      runKelpie();
-      break;
+  device->update();
 
-      case 1:
-      runChordOrgan();
-      break;
+#ifdef SYNTHS
+  run_synths();
+#endif
 
-      case 2:
-      runTsynth();
-      break;
+#ifdef SAMPLEPLAYER
+  // SAMPLEPLAYER
+#endif
 
-      case 3:
-      runBraids();
-      break;
-
-      case 4:
-      runPsyc03();
-      break;
-
-      case 5:
-      // runDS909();
-      break;
-
-      case 6:
-      runFMSynth();
-      break;
-    }
-  }
+#ifdef EFFECTSPROCESSOR
+  // EFFECTSPROCESSOR
+#endif
 
 #if DEBUG
   if(DEBUG && DisplayDebug > 1000){

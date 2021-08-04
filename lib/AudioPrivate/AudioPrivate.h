@@ -61,17 +61,23 @@
 
 // Private audio lib with the ability to stop the update functions
 // in audio objects in order to save CPU  and MEMORY
-
-#include "output_dac.h"
-#include "output_dacs.h"
-#include "output_pt8211.h"
+#include "input_i2s.h"
+#include "input_i2s2.h"
+#include "output_i2s.h"
+#include "output_i2s2.h"
+#include "output_pt8211_2.h"
+#include "control_sgtl5000.h"
 #include "synth_sine.h"
 #include "synth_whitenoise.h"
 #include "synth_pinknoise.h"
 #include "synth_simple_drum.h"
 #include "effect_multiply.h"
+#include "effect_delay.h"
+#include "effect_delay_ext.h"
+#include "effect_flange.h"
 #include "play_sd_wav.h"
 #include "analyze_peak.h"
+#include "effect_granular.h"
 
 // Private audio objects
 #include "synth_waveform.h"

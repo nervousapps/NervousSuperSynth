@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include <ArduinoJson.h>
+#include <playsdresmp.h>
 #include "SamplePlayerAudioConnections.h"
 
 File root;
@@ -10,11 +11,7 @@ const char* sampleplayerBaseDir = "/SAMPLES/";
 
 volatile boolean directory = true;
 volatile boolean sample = false;
-volatile int bank_number = 0;
-volatile int number_banks;
-volatile int number_sample_per_bank = 6;
 elapsedMillis sampleParamMsec;
-boolean sampleplayerOn = false;
 int sampleplayerState = 1;
 int sample_number = 0;
 
@@ -25,47 +22,13 @@ struct Directories{
   int numberFile;
 };
 
-// struct BankEdit {
-//   char* sample1;
-//   char* sample2;
-//   char* sample3;
-//   char* sample4;
-//   char* sample5;
-//   char* sample6;
-// };
-
-char editableBank[6][100];
+char editableBank[2][100] = {NULL};
 
 int numDirectory = 0;
 int numDirectorymax = 0;
 Directories directoriesList[20];
 
-struct Bank {
-  const char* name;
-  const char* sample1;
-  const char* sample2;
-  const char* sample3;
-  const char* sample4;
-  const char* sample5;
-  const char* sample6;
-};
-
-volatile Bank banks[30];
-
-const char* _filename = "banks.txt";
-
-volatile int ampVolnum = 0;
-volatile boolean selectingAmp = true;
 volatile boolean sampleVolCtrl = false;
-volatile float ampVol[7] = {
-  5,
-  5,
-  5,
-  5,
-  5,
-  5,
-  10
-};
 
 String splitString(String data, char separator, int index)
 {
@@ -84,247 +47,120 @@ String splitString(String data, char separator, int index)
 }
 
 void volumeControl(){
-  amp1.gain(((float)ampVol[0]/(float)20)+2);
-  amp2.gain(((float)ampVol[1]/(float)20)+2);
-  amp3.gain(((float)ampVol[2]/(float)20)+2);
-  amp4.gain(((float)ampVol[3]/(float)20)+2);
-  amp5.gain(((float)ampVol[4]/(float)20)+2);
-  amp6.gain(((float)ampVol[5]/(float)20)+2);
-  amp7.gain(((float)ampVol[6]/(float)20)+10);
+
 }
 
 void sampleplay(byte inputIndex){
-  if(sampleplayerOn){
+  if(editableBank[inputIndex] != NULL){
     switch (inputIndex) {
       case 0:
-      sampleplaySdWav1.play(editableBank[inputIndex]);
+      sampleplaySdWav1.playWav(editableBank[inputIndex]);
+      device->updateLine(2, "PLAYER ONE READY");
       break;
 
       case 1:
-      sampleplaySdWav2.play(editableBank[inputIndex]);
-      break;
-
-      case 2:
-      sampleplaySdWav3.play(editableBank[inputIndex]);
-      break;
-
-      case 3:
-      sampleplaySdWav4.play(editableBank[inputIndex]);
-      break;
-
-      case 4:
-      sampleplaySdWav5.play(editableBank[inputIndex]);
-      break;
-
-      case 5:
-      sampleplaySdWav6.play(editableBank[inputIndex]);
-      break;
-    }
-  }else{
-    char result[100];
-    switch (inputIndex) {
-      case 0:
-      strcpy(result,sampleplayerBaseDir); // copy string one into the result.
-      strcat(result,banks[bank_number].sample1); // append string two to the result.
-      sampleplaySdWav1.play(result);
-      break;
-
-      case 1:
-      strcpy(result,sampleplayerBaseDir); // copy string one into the result.
-      strcat(result,banks[bank_number].sample2); // append string two to the result.
-      sampleplaySdWav2.play(result);
-      break;
-
-      case 2:
-      strcpy(result,sampleplayerBaseDir); // copy string one into the result.
-      strcat(result,banks[bank_number].sample3); // append string two to the result.
-      sampleplaySdWav3.play(result);
-      break;
-
-      case 3:
-      strcpy(result,sampleplayerBaseDir); // copy string one into the result.
-      strcat(result,banks[bank_number].sample4); // append string two to the result.
-      sampleplaySdWav4.play(result);
-      break;
-
-      case 4:
-      strcpy(result,sampleplayerBaseDir); // copy string one into the result.
-      strcat(result,banks[bank_number].sample5); // append string two to the result.
-      sampleplaySdWav5.play(result);
-      break;
-
-      case 5:
-      strcpy(result,sampleplayerBaseDir); // copy string one into the result.
-      strcat(result,banks[bank_number].sample6); // append string two to the result.
-      sampleplaySdWav6.play(result);
+      // sampleplaySdWav2.playWav(editableBank[inputIndex]);
+      device->updateLine(2, "PLAYER TWO READY");
       break;
     }
   }
 }
 
-void printSamplePlayerLine(){
-  switch(ampVolnum){
-    case 0:
-    device->updateLine(2, splitString(splitString(banks[bank_number].sample1, '/', 1), '.', 0) + " : " + ampVol[ampVolnum]);
-    break;
 
-    case 1:
-    device->updateLine(2, splitString(splitString(banks[bank_number].sample2, '/', 1), '.', 0) + " : " + ampVol[ampVolnum]);
-    break;
+void setPitch1(byte inputIndex, unsigned int value, int diffToPrevious){
+  float rate = (map(value, 0, 127, 0, 1024) - 512.0) / 512.0;
+  sampleplaySdWav1.setPlaybackRate(rate);
+  Serial.println(rate);
+  device->updateLine(2, "PITCH 1 : " + String(rate));
+}
 
-    case 2:
-    device->updateLine(2, splitString(splitString(banks[bank_number].sample3, '/', 1), '.', 0) + " : " + ampVol[ampVolnum]);
-    break;
-
-    case 3:
-    device->updateLine(2, splitString(splitString(banks[bank_number].sample4, '/', 1), '.', 0) + " : " + ampVol[ampVolnum]);
-    break;
-
-    case 4:
-    device->updateLine(2, splitString(splitString(banks[bank_number].sample5, '/', 1), '.', 0) + " : " + ampVol[ampVolnum]);
-    break;
-
-    case 5:
-    device->updateLine(2, splitString(splitString(banks[bank_number].sample6, '/', 1), '.', 0) + " : " + ampVol[ampVolnum]);
-    break;
-
-    case 6:
-    device->updateLine(2, "MAINAMP : " + String(ampVol[ampVolnum]));
-    break;
-  }
+void setPitch2(byte inputIndex, unsigned int value, int diffToPrevious){
+  float rate = (map(value, 0, 127, 0, 1024) - 512.0) / 512.0;
+  // sampleplaySdWav2.setPlaybackRate(rate);
+  Serial.println(rate);
+  device->updateLine(2, "PITCH 2 : " + String(rate));
 }
 
 void encoderHandler(byte inputIndex, long value){
-  if(sampleplayerOn){
-    switch(sampleplayerState){
-      case 1:
-      sample_number = value;
-      device->updateLine(2, "PLAYER -> " + String(sample_number+1));
-      break;
+  switch(sampleplayerState){
+    case 1:
+    sample_number = value;
+    device->updateLine(1, "PLAYER -> " + String(sample_number+1));
+    break;
 
-      case 2:
-      Serial.print(value);
-      Serial.print(" : ");
-      Serial.println(directoriesList[numDirectory].directory);
-      numDirectory = int(value);
-      device->updateLine(2, directoriesList[numDirectory].directory);
-      break;
+    case 2:
+    Serial.print(value);
+    Serial.print(" : ");
+    Serial.println(directoriesList[numDirectory].directory);
+    numDirectory = int(value);
+    device->updateLine(1, directoriesList[numDirectory].directory);
+    break;
 
-      case 3:
-      Serial.print(value);
-      Serial.print(" : ");
-      Serial.println(directoriesList[numDirectory].files[numFile]);
-      numFile = value;
-      device->updateLine(2, directoriesList[numDirectory].files[numFile]);
-      break;
-    }
-  }else{
-    if(sampleVolCtrl){
-      if(selectingAmp){
-        device->updateEncodeursMaxValue(1, 7);
-        ampVolnum = value;
-      }else{
-        device->updateEncodeursMaxValue(1, 300);
-        ampVol[ampVolnum] = abs(int(value));
-        volumeControl();
-      }
-      printSamplePlayerLine();
-    }else{
-      device->updateEncodeursMaxValue(1, number_banks-1);
-      bank_number = value;
-      device->updateLine(2, "BANK : " + String(banks[bank_number].name));
-    }
+    case 3:
+    Serial.print(value);
+    Serial.print(" : ");
+    Serial.println(directoriesList[numDirectory].files[numFile]);
+    numFile = value;
+    device->updateLine(1, directoriesList[numDirectory].files[numFile]);
+    break;
   }
 }
 
 void simplePressHandler(byte inputIndex){
-  if(sampleplayerOn){
-    switch(sampleplayerState){
-      case 1:
-      device->updateEncodeursValue(1, numDirectory-1);
-      device->updateEncodeursMaxValue(1, numDirectorymax-1);
-      device->updateLine(2, directoriesList[numDirectory].directory);
-      sampleplayerState = 2;
-      break;
+  switch(sampleplayerState){
+    case 1:
+    device->updateEncodeursValue(1, numDirectory-1);
+    device->updateEncodeursMaxValue(1, numDirectorymax-1);
+    device->updateLine(1, directoriesList[numDirectory].directory);
+    sampleplayerState = 2;
+    break;
 
-      case 2:
-      device->updateEncodeursMaxValue(1, directoriesList[numDirectory].numberFile-1);
-      device->updateEncodeursValue(1, numFile);
-      device->updateLine(2, directoriesList[numDirectory].files[numFile]);
-      sampleplayerState = 3;
-      break;
+    case 2:
+    device->updateEncodeursMaxValue(1, directoriesList[numDirectory].numberFile-1);
+    device->updateEncodeursValue(1, numFile);
+    device->updateLine(1, directoriesList[numDirectory].files[numFile]);
+    sampleplayerState = 3;
+    break;
 
-      case 3:
-      device->updateLine(2, directoriesList[numDirectory].files[numFile]);
-      strcpy(editableBank[sample_number], sampleplayerBaseDir);
-      strcat(editableBank[sample_number], directoriesList[numDirectory].directory.c_str());
-      strcat(editableBank[sample_number], "/");
-      strcat(editableBank[sample_number], directoriesList[numDirectory].files[numFile].c_str());
-      Serial.print("SAMPLE : ");
-      Serial.println(editableBank[sample_number]);
-      break;
-    }
-  }else{
-    if(sampleVolCtrl){
-      if(selectingAmp){
-        device->updateEncodeursValue(1, ampVol[ampVolnum]);
-      }else{
-        device->updateEncodeursValue(1, ampVolnum);
-        volumeControl();
-      }
-      selectingAmp = !selectingAmp;
-    }else{
-      sampleVolCtrl = true;
-    }
-    printSamplePlayerLine();
+    case 3:
+    strcpy(editableBank[sample_number], sampleplayerBaseDir);
+    strcat(editableBank[sample_number], directoriesList[numDirectory].directory.c_str());
+    strcat(editableBank[sample_number], "/");
+    strcat(editableBank[sample_number], directoriesList[numDirectory].files[numFile].c_str());
+    Serial.print("SAMPLE : ");
+    Serial.println(editableBank[sample_number]);
+    device->updateLine(1, "SAMPLE CHARGED");
+    device->updateLine(2, String(editableBank[sample_number]));
+    break;
   }
 }
 
 void doublePressHandler(byte inputIndex){
-  if(sampleplayerOn){
-    switch(sampleplayerState){
-      case 1:
-      device->updateEncodeursMaxValue(1, number_sample_per_bank-1);
-      device->updateEncodeursValue(1, sample_number);
-      device->updateLine(2, "PLAYER -> " + String(sample_number));
-      break;
+  switch(sampleplayerState){
+    case 1:
+    device->updateEncodeursMaxValue(1, 1);
+    device->updateEncodeursValue(1, sample_number);
+    device->updateLine(1, "PLAYER -> " + String(sample_number));
+    break;
 
-      case 2:
-      device->updateEncodeursMaxValue(1, number_sample_per_bank-1);
-      device->updateEncodeursValue(1, sample_number);
-      device->updateLine(2, "PLAYER -> " + String(sample_number));
-      sampleplayerState = 1;
-      break;
+    case 2:
+    device->updateEncodeursMaxValue(1, 1);
+    device->updateEncodeursValue(1, sample_number);
+    device->updateLine(1, "PLAYER -> " + String(sample_number));
+    sampleplayerState = 1;
+    break;
 
-      case 3:
-      device->updateEncodeursMaxValue(1, numDirectorymax-1);
-      device->updateEncodeursValue(1, numDirectory);
-      device->updateLine(2, directoriesList[numDirectory].directory);
-      sampleplayerState = 2;
-      break;
-    }
-  }else{
-    sampleVolCtrl = false;
-    selectingAmp = true;
-    device->updateEncodeursValue(1, bank_number);
-    device->updateLine(2, "BANK : " + String(banks[bank_number].name));
+    case 3:
+    device->updateEncodeursMaxValue(1, numDirectorymax-1);
+    device->updateEncodeursValue(1, numDirectory);
+    device->updateLine(1, directoriesList[numDirectory].directory);
+    sampleplayerState = 2;
+    break;
   }
 }
 
 void longPressHandler(byte inputIndex){
-  sampleplayerOn = !sampleplayerOn;
-  if(sampleplayerOn){
-    device->updateLine(2, "SampleplayerEDITmode");
-    sampleplayerState = 1;
-    numFile = 0;
-    numDirectory = 0;
-    device->updateEncodeursMaxValue(1, number_sample_per_bank-1);
-    // sampleplayerStart();
-  }else{
-    // sampleplayerStop();
-    device->updateEncodeursMaxValue(1, number_banks-1);
-    device->updateLine(2, "SampleplayerBANKMmode");
-  }
+
 }
 
 void listDirectories(File dir) {
@@ -358,19 +194,11 @@ void init_banks(){
   samplemix1.gain(0, 0.25);
   samplemix1.gain(1, 0.25);
   samplemix1.gain(2, 0.25);
+  samplemix1.gain(3, 0.25);
   samplemix2.gain(0, 0.25);
   samplemix2.gain(1, 0.25);
   samplemix2.gain(2, 0.25);
-  samplemix3.gain(0, 0.25);
-  samplemix3.gain(1, 0.25);
-
-  amp1.gain(ampVol[0]);
-  amp2.gain(ampVol[1]);
-  amp3.gain(ampVol[2]);
-  amp4.gain(ampVol[3]);
-  amp5.gain(ampVol[4]);
-  amp6.gain(ampVol[5]);
-  amp7.gain(ampVol[6]);
+  samplemix2.gain(3, 0.25);
 
   if (hasSD) {
     // Open file for reading
@@ -390,72 +218,66 @@ void init_banks(){
     }
     numFile = 0;
     numDirectory = 0;
-
-    // Allocate the memory pool on the stack.
-    // Don't forget to change the capacity to match your JSON document.
-    // Use arduinojson.org/assistant to compute the capacity.
-    StaticJsonDocument<8192> jsonBuffer;
-
-    // Parse the root object
-    File file = SD.open(_filename);
-    auto error = deserializeJson(jsonBuffer, file);
-
-    if (error)
-    if(debug) Serial.println(F("Failed to read file, using default configuration"));
-
-    number_banks = jsonBuffer["banks"].size();
-    if(DEBUG){
-      Serial.print("number_banks : ");
-      Serial.println(number_banks);
-    }
-
-    // Copy values from the JsonObject to the Config
-    for(int i=0; i<number_banks; i++){
-      banks[i].name = jsonBuffer["banks"][i]["name"];
-      for(int j=0; j<number_sample_per_bank; j++){
-        switch(j){
-          case 0:
-          banks[i].sample1 = jsonBuffer["banks"][i]["value"][j];
-          break;
-          case 1:
-          banks[i].sample2 = jsonBuffer["banks"][i]["value"][j];
-          break;
-          case 2:
-          banks[i].sample3 = jsonBuffer["banks"][i]["value"][j];
-          break;
-          case 3:
-          banks[i].sample4 = jsonBuffer["banks"][i]["value"][j];
-          break;
-          case 4:
-          banks[i].sample5 = jsonBuffer["banks"][i]["value"][j];
-          break;
-          case 5:
-          banks[i].sample6 = jsonBuffer["banks"][i]["value"][j];
-          break;
-        }
-      }
-    }
-    // Close the file (File's destructor doesn't close the file)
-    file.close();
   }
   return;
 }
 
-void setSamplePlayerHandlers(){
-  for(byte i = 0; i < 6; i++){
-    device->setHandleTrigger(i, sampleplay);
+void sampleMuxHandler(byte inputIndex, unsigned int valparam, int diffToPrevious){
+  switch(inputIndex){
+    case SLIDE10:
+    device->updateLine(2, "FREQ -> " + String(((float)valparam/127.0)*1000.0));
+    samplefilter2.frequency(((float)valparam/127.0)*1000.0);
+    samplefilter1.frequency(((float)valparam/127.0)*1000.0);
+    break;
+
+    case POT5:
+    device->updateLine(2, "RES -> " + String(((float)valparam/127.0)*5.0));
+    samplefilter2.resonance(((float)valparam/127.0)*5.0);
+    samplefilter1.resonance(((float)valparam/127.0)*5.0);
+    break;
   }
+}
+
+// void activeHP(byte inputeIndex, bool value){
+//   if(value){
+//     sgtl5000_1.adcHighPassFilterDisable();
+//     device->updateLine(2, "HP OFF");
+//   }else{
+//     sgtl5000_1.adcHighPassFilterEnable();
+//     device->updateLine(2, "HP ON");
+//   }
+// }
+
+void setSamplePlayerHandlers(){
+  device->setHandleTrigger(0, sampleplay);
+  device->setHandleTrigger(1, sampleplay);
+
   device->setHandlePress(1, simplePressHandler);
   device->setHandleDoublePress(1, doublePressHandler);
   device->setHandleLongPress(1, longPressHandler);
   device->setHandleEncoderChange(1, encoderHandler);
+  device->setHandleMuxControlChange(SLIDE1, setPitch1);
+  device->setHandleMuxControlChange(POT1, setPitch1);
+  device->setHandleMuxControlChange(SLIDE2, setPitch2);
+  device->setHandleMuxControlChange(SLIDE10, sampleMuxHandler);
+  device->setHandleMuxControlChange(POT5, sampleMuxHandler);
+
+  // device->setHandleSwitchChange(0, activeHP);
+
+  sampleplaySdWav1.begin();
+  sampleplaySdWav1.setPlaybackRate(0.5);
+  sampleplaySdWav1.setLoopType(looptype_none);
+  sampleplaySdWav1.enableInterpolation(true);
+  // sampleplaySdWav2.begin();
+  // sampleplaySdWav2.setPlaybackRate(0.5);
+  // sampleplaySdWav2.setLoopType(looptype_none);
+  // sampleplaySdWav2.enableInterpolation(true);
 }
 
-void initSamplePlayer(){
+void setup_sampleplayer(){
   init_banks();
   setSamplePlayerHandlers();
   volumeControl();
 }
-
 
 #endif

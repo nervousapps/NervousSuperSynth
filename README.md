@@ -1,5 +1,5 @@
 # NervousSuperSynth
-Synthesizer and sampler built around Teensy 3.5/3.6.
+Synthesizer and sampler built around Teensy 3.5/3.6 and adapted to 4.1.
 
 It is mainly a development platform using almost all the ports on Teensy.
 
